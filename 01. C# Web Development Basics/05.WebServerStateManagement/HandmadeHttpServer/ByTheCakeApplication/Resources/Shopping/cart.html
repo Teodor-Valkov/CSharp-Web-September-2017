@@ -1,0 +1,26 @@
+﻿<h1 style="margin: 10px">Your Cart</h1>
+
+<div style="margin: 10px">
+    <a href="/" style="margin-right: 10px;">Back to home</a>
+    <a href="/search">Search more cakes</a>
+</div>
+
+<br />
+
+<div style="margin: 10px">
+    {{{cartProducts}}}
+</div>
+
+<br />
+
+<hr />
+
+<p style="margin:10px">Total Cost: ${{{totalCost}}}</p>
+
+<hr />
+
+<form style="margin: 10px" method="post" action="/shopping/finish-order">
+    <input type="submit" value="Finish Order" />
+</form>
+
+<br />

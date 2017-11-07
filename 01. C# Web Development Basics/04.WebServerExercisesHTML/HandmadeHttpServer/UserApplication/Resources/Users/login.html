@@ -1,0 +1,26 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
+    <div>
+        <form method="post">
+            <div>
+                <label for="username">Username: </label>
+                <input type="text" id="username" name="username" placeholder="Username" autofocus />
+            </div>
+            <div>
+                <label for="password">Password: </label>
+                <input type="password" id="password" name="password" placeholder="Password" />
+            </div>
+            <div>
+                <input type="submit" value="Login">
+            </div>
+        </form>
+        <div style="display: {{{display}}}">
+            <p style="color: red">{{{error}}}</p>
+        </div>
+    </div>
+</body>
+</html>

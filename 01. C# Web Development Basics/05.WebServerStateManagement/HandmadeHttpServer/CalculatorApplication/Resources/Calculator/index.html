@@ -1,0 +1,21 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Calculator</title>
+</head>
+<body>
+    <div style="margin: 10px;">
+        <form class="calculator" method="post">
+            <div>
+                <input type="number" name="firstNumber" placeholder="Enter first number" autofocus>
+                <input type="text" name="mathOperator" placeholder="Enter math operator">
+                <input type="number" name="secondNumber" placeholder="Enter second number">
+                <button type="submit">Calculate</button>
+            </div>
+            <div style="display: {{{display}}}">
+                <p>{{{content}}}</p>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

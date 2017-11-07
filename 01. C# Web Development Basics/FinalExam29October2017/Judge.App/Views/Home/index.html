@@ -1,0 +1,30 @@
+﻿<main>
+    <div class="row">
+        <div class="container text-center">
+            <br />
+            <br />
+            <div class="container-fluid" style="display: {{{anonymousDisplay}}}">
+                <div class="jumbotron">
+                    <h1 class="display-3">Hello, Guest!</h1>
+                    <p class="lead">Please log int to our system in order to use it.</p>
+                    <hr />
+                    <p>
+                        If you don't have a registration yet, you can register <a href="/users/register">here</a>
+                    </p>
+                    <a class="btn btn-primary btn-lg" href="/users/login" role="button">Login</a>
+                </div>
+            </div>
+
+            <div class="container-fluid" style="display: {{{authenticatedDisplay}}}">
+                <div class="jumbotron">
+                    <h1 class="display-3">Hello, {{{name}}}!</h1>
+                    <p class="lead">You can view all contests or review your submissions.</p>
+                    <p>
+                        <a class="btn btn-primary btn-lg" href="/contests/all" role="button">Contests</a>
+                        <a class="btn btn-primary btn-lg" href="/submissions/all" role="button">Submissions</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

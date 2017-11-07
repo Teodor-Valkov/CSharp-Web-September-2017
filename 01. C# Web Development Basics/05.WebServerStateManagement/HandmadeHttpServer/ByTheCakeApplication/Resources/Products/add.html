@@ -1,0 +1,32 @@
+﻿<h1 style="margin: 10px">Add new product</h1>
+
+<div style="margin: 10px;">
+    <a href="/">Back to home</a>
+</div>
+
+<form style="margin: 10px;" method="post">
+    Name:
+    <input type="text" name="name" placeholder="Name" />
+    <br />
+    Price:
+    <input type="number" min="0" name="price" step="0.01" placeholder="Price" />
+    <br />
+    Image URL:
+    <input type="url" name="imageUrl" placeholder="Image URL" />
+    <br />
+    <div style="margin-top: 10px;">
+        <input type="submit" value="Add product" />
+    </div>
+</form>
+
+<br />
+
+<div style="display: {{{displayError}}}; color: red;">
+    {{{error}}}
+</div>
+
+<div style="display: {{{displayResult}}};">
+    <p>Name: {{{name}}}</p>
+    <p>Price: {{{price}}}</p>
+    <img src="{{{imageUrl}}}" alt="{{{name}}}" width="400" />
+</div> 

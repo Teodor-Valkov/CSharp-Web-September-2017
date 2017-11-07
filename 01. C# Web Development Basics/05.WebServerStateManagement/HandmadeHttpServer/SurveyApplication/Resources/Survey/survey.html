@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Survey</title>
+    <style>
+        div, h1 {
+            margin: 10px;
+        }
+
+            div p {
+                margin-left: 130px;
+                font-size: 12px;
+            }
+
+        button {
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .firstButton {
+            background-color: whitesmoke;
+            margin-left: 140px;
+        }
+
+        .secondButton {
+            background-color: cornflowerblue;
+        }
+
+        .field {
+            border-radius: 5px;
+            border: solid black 1px;
+            padding: 5px;
+            width: 500px;
+        }
+
+        .firstName {
+            margin-left: 70px;
+        }
+
+        .secondName {
+            margin-left: 50px;
+        }
+
+        .birthdate {
+            margin-left: 80px;
+        }
+
+        .gender {
+            display: flex;
+            margin-left: 90px;
+            justify-content: space-between;
+            width: 400px;
+        }
+
+        .status {
+            margin-left: 100px;
+        }
+
+        .recommendations {
+            margin-left: 20px;
+        }
+
+        .possession {
+            display: flex;
+            margin-left: 90px;
+            justify-content: space-between;
+            width: 500px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+<body>
+    <div>
+        <h1>Survey</h1>
+    </div><hr />
+    <form method="post">
+        <div class="firstName">
+            <label for="firstName">First Name:</label>
+            <input class="field" type="text" id="firstName" placeholder="First Name" name="firstName">
+        </div>
+        <div class="secondName">
+            <label for="secondName">Second Name:</label>
+            <input class="field" type="text" id="secondName" placeholder="Second Name" name="secondName">
+        </div>
+        <div class="birthdate">
+            <label for="birthdate">Birthdate:</label>
+            <input class="field" type="date" id="birthdate" name="birthdate">
+        </div>
+        <div class="gender">
+            <label for="gender">Gender:</label>
+            <input type="radio" name="gender" value="Male" checked>Male<br>
+            <input type="radio" name="gender" value="Female">Female<br>
+            <input type="radio" name="gender" value="Do not want to answer">Do not want to answer
+        </div>
+        <div class="status">
+            <label for="status">Status:</label>
+            <select class="field" name="status">
+                <option value="Student">Student</option>
+                <option value="Part Time">Part-time Employee</option>
+                <option value="Full Time">Full-time Employee</option>
+                <option value="Unemployed">Unemployed</option>
+                <option value="Do not want to answer">Do not want to answer</option>
+            </select>
+        </div>
+        <div class="recommendations">
+            <label for="recommendations">Recommendations:</label>
+            <textarea class="field" name="recommendations" id="recommendations" cols="30" rows="10"></textarea>
+            <div>
+                <p>Please tell us what are your recommendations for us and how to improve our product.</p>
+            </div>
+        </div>
+        <div class="possession">
+            <label for="possession">You own:</label>
+            <input type="checkbox" id="possession" name="laptop">Laptop<br>
+            <input type="checkbox" id="possession" name="smartPhone">Smart Phone<br>
+            <input type="checkbox" id="possession" name="mobilePhone">Mobile Phone<br>
+            <input type="checkbox" id="possession" name="car">Car<br>
+            <input type="checkbox" id="possession" name="bike">Bike<br>
+        </div>
+        <div>
+            <button class="firstButton" type="reset">Reset all fields</button>
+            <button class="secondButton" type="submit">Send survey</button>
+        </div>
+    </form>
+</body>
+</html>
