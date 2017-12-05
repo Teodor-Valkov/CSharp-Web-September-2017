@@ -1,0 +1,34 @@
+﻿@model CarsByMakeViewModel
+@{
+    ViewData["Title"] = $"{Model.Make} Cars";
+    int count = 1;
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<a href="/cars/all" class="btn btn-default">Back to All Cars</a>
+
+<br />
+<br />
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Car No.</th>
+            <th>Make</th>
+            <th>Model</th>
+            <th>Travelled Distance</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var car in Model.Cars)
+        {
+            <tr>
+                <td><a href="/cars/details/@car.Id">@(count++)</a></td>
+                <td>@car.Make</td>
+                <td>@car.Model</td>
+                <td>@car.TravelledDistance KM</td>
+            </tr>
+        }
+    </tbody>
+</table>

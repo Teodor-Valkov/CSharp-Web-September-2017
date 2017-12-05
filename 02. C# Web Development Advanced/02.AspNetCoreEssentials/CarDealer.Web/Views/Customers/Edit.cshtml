@@ -1,0 +1,17 @@
+﻿@model CustomerFormModel
+
+@{
+    ViewData["Title"] = "Edit Customer";
+}
+
+<div class="row">
+    <div class="col-md-offset-2 col-md-8">
+        <h2>@ViewData["Title"]</h2>
+        <a href="/customers/all/ascending" class="btn btn-default">Back</a>
+
+        <br />
+        <br />
+
+        @Html.Partial("_CustomerForm", Model)
+    </div>
+</div>

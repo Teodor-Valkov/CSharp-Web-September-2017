@@ -1,0 +1,77 @@
+﻿@model SalesPageListViewModel
+
+@{
+    ViewData["Title"] = "All Sales With Discounts";
+}
+
+<div class="row">
+    <div class="col-md-offset-1 col-md-10">
+        <h2>@ViewData["Title"]</h2>
+
+        <a class="btn btn-default" href="/home/index">Back to Home</a>
+        <a class="btn btn-primary" href="/sales/create">Add Sale</a>
+
+        <br />
+        <br />
+
+        <div class="row">
+            <div class="col-md-4">
+                <form action="/sales/discounted" method="get">
+                    <label for="discount">Discount</label>
+                    <div class="input-group">
+                        <input class="form-control" id="discount" name="discount" value="@Model.Discount" placeholder="Discount" />
+                        <span class="input-group-btn">
+                            <input class="btn btn-primary" type="submit" value="Filter" />
+                        </span>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <br />
+
+        <p>* Filter sales with given discount in range of 0-100%</p>
+
+        @if (!Model.Sales.Any())
+        {
+            <h2>No sales found.</h2>
+        }
+        else
+        {
+            string actionLink = Model.Discount == null
+             ? $"/sales/discounted?"
+             : $"/sales/discounted?discount={Model.Discount}&";
+
+            @Html.Partial("_Pagination", new PaginationViewModel { ActionLink = actionLink, CurrentPage = Model.CurrentPage, PreviousPage = Model.PreviousPage, NextPage = Model.NextPage, TotalPages = Model.TotalPages })
+
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>Customer Name</th>
+                        <th>Price</th>
+                        <th>Discount</th>
+                        <th>Price With Discount</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var sale in Model.Sales)
+                {
+                    string discount = sale.IsYountDriver
+                      ? $"{(sale.Discount * 100).ToPercentage()} + ({((double)5).ToPercentage()})"
+                      : (sale.Discount * 100).ToPercentage();
+
+                        <tr>
+                            <td>@sale.CustomerName</td>
+                            <td>@sale.Price.ToPrice()</td>
+                            <td>@discount</td>
+                            <td>@sale.PriceWithDiscount.ToPrice()</td>
+                            <td><a class="btn btn-primary" href="/sales/@sale.Id">More Details</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            @Html.Partial("_Pagination", new PaginationViewModel { ActionLink = actionLink, CurrentPage = Model.CurrentPage, PreviousPage = Model.PreviousPage, NextPage = Model.NextPage, TotalPages = Model.TotalPages })
+        }
+    </div>
+</div>

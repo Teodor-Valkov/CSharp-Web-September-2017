@@ -1,0 +1,106 @@
+﻿@model UserDetailsServiceModel
+
+@{
+    ViewData["Title"] = "Profile Details";
+}
+
+@{
+    Layout = "_ProfileLayout";
+    string lastLoginTime = Model.LastLoginTime == DateTime.MinValue
+          ? "First log in"
+          : Model.LastLoginTime.ToString();
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-offset-1 col-md-10">
+            <h2>@ViewData["Title"]</h2>
+            <p>Last login: @lastLoginTime</p>
+            <br />
+
+            @if (User.Identity.IsAuthenticated && Model.Username == User.Identity.Name)
+            {
+                <div>
+                    <a class="btn btn-warning" href="/users/edit?username=@User.Identity.Name">Edit Profile</a>
+                </div>
+                <br />
+            }
+
+            <table class="table table-bordered user-details-table-headings-box">
+                <tr>
+                    <th>Username:</th>
+                    <td>@Model.Username</td>
+                </tr>
+                <tr>
+                    <th>Email:</th>
+                    <td>@Model.Email</td>
+                </tr>
+                <tr>
+                    <th>Phone:</th>
+                    <td>@Model.Phone</td>
+                </tr>
+                <tr>
+                    <th>Cameras:</th>
+                    <td>@Model.Cameras</td>
+                </tr>
+            </table>
+
+            <br />
+
+            <h3>Cameras:</h3>
+
+            @if (!Model.CamerasOwned.Any())
+            {
+                <h3>The user is not selling any cameras. Go to <a href="/home/index">Home Page </a>to find more offers of other users.</h3>
+            }
+            else
+            {
+                <table class="table table-bordered table-responsive">
+                    <thead>
+                        <tr>
+                            <th width="300px">Image</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var camera in Model.CamerasOwned)
+                        {
+                            string color = camera.Status == "IN STOCK" ? "text-success" : "text-danger";
+
+                            <tr>
+                                <td>
+                                    <div class="text-center">
+                                        <img class="camera-list-image" src="@camera.ImageUrl" alt="camera-image" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <table class="table table-responsive">
+                                        <tr>
+                                            <td>@camera.Make @camera.Model</td>
+                                        </tr>
+                                        <tr>
+                                            <td>@camera.Price.ToPrice()</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="@color">@camera.Status</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <a class="btn btn-primary" href="/cameras/details/@camera.Id">Details</a>
+                                                @if (User.Identity.Name == Model.Username)
+                                                {
+                                                    <a class="btn btn-warning" href="/cameras/Edit/@camera.Id">Edit</a>
+                                                    <a class="btn btn-danger" href="/cameras/Delete/@camera.Id">Delete</a>
+                                                }
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>

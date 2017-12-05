@@ -1,0 +1,52 @@
+﻿@model PartsPageListViewModel
+
+@{
+    ViewData["Title"] = "All Parts";
+}
+
+<div class="row">
+    <div class="col-md-offset-1 col-md-10">
+        <h2>@ViewData["Title"]</h2>
+
+        <a href="/home/index" class="btn btn-default">Back to Home</a>
+        <a class="btn btn-primary" href="/parts/create">Add Part</a>
+        <br />
+        @if (!Model.Parts.Any())
+        {
+            <h2>No parts found.</h2>
+        }
+        else
+        {
+            @Html.Partial("_Pagination", new PaginationViewModel { ActionLink = "/parts/all?", CurrentPage = Model.CurrentPage, PreviousPage = Model.PreviousPage, NextPage = Model.NextPage, TotalPages = Model.TotalPages })
+
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Supplier</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var part in Model.Parts)
+                    {
+                        <tr>
+                            <td>@part.Name</td>
+                            <td>@part.Price.ToPrice()</td>
+                            <td>@part.Quantity</td>
+                            <td>@part.SupplierName</td>
+                            <td>
+                                <a class="btn btn-warning" href="/parts/edit/@part.Id">Edit</a>
+                                <a class="btn btn-danger" href="/parts/delete/@part.Id">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            @Html.Partial("_Pagination", new PaginationViewModel { ActionLink = "/parts/all?", CurrentPage = Model.CurrentPage, PreviousPage = Model.PreviousPage, NextPage = Model.NextPage, TotalPages = Model.TotalPages })
+        }
+    </div>
+</div>

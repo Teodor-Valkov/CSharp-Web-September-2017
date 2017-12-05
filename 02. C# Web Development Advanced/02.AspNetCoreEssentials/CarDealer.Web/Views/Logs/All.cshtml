@@ -1,0 +1,68 @@
+﻿@model LogsPageListViewModel
+
+@{
+    ViewData["Title"] = "All Logs";
+}
+
+<div class="row">
+    <div class="col-md-offset-1 col-md-10">
+        <h2>@ViewData["Title"]</h2>
+
+        <a href="/home/index" class="btn btn-default">Back to Home</a>
+        <br />
+        <br />
+
+        <div class="row">
+            <div class="col-md-4">
+                <form method="get">
+                    <div class="input-group">
+                        <input class="form-control" name="username" type="text" placeholder="Username" value="@Model.Username" />
+                        <span class="input-group-btn">
+                            <input class="btn btn-primary" type="submit" value="Search Logs" />
+                        </span>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-offset-4 col-md-4">
+                <a class="btn btn-warning" href="/logs/clear">Clear Logs</a>
+            </div>
+        </div>
+
+        <br />
+
+        @if (!Model.Logs.Any())
+        {
+            <h2>No logs found.</h2>
+        }
+        else
+        {
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Operation</th>
+                        <th>Modified Table</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var log in Model.Logs)
+                    {
+                        <tr>
+                            <td>@log.UserName</td>
+                            <td>@log.Operation</td>
+                            <td>@log.ModifiedTable</td>
+                            <td>@log.ModifiedOn</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            string actionLink = string.IsNullOrWhiteSpace(Model.Username)
+                ? $"/logs/all?"
+                : $"/logs/all?username={Model.Username}&";
+
+            @Html.Partial("_Pagination", new PaginationViewModel { ActionLink = actionLink, CurrentPage = Model.CurrentPage, PreviousPage = Model.PreviousPage, NextPage = Model.NextPage, TotalPages = Model.TotalPages })
+        }
+    </div>
+</div>

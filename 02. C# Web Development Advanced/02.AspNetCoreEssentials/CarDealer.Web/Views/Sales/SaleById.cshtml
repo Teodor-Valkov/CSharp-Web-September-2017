@@ -1,0 +1,49 @@
+﻿@model SaleDetailsServiceModel
+
+@{
+    ViewData["Title"] = $"Sale Details";
+}
+
+@{
+    string discount = Model.IsYountDriver
+        ? $"{(Model.Discount * 100).ToPercentage()} + ({((double)5).ToPercentage()})"
+        : (Model.Discount * 100).ToPercentage();
+}
+
+<div class="row">
+    <div class="col-md-offset-1 col-md-10">
+        <h2>@ViewData["Title"]</h2>
+
+        <a class="btn btn-default" href="/sales/all">Back to All Sales</a>
+
+        <br />
+        <br />
+
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Car</th>
+                    <th>Customer Name</th>
+                    <th>Price</th>
+                    <th>Discount</th>
+                    <th>Price With Discount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <ul>
+                            <li>Make: @Model.Car.Make</li>
+                            <li>Model: @Model.Car.Model</li>
+                            <li>Travelled Distance: @Model.Car.TravelledDistance</li>
+                        </ul>
+                    </td>
+                    <td>@Model.CustomerName</td>
+                    <td>@Model.Price.ToPrice()</td>
+                    <td>@discount</td>
+                    <td>@Model.PriceWithDiscount.ToPrice()</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

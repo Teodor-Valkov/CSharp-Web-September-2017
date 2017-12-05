@@ -1,0 +1,78 @@
+﻿@model CameraPageListViewModel
+
+@{
+    ViewData["Title"] = "All Cameras";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-offset-1 col-md-10">
+            <h2>@ViewData["Title"]</h2>
+
+            <div>
+                <a class="btn btn-default" href="/cameras/create">Add Camera</a>
+            </div>
+
+            <br />
+
+            @if (!Model.Cameras.Any())
+            {
+                <h2>No Cameras Found.</h2>
+            }
+            else
+            {
+                <table class="table table-bordered table-responsive">
+                    <thead>
+                        <tr>
+                            <th class="camera-list-table-image-box">Image</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var camera in Model.Cameras)
+                        {
+                            string color = camera.Status == "IN STOCK" ? "text-success" : "text-danger";
+
+                            <tr>
+                                <td>
+                                    <div class="text-center">
+                                        <img class="camera-list-image" src="@camera.ImageUrl" alt="camera-image" />
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <table class="table table-responsive">
+                                        <tr>
+                                            <th>Make:</th>
+                                            <td>@camera.Make</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Model:</th>
+                                            <td>@camera.Model</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Price:</th>
+                                            <td>@camera.Price.ToPrice()</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Price:</th>
+                                            <td class="@color">@camera.Status</td>
+                                        </tr>
+                                        <tr>
+                                            <th></th>
+                                            <td>
+                                                <a class="btn btn-primary" href="/cameras/details/@camera.Id">More Details</a>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                @Html.Partial("_Pagination", new PaginationViewModel { ActionLink = "/cameras/all?", CurrentPage = Model.CurrentPage, PreviousPage = Model.PreviousPage, NextPage = Model.NextPage, TotalPages = Model.TotalPages })
+            }
+        </div>
+    </div>
+</div>

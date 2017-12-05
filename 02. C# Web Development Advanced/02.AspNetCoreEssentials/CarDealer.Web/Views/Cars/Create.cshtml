@@ -1,0 +1,16 @@
+﻿@model CarFormModel
+@{
+    ViewData["Title"] = "Add Car";
+}
+
+<div class="row">
+    <div class="col-md-offset-2 col-md-8">
+        <h2>@ViewData["Title"]</h2>
+        <a href="/cars" class="btn btn-default">Back</a>
+
+        <br />
+        <br />
+
+        @Html.Partial("_CarForm", Model)
+    </div>
+</div>

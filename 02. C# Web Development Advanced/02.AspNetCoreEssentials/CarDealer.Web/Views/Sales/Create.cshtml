@@ -1,0 +1,36 @@
+﻿@model SaleFormModel
+
+@{
+    ViewData["Title"] = "Add Sale";
+}
+
+<div class="row">
+    <div class="col-md-offset-2 col-md-8">
+        <h2>@ViewData["Title"]</h2>
+        <a href="/sales/all" class="btn btn-default">Back to All Sales</a>
+
+        <br />
+        <br />
+
+        <form action="/sales/review" method="post">
+            <div class="form-group">
+                <label asp-for="CustomerId"></label>
+                <select class="form-control" asp-for="CustomerId" asp-items="Model.AllCustomers"></select>
+                <span class="form-text text-danger" asp-validation-for="CustomerId"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CarId"></label>
+                <select class="form-control" asp-for="CarId" asp-items="Model.AllCars"></select>
+                <span class="form-text text-danger" asp-validation-for="CarId"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Discount"></label>
+                <select class="form-control" asp-for="Discount" asp-items="Model.AllDiscounts"></select>
+                <span class="form-text text-danger" asp-validation-for="Discount"></span>
+            </div>
+            <div>
+                <input class="btn btn-success" type="submit" />
+            </div>
+        </form>
+    </div>
+</div>

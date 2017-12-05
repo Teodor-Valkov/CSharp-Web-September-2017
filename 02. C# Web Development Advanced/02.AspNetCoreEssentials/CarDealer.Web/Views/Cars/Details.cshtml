@@ -1,0 +1,36 @@
+﻿@model CarWithPartsServiceModel
+@{
+    ViewData["Title"] = "Car Details";
+}
+<h2>@ViewData["Title"]</h2>
+
+<a href="/cars/all" class="btn btn-default">Back to All Cars</a>
+
+<br />
+<br />
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th class="text-center">Make</th>
+            <th class="text-center">Model</th>
+            <th class="text-center">Travelled Distance</th>
+            <th class="text-center">Parts</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Model.Make</td>
+            <td>@Model.Model</td>
+            <td>@Model.TravelledDistance KM</td>
+            <td>
+                <ul>
+                    @foreach (var part in Model.Parts)
+                    {
+                        <li>@part.Name - $@part.Price.ToString("F2")</li>
+                    }
+                </ul>
+            </td>
+        </tr>
+    </tbody>
+</table>

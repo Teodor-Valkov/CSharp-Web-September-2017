@@ -1,0 +1,69 @@
+﻿@model UserPageListViewModel
+@{
+    ViewData["Title"] = "All Users";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-offset-1 col-md-10">
+            <h2>@ViewData["Title"]</h2>
+
+            <div>
+                <a class="btn btn-default" href="/identity/create">Add User</a>
+            </div>
+
+            <br />
+
+            @if (!Model.Users.Any())
+            {
+                <h2>No Users Found.</h2>
+            }
+            else
+            {
+                <table class="table table-bordered table-responsive">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Username</th>
+                            <th class="text-center">Email</th>
+                            <th class="text-center">User Status</th>
+                            <th class="text-center">User Roles</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model.Users)
+                        {
+                            <tr class="text-center">
+                                <td>@user.Username</td>
+                                <td>@user.Email</td>
+                                <td>
+                                    @if (user.CanUserCreateCameras)
+                                    {
+                                        <a class="btn btn-danger" href="/identity/changeuserpermission/@user.Id">Forbid Create Cameras</a>
+                                    }
+                                    else
+                                    {
+                                        <a class="btn btn-success" href="/identity/changeuserpermission/@user.Id">Permit Create Cameras</a>
+                                    }
+                                <td>
+                                    <a class="btn btn-primary" href="/identity/roles/@user.Id">Details</a>
+                                </td>
+                                <td>
+                                    <a class="btn btn-warning" href="/identity/edit/@user.Id">Edit</a>
+                                    @Html.ActionLink("Delete", "delete", "identity", new { id = user.Id },
+                                        new
+                                        {
+                                            @class = "btn btn-danger",
+                                            onclick = $"return confirm('Are you sure you want to delete {user.Username}?');"
+                                        })
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                @Html.Partial("_Pagination", new PaginationViewModel { ActionLink = "/identity/all?", CurrentPage = Model.CurrentPage, PreviousPage = Model.PreviousPage, NextPage = Model.NextPage, TotalPages = Model.TotalPages })
+            }
+        </div>
+    </div>
+</div>

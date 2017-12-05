@@ -1,0 +1,62 @@
+﻿@model SaleReviewFormModel
+@{
+    ViewData["Title"] = "Review Sale";
+}
+
+@{
+    string discount = Model.IsYoungDriver
+                     ? $"{Model.Discount.ToPercentage()} + ({((double)5).ToPercentage()})"
+                     : Model.Discount.ToPercentage();
+}
+
+<div class="row">
+    <div class="col-md-offset-2 col-md-8">
+        <h2>@ViewData["Title"]</h2>
+        <a href="/sales/all" class="btn btn-default">Back to All Sales</a>
+
+        <br />
+        <br />
+
+        <form action="/sales/finalize" method="post">
+            <div class="form-group">
+                <input class="form-control" type="hidden" asp-for="CustomerId" />
+            </div>
+            <div class="form-group">
+                <label asp-for="CustomerName"></label>
+                <input class="form-control" readonly asp-for="CustomerName" />
+                <span class="form-text text-danger" asp-validation-for="CustomerName"></span>
+            </div>
+            <div class="form-group">
+                <input class="form-control" type="hidden" asp-for="CarId">
+            </div>
+            <div class="form-group">
+                <label asp-for="CarMake"></label>
+                <input class="form-control" readonly asp-for="CarMake" />
+                <span class="form-text text-danger" asp-validation-for="CarMake"></span>
+            </div>
+            <div class="form-group">
+                <input class="form-control" type="hidden" asp-for="Discount">
+            </div>
+            <div class="form-group">
+                <label asp-for="Discount"></label>
+                <input class="form-control" readonly asp-for="Discount" value="@discount" />
+                <span class="form-text text-danger" asp-validation-for="Discount"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CarPrice"></label>
+                <input class="form-control" readonly asp-for="CarPrice" />
+                <span class="form-text text-danger" asp-validation-for="CarPrice"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FinalCarPrice"></label>
+                <input class="form-control" readonly asp-for="FinalCarPrice" />
+                <span class="form-text text-danger" asp-validation-for="FinalCarPrice"></span>
+            </div>
+
+            <div class="text-center">
+                <a class="btn btn-default btn-lg" href="/sales/create">Cancel</a>
+                <input class="btn btn-success btn-lg" type="submit" value="Finalize" />
+            </div>
+        </form>
+    </div>
+</div>

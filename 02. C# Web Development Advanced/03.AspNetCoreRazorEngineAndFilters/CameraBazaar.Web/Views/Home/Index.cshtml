@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="jumbotron">
+            <div class="text-center home-text">
+                <div>
+                    <h1>Welcome to the Camera Bazaar!</h1>
+                </div>
+
+                <div>
+                    <a class="btn btn-default btn-lg" href="/cameras/all">Cameras</a>
+                    @if (this.User.Identity.IsAuthenticated && this.User.IsInRole(GlobalConstants.AdminName))
+                    {
+                        <a class="btn btn-default btn-lg" href="/identity/all">Users</a>
+                    }
+                </div>
+
+                <br />
+                <br />
+
+                <div>
+                    <img src="~/images/cameras.jpg" alt="camera-bazaar-photo" width="1000" height="600" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,32 @@
+﻿@model CustomerWithSalesServiceModel
+
+@{
+    ViewData["Title"] = $"{Model.Name}";
+}
+
+<div class="row">
+    <div class="col-md-offset-1 col-md-10">
+        <h2>@ViewData["Title"]</h2>
+
+        @{
+            int totalBoughtCars = Model.BoughtCars.Count();
+        }
+
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Bought Cars</th>
+                    <th>Money Spent</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>@Model.Name</td>
+                    <td>@totalBoughtCars @(totalBoughtCars == 1 ? "Car" : "Cars") Bought</td>
+                    <td>@Model.MoneySpent.ToString("F2")</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

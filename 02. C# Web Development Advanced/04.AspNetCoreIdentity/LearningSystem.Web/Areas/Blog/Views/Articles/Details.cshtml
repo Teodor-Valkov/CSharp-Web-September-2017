@@ -1,0 +1,28 @@
+﻿@model ArticleDetailsServiceModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<div class="row">
+    <div class="col-md-offset-1 col-md-10">
+        <br />
+
+        <div>
+            <a class="btn btn-default" asp-action="Index">Back To All Articles</a>
+        </div>
+
+        <div class="text-center">
+            <h1>@Model.Title</h1>
+        </div>
+        <br />
+        <div class="text-justify">
+            <p>@Html.Raw(Model.Content)</p>
+        </div>
+        <br />
+        <div class="text-right">
+            <p><em>Published on: @Model.PublishDate.ToShortDateString()</em></p>
+            <p><em>Created by: @Model.Author</em></p>
+        </div>
+    </div>
+</div>

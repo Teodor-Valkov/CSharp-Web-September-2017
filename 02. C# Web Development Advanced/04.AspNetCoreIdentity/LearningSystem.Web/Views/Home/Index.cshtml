@@ -1,0 +1,60 @@
+﻿@model HomeIndexViewModel
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="jumbotron">
+    <div class="text-center">
+
+        <div class="col-md-12">
+            <form action="Search">
+                <div class="col-md-8">
+                    <input asp-for="SearchToken" placeholder="Search" class="form-control" />
+                </div>
+                <div class="col-md-1">
+                    <input asp-for="SearchInUsers" />
+                    <label asp-for="SearchInUsers"></label>
+                </div>
+                <div class="col-md-1">
+                    <input asp-for="SearchInCourses" />
+                    <label asp-for="SearchInCourses"></label>
+                </div>
+                <div class="col-md-1">
+                    <input asp-for="SearchInArticles" />
+                    <label asp-for="SearchInArticles"></label>
+                </div>
+                <div class="col-md-1">
+                    <input type="submit" class="btn btn-default" value="Search" />
+                </div>
+            </form>
+        </div>
+
+        <div class="home-text">
+            <div>
+                <h1>Welcome to the Learning System!</h1>
+            </div>
+
+            <div>
+                @if (User.Identity.IsAuthenticated && User.IsInRole(CommonConstants.AdministratorRole))
+                {
+                    <a class="btn btn-default btn-lg" asp-area="Admin" asp-controller="Users" asp-action="Index">Users</a>
+                }
+                @if (User.Identity.IsAuthenticated && User.IsInRole(CommonConstants.TrainerRole))
+                {
+                    <a class="btn btn-default btn-lg" asp-area="Trainer" asp-controller="Trainer" asp-action="Index">Trainer</a>
+                }
+                <a class="btn btn-default btn-lg" asp-area="" asp-controller="Courses" asp-action="Index">Courses</a>
+
+                <a class="btn btn-default btn-lg" asp-area="Blog" asp-controller="Articles" asp-action="Index">Blog</a>
+            </div>
+
+            <br />
+            <br />
+
+            <div>
+                <img src="~/images/system.jpg" alt="learning-system-photo" width="1000" height="600" />
+            </div>
+        </div>
+    </div>
+</div>

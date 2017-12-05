@@ -1,0 +1,67 @@
+﻿@model PagesViewModel<ArticleBasicServiceModel>
+
+@{
+    ViewData["Title"] = "All Articles";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (User.IsInRole(CommonConstants.BlogAuthorRole))
+{
+    <div>
+        <a class="btn btn-default" asp-action="Create">Add Article</a>
+    </div>
+    <br />
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <form>
+            <label asp-for="SearchToken"></label>
+            <div class="input-group">
+                <input class="form-control" asp-for="@Model.SearchToken" />
+                <span class="input-group-btn">
+                    <input class="btn btn-primary" type="submit" value="Search" />
+                </span>
+            </div>
+        </form>
+    </div>
+</div>
+<br />
+
+@if (!Model.Elements.Any())
+{
+    <h2>No Articles Found.</h2>
+}
+else
+{
+    <div class="row">
+        @foreach (var article in Model.Elements)
+        {
+            <div class="col-sm-4">
+                <div class="card">
+                    <div class="card-block">
+                        <h3 class="card-title">@article.Title</h3>
+                        <p class="card-text text-justify">
+                            @Html.Raw(article.Resume)
+                            <a asp-action="Details" asp-route-id="@article.Id" asp-route-title="@article.Title.ToFriendlyUrl()">Read More</a>
+                        </p>
+                        <p class="card-text">Published on: @article.PublishDate.ToShortDateString()</p>
+                    </div>
+                </div>
+            </div>
+
+        }
+    </div>
+
+    if (Model.Pagination.TotalPages > 1)
+    {
+        string actionLink = string.IsNullOrWhiteSpace(Model.SearchToken)
+                ? $"/blog/articles?"
+                : $"/blog/articles?SearchToken={Model.SearchToken}&";
+
+        Model.Pagination.ActionLink = actionLink;
+
+        @Html.Partial("_Pagination", Model.Pagination)
+    }
+}

@@ -1,0 +1,118 @@
+﻿@model CameraDetailsServiceModel
+
+@{
+    string color = Model.Status == "IN STOCK" ? "text-success" : "text-danger";
+}
+
+<div class="col-md-offset-1 col-md-4">
+    <h2>@ViewData["Title"] </h2>
+
+    <div>
+        <a href="/users/profile?username=@Model.SellerUsername" class="btn btn-default">Seller: @Model.SellerUsername</a>
+    </div>
+
+    <br />
+
+    <div>
+        <a href="/cameras/all" class="btn btn-default">Back to All Cameras</a>
+    </div>
+</div>
+
+<br />
+
+<div class="col-md-6">
+    <table class="table table-bordered table-responsive camera-details-table-headings-box">
+        <tr></tr>
+        <tr>
+            <th>Make:</th>
+            <td>@Model.Make</td>
+        </tr>
+        <tr>
+            <th>Model:</th>
+            <td>@Model.Model</td>
+        </tr>
+        <tr>
+            <th>Price:</th>
+            <td>@Model.Price.ToPrice()</td>
+        </tr>
+        <tr>
+            <th>Status:</th>
+            <td class="@color">@Model.Status</td>
+        </tr>
+    </table>
+</div>
+
+<div class="col-md-offset-1 col-md-10">
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <img class="camera-details-image" src="@Model.ImageUrl" alt="camera-image" />
+                </td>
+                <td>
+                    <table class="table table-responsive">
+                        <tr>
+                            <td>
+                                <span><label asp-for="@Model.FullFrame"></label>:</span>
+                                @Model.FullFrame
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span><label asp-for="@Model.MinShutterSpeed"></label>:</span>
+                                @Model.MinShutterSpeed"
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span><label asp-for="@Model.MaxShutterSpeed"></label>:</span>
+                                1/@Model.MaxShutterSpeed
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span><label asp-for="@Model.MinISO"></label>:</span>
+                                @Model.MinISO
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span><label asp-for="@Model.MaxISO"></label>:</span>
+                                @Model.MaxISO
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span><label asp-for="@Model.VideoResolution"></label>:</span>
+                                @Model.VideoResolution
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span><label asp-for="@Model.LightMeterings"></label>:</span>
+                                @foreach (var lightMetering in Model.LightMeterings)
+                                {
+                                    <br>
+                                    @:&ndash; @lightMetering
+                                        }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span><label asp-for="@Model.Description"></label>:</span>
+                                @Model.Description
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

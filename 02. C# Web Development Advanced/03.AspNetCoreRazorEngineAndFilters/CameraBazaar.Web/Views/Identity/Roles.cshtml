@@ -1,0 +1,23 @@
+﻿@model IdentityWithRolesBasicServiceModel
+@{
+    ViewData["Title"] = "User Details";
+}
+
+<h2>Roles for @Model.Username</h2>
+
+<div>
+    <a href="/identity/addtorole/@Model.Id" class="btn btn-primary">Add To Role</a>
+</div>
+<br />
+
+@if (!Model.Roles.Any())
+{
+    <h3>No roles for this user.</h3>
+}
+
+<ul>
+    @foreach (var role in Model.Roles)
+    {
+        <li>@role &ndash; <a class="btn btn-default" href="/identity/removefromrole?id=@Model.Id&role=@role">Remove</a></li>
+    }
+</ul>

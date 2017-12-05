@@ -1,0 +1,46 @@
+﻿@model ArticleFormViewModel
+
+@{
+    ViewData["Title"] = "Create Article";
+}
+
+<script src="https://cloud.tinymce.com/stable/tinymce.min.js"></script>
+<script>tinymce.init({ selector: '#Content' });</script>
+
+<div class="row">
+    <div class="col-md-offset-2 col-md-8">
+
+        <div class="text-center">
+            <h2>@ViewData["Title"]</h2>
+        </div>
+
+        <br />
+        <br />
+
+        <form method="post">
+            <div class="form-group">
+                <label asp-for="Title"></label>
+                <input class="form-control" asp-for="Title" />
+                <span class="form-text text-danger" asp-validation-for="Title"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Content"></label>
+                <textarea class="form-control" asp-for="Content" rows="10"></textarea>
+                <span class="form-text text-danger" asp-validation-for="Content"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PublishDate"></label>
+                <input class="form-control" asp-for="PublishDate" type="date" />
+                <span class="form-text text-danger" asp-validation-for="PublishDate"></span>
+            </div>
+            <div class="text-center">
+                <a class="btn btn-default" asp-action="Index">Back to All Articles</a>
+                <input class="btn btn-success" type="submit" value="Create Article" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

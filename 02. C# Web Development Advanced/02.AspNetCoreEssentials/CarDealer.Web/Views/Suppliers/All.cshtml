@@ -1,0 +1,51 @@
+﻿@model SuppliersPageListViewModel
+
+@{
+    ViewData["Title"] = $"All Suppliers";
+}
+
+<div class="row">
+    <div class="col-md-offset-1 col-md-10">
+        <h2>@ViewData["Title"]</h2>
+
+        <a href="/home/index" class="btn btn-default">Back to Home</a>
+        <a class="btn btn-primary" href="/suppliers/create">Add Supplier</a>
+        <br />
+
+        @if (!Model.Suppliers.Any())
+        {
+            <h2>No suppliers found.</h2>
+        }
+        else
+        {
+            @Html.Partial("_Pagination", new PaginationViewModel { ActionLink = "/suppliers/all?", CurrentPage = Model.CurrentPage, PreviousPage = Model.PreviousPage, NextPage = Model.NextPage, TotalPages = Model.TotalPages })
+
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Importer</th>
+                        <th>Total Parts</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var supplier in Model.Suppliers)
+                    {
+                        <tr>
+                            <td>@supplier.Name</td>
+                            <td>@(supplier.IsImporter ? "Yes" : "No")</td>
+                            <td>@supplier.TotalPartsCount</td>
+                            <td>
+                                <a class="btn btn-warning" href="/suppliers/edit/@supplier.Id">Edit</a>
+                                <a class="btn btn-danger" href="/suppliers/delete/@supplier.Id">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            @Html.Partial("_Pagination", new PaginationViewModel { ActionLink = "/suppliers/all?", CurrentPage = Model.CurrentPage, PreviousPage = Model.PreviousPage, NextPage = Model.NextPage, TotalPages = Model.TotalPages })
+        }
+    </div>
+</div>

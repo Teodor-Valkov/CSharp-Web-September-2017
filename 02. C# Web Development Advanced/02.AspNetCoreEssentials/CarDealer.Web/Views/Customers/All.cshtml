@@ -1,0 +1,58 @@
+﻿@model CustomersPageListViewModel
+@{
+    ViewData["Title"] = "All Customers";
+}
+
+<div class="row">
+    <div class="col-md-offset-1 col-md-10">
+        <h2>@ViewData["Title"]</h2>
+        <h3>Ordered in @ViewData["order"] direction</h3>
+
+        <a href="/home/index" class="btn btn-default">Back to Home</a>
+        <a href="/customers/create" class="btn btn-primary">Add Customer</a>
+        <br />
+        <br />
+
+        <p>Filter customers by order:</p>
+
+        <div class="row">
+            <div class="col-md-4">
+                <a class="btn btn-default" href="/customers/all/ascending">Ascending</a>
+                <a class="btn btn-default" href="/customers/all/descending">Descending</a>
+            </div>
+        </div>
+
+        @if (!Model.Customers.Any())
+        {
+            <h2>No customers found.</h2>
+        }
+        else
+        {
+            @Html.Partial("_Pagination", new PaginationViewModel { ActionLink = $"/customers/all/{Model.OrderDirection.ToString().ToLower()}?", CurrentPage = Model.CurrentPage, PreviousPage = Model.PreviousPage, NextPage = Model.NextPage, TotalPages = Model.TotalPages })
+
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Birthdate</th>
+                        <th>Is Young Driver</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var customer in Model.Customers)
+                    {
+                        <tr>
+                            <td><a href="/customers/@customer.Id">@customer.Name</a></td>
+                            <td>@customer.BirthDate.ToShortDateString()</td>
+                            <td>@(customer.IsYoungDriver ? "Yes" : "No")</td>
+                            <td><a class="btn btn-warning" href="/customers/edit/@customer.Id">Edit</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            @Html.Partial("_Pagination", new PaginationViewModel { ActionLink = $"/customers/all/{Model.OrderDirection.ToString().ToLower()}?", CurrentPage = Model.CurrentPage, PreviousPage = Model.PreviousPage, NextPage = Model.NextPage, TotalPages = Model.TotalPages })
+        }
+    </div>
+</div>

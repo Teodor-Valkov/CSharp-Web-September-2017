@@ -1,0 +1,16 @@
+﻿@model PartFormModel
+@{
+    ViewData["Title"] = "Edit Part";
+}
+
+<div class="row">
+    <div class="col-md-offset-2 col-md-8">
+        <h2>@ViewData["Title"]</h2>
+        <a href="/parts/all" class="btn btn-default">Back to All Parts</a>
+
+        <br />
+        <br />
+
+        @Html.Partial("_PartForm", Model)
+    </div>
+</div>
