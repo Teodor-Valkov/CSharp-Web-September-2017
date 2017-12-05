@@ -1,0 +1,97 @@
+﻿@using System.Linq
+@model LoginViewModel
+@inject SignInManager<User> SignInManager
+
+@{
+    ViewData["Title"] = "Log in";
+}
+
+<div class="row">
+    <div class="col-md-offset-3 col-md-6">
+        <h2>@ViewData["Title"]</h2>
+    </div>
+    <div class="col-md-offset-3 col-md-6">
+
+        <section>
+            <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+                <hr />
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Username"></label>
+                    <input asp-for="Username" class="form-control" />
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Password"></label>
+                    <input asp-for="Password" class="form-control" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label asp-for="RememberMe">
+                            <input asp-for="RememberMe" />
+                            @Html.DisplayNameFor(m => m.RememberMe)
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-default">Back To Home</a>
+                    <button type="submit" class="btn btn-success">Log in</button>
+                </div>
+                @*<div class="form-group">
+                    <p>
+                    <a asp-action="forgotpassword">click here if you forgot your password?</a>
+                    </p>
+                    <p>
+                    <a asp-action="register" asp-route-returnurl="@viewdata["returnurl"]">register as a new user?</a>
+                    </p>
+                    </div>*@
+            </form>
+        </section>
+
+        <section>
+            @{
+                var loginProviders = (await SignInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+                <div>
+                    @if (loginProviders.Count == 0)
+                    {
+                        <div>
+                            <p>
+                                There are no external authentication services configured. See <a href="https://go.microsoft.com/fwlink/?LinkID=532715">this article</a>
+                                for details on setting up this ASP.NET application to support logging in via external services.
+                            </p>
+                        </div>
+                    }
+                    else
+                    {
+                        <form asp-action="ExternalLogin" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal">
+                            <div>
+                                <p>
+                                    @foreach (var provider in loginProviders)
+                                    {
+                                        if (provider.Name == "Facebook")
+                                        {
+                                            <span>
+                                                <button type="submit" class="btn btn-primary btn-lg" id="external-login-provider" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account"><i class="fa fa-facebook"></i> Log in with @provider.Name</button>
+                                            </span>
+                                        }
+                                        if (provider.Name == "Google")
+                                        {
+                                            <span>
+                                                <button type="submit" class="btn btn-danger btn-lg" id="external-login-provider" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account"><i class="fa fa-google"></i> Log in with @provider.Name</button>
+                                            </span>
+                                        }
+                                    }
+                                </p>
+                            </div>
+                        </form>
+                    }
+                </div>
+            }
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

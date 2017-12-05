@@ -1,0 +1,37 @@
+﻿@model ManufacturerFormViewModel
+
+@{
+    ViewData["Title"] = "Create Manufacturer";
+}
+
+<div class="row">
+    <div class="col-md-offset-3 col-md-6">
+
+        <div class="text-center">
+            <h2>@ViewData["Title"]</h2>
+            <br />
+        </div>
+
+        <form method="post">
+            <div class="form-text text-danger" asp-validation-summary="ModelOnly"></div>
+            <div class="form-group">
+                <label asp-for="Name"></label>
+                <input class="form-control" asp-for="Name" />
+                <span class="form-text text-danger" asp-validation-for="Name"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Address"></label>
+                <input class="form-control" asp-for="Address" />
+                <span class="form-text text-danger" asp-validation-for="Address"></span>
+            </div>
+            <div class="text-center">
+                <a asp-area="" asp-controller="Manufacturers" asp-action="Index" class="btn btn-default">Back To All Manufacturers</a>
+                <input class="btn btn-success" type="submit" value="Create Manufacturer" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

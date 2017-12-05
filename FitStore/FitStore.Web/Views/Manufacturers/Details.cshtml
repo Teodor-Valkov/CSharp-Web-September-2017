@@ -1,0 +1,25 @@
+﻿@model ManufacturerDetailsServiceModel
+
+@{
+    ViewData["Title"] = $"{Model.Name} - {Model.Supplements.Count()} Supplements";
+}
+
+<div class="row">
+    <div class="col-md-offset-1 col-md-10">
+        <h2>@ViewData["Title"]</h2>
+        <h4>Address - @Model.Address</h4>
+        <br />
+
+        <div>
+            <a class="btn btn-default" asp-area="" asp-controller="Manufacturers" asp-action="Index">Back To All Manufacturers</a>
+        </div>
+        <br />
+
+        @foreach (var supplement in Model.Supplements)
+        {
+            <div class="text-center">
+                <h1>@supplement</h1>
+            </div>
+        }
+    </div>
+</div>

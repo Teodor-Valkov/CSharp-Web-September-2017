@@ -1,0 +1,54 @@
+﻿@model HomeIndexViewModel
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="jumbotron">
+    <div class="text-center">
+
+        @*<div class="col-md-12">
+                <form action="Search">
+                    <div class="col-md-8">
+                        <input asp-for="SearchToken" placeholder="Search" class="form-control" />
+                    </div>
+                    <div class="col-md-1">
+                        <input asp-for="SearchInUsers" />
+                        <label asp-for="SearchInUsers"></label>
+                    </div>
+                    <div class="col-md-1">
+                        <input asp-for="SearchInCourses" />
+                        <label asp-for="SearchInCourses"></label>
+                    </div>
+                    <div class="col-md-1">
+                        <input asp-for="SearchInArticles" />
+                        <label asp-for="SearchInArticles"></label>
+                    </div>
+                    <div class="col-md-1">
+                        <input type="submit" class="btn btn-default" value="Search" />
+                    </div>
+                </form>
+            </div>*@
+
+        <div class="home-text">
+            <div>
+                <h1>Welcome to the Fit Store!</h1>
+            </div>
+
+            <div>
+                @if (User.Identity.IsAuthenticated && User.IsInRole(WebConstants.AdministratorRole))
+                {
+                    <a class="btn btn-default btn-lg" asp-area="Admin" asp-controller="Users" asp-action="Index">Users</a>
+                }
+                <a class="btn btn-default btn-lg" asp-area="" asp-controller="Categories" asp-action="Index">Categories</a>
+                <a class="btn btn-default btn-lg" asp-area="" asp-controller="Manufacturers" asp-action="Index">Manufacturers</a>
+            </div>
+            <br />
+            <br />
+
+            <div>
+                <img src="~/images/2.jpg" alt="fit-store-photo" width="1000" height="600" />
+            </div>
+        </div>
+    </div>
+</div>

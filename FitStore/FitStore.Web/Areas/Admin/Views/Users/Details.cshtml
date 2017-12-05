@@ -1,0 +1,96 @@
+﻿@model AdminUserDetailsServiceModel
+
+@{
+    ViewData["Title"] = $"Details For '{Model.Username}'";
+}
+
+<div class="row">
+    <div class="col-md-offset-2 col-md-8">
+        <h2 class="text-center">@ViewData["Title"]</h2>
+        <hr />
+
+        <table class="table table-bordered table-responsive">
+            <tr>
+                <th><label asp-for="@Model.Username"></label></th>
+                <td>@Model.Username</td>
+            </tr>
+            <tr>
+                <th><label asp-for="@Model.FullName"></label></th>
+                <td>@Model.FullName</td>
+            </tr>
+            <tr>
+                <th><label asp-for="@Model.Email"></label></th>
+                <td>@Model.Email</td>
+            </tr>
+            <tr>
+                <th><label asp-for="@Model.Address"></label></th>
+                <td>@Model.Address</td>
+            </tr>
+            <tr>
+                <th><label asp-for="@Model.BirthDate"></label></th>
+                <td>@Model.BirthDate.ToShortDateString()</td>
+            </tr>
+            <tr>
+                <th><label asp-for="@Model.RegistrationDate"></label></th>
+                <td>@Model.RegistrationDate.ToShortDateString()</td>
+            </tr>
+            <tr>
+                <th><label asp-for="@Model.CurrentRoles"></label></th>
+                <td>
+                    @if (Model.CurrentRoles.Any())
+                    {
+                        <div class="form-group">
+                            <form asp-action="RemoveFromRole" method="post">
+                                <div class="col-md-9" id="user-remove-from-role">
+
+                                    <input type="hidden" name="Username" value="@Model.Username" />
+                                    <select name="Role" asp-items="@Model.CurrentRoles" class="form-control"></select>
+                                </div>
+                                <div class="col-md-3">
+
+                                    <input type="submit" class="btn btn-danger" value="Remove" />
+                                </div>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="form-group">
+                            <p>
+                                User has no roles
+                            </p>
+                        </div>
+                    }
+                </td>
+            </tr>
+            <tr>
+                <th><label asp-for="@Model.AllRoles"></label></th>
+                <td>
+                    @if (Model.AllRoles.Any())
+                    {
+                        <div class="form-group">
+                            <form asp-action="AddToRole" method="post">
+                                <div class="col-md-9" id="user-add-to-role">
+                                    <input type="hidden" name="Username" value="@Model.Username" />
+                                    <select name="Role" asp-items="Model.AllRoles" class="form-control"></select>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <input type="submit" class="btn btn-success" value="Add" />
+                                </div>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="form-group">
+                            <p>
+                                User has all roles possible
+                            </p>
+                        </div>
+                    }
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
