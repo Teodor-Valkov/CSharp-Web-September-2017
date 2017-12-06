@@ -1,4 +1,4 @@
-﻿@model ManufacturerBasicServiceModel
+﻿@model ManufacturerFormViewModel
 
 @{
     ViewData["Title"] = "Edit Manufacturer";
@@ -24,8 +24,10 @@
                 <input class="form-control" asp-for="Address" />
                 <span class="form-text text-danger" asp-validation-for="Address"></span>
             </div>
+            <br />
             <div class="text-center">
-                <a asp-area="" asp-controller="Manufacturers" asp-action="Index" class="btn btn-default">Back To All Manufacturers</a>
+                <a asp-area="Manager" asp-controller="Manufacturers" asp-action="Index" class="btn btn-default">Back To Manufacturers</a>
+                <input type="hidden" name="name" value="@Model.Name" />
                 <input class="btn btn-success" type="submit" value="Edit Manufacturer" />
             </div>
         </form>

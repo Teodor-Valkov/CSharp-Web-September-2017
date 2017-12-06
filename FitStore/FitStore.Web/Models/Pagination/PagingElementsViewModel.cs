@@ -8,6 +8,8 @@
         [Display(Name = "Search")]
         public string SearchToken { get; set; }
 
+        public bool IsDeleted { get; set; }
+
         public IEnumerable<TModel> Elements { get; set; }
 
         public PaginationViewModel Pagination { get; set; }

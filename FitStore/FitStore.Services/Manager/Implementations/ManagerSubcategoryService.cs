@@ -6,8 +6,11 @@
     using Manager.Contracts;
     using Microsoft.EntityFrameworkCore;
     using Models.Subcategories;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+
+    using static Common.CommonConstants;
 
     public class ManagerSubcategoryService : IManagerSubcategoryService
     {
@@ -16,6 +19,24 @@
         public ManagerSubcategoryService(FitStoreDbContext database)
         {
             this.database = database;
+        }
+
+        public async Task<IEnumerable<SubcategoryAdvancedServiceModel>> GetAllPagedListingAsync(bool isDeleted, string searchToken, int page)
+        {
+            IQueryable<Subcategory> subcategories = this.database.Subcategories;
+
+            if (!string.IsNullOrWhiteSpace(searchToken))
+            {
+                subcategories = subcategories.Where(c => c.Name.ToLower().Contains(searchToken.ToLower()));
+            }
+
+            return await subcategories
+               .Where(s => s.IsDeleted == isDeleted)
+               .OrderBy(c => c.Name)
+               .Skip((page - 1) * SubcategoryPageSize)
+               .Take(CategoryPageSize)
+               .ProjectTo<SubcategoryAdvancedServiceModel>()
+               .ToListAsync();
         }
 
         public async Task CreateAsync(string name, int categoryId)
@@ -91,6 +112,19 @@
             subcategory.IsDeleted = false;
 
             await this.database.SaveChangesAsync();
+        }
+
+        public async Task<int> TotalCountAsync(bool isDeleted, string searchToken)
+        {
+            if (string.IsNullOrWhiteSpace(searchToken))
+            {
+                return await this.database.Subcategories.Where(s => s.IsDeleted == isDeleted).CountAsync();
+            }
+
+            return await this.database
+              .Subcategories
+              .Where(s => s.IsDeleted == isDeleted && s.Name.ToLower().Contains(searchToken.ToLower()))
+              .CountAsync();
         }
     }
 }

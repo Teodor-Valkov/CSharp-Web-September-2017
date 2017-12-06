@@ -1,0 +1,30 @@
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Services\bin\Debug\netstandard2.0\FitStore.Services.deps.json
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Services\bin\Debug\netstandard2.0\FitStore.Services.dll
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Services\obj\Debug\netstandard2.0\FitStore.Services.csproj.CoreCompileInputs.cache
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Services\obj\Debug\netstandard2.0\FitStore.Services.AssemblyInfoInputs.cache
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Services\obj\Debug\netstandard2.0\FitStore.Services.AssemblyInfo.cs
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Services\bin\Debug\netstandard2.0\FitStore.Services.pdb
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Services\bin\Debug\netstandard2.0\FitStore.Common.dll
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Services\bin\Debug\netstandard2.0\FitStore.Data.dll
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Services\bin\Debug\netstandard2.0\FitStore.Common.pdb
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Services\bin\Debug\netstandard2.0\FitStore.Data.pdb
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Services\obj\Debug\netstandard2.0\FitStore.Services.csprojResolveAssemblyReference.cache
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Services\obj\Debug\netstandard2.0\FitStore.Services.dll
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Services\obj\Debug\netstandard2.0\FitStore.Services.pdb
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Services\bin\Debug\netstandard2.0\Microsoft.AspNetCore.Mvc.ViewFeatures.dll
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Services\bin\Debug\netstandard2.0\Microsoft.AspNetCore.Mvc.ViewFeatures.xml
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Services\obj\Debug\netstandard2.0\FitStore.Services.csprojResolveAssemblyReference.cache
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Services\obj\Debug\netstandard2.0\FitStore.Services.csproj.CoreCompileInputs.cache
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Services\obj\Debug\netstandard2.0\FitStore.Services.AssemblyInfoInputs.cache
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Services\obj\Debug\netstandard2.0\FitStore.Services.AssemblyInfo.cs
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Services\obj\Debug\netstandard2.0\FitStore.Services.dll
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Services\obj\Debug\netstandard2.0\FitStore.Services.pdb
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Services\bin\Debug\netstandard2.0\FitStore.Services.deps.json
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Services\bin\Debug\netstandard2.0\FitStore.Services.dll
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Services\bin\Debug\netstandard2.0\FitStore.Services.pdb
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Services\bin\Debug\netstandard2.0\FitStore.Common.dll
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Services\bin\Debug\netstandard2.0\FitStore.Data.dll
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Services\bin\Debug\netstandard2.0\Microsoft.AspNetCore.Mvc.ViewFeatures.dll
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Services\bin\Debug\netstandard2.0\FitStore.Common.pdb
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Services\bin\Debug\netstandard2.0\FitStore.Data.pdb
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Services\bin\Debug\netstandard2.0\Microsoft.AspNetCore.Mvc.ViewFeatures.xml

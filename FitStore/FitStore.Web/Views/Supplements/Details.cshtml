@@ -12,7 +12,7 @@
         <br />
         <br />
         <div>
-            <img id="supplement-image" src="@Model.Picture" alt="supplement-picture">
+            <img id="supplement-details-image" src="@Model.Picture" alt="supplement-picture">
         </div>
         <br />
         <br />
@@ -34,16 +34,20 @@
         <div>
             @if (User.Identity.IsAuthenticated && User.IsInRole(WebConstants.ManagerRole))
             {
-                <a class="btn btn-default" asp-area="" asp-controller="Subcategories" asp-action="Index">Back To All Subcategories</a>
-                <a asp-area="Manager" asp-controller="Supplements" asp-action="Edit" asp-route-categoryId="@Model.CategoryId" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+                <a asp-area="Manager" asp-controller="Supplements" asp-action="Edit" asp-route-id="@Model.Id" asp-route-name="@Model.Name" class="btn btn-warning">Edit</a>
                 if (Model.IsDeleted)
                 {
-                    <a asp-area="Manager" asp-controller="Supplements" asp-action="Restore" asp-route-id="@Model.Id" asp- asp-route-name="@Model.Name" class="btn btn-success">Restore</a>
+                    <a asp-area="Manager" asp-controller="Supplements" asp-action="Restore" asp-route-id="@Model.Id" asp-route-name="@Model.Name" class="btn btn-success">Restore</a>
 
                 }
                 else
                 {
-                    <a asp-area="Manager" asp-controller="Supplements" asp-action="Delete" asp-route-id="@Model.Id" asp-route-name="@Model.Name" class="btn btn-danger">Delete</a>
+                    @Html.ActionLink("Delete", "Delete", "Supplements", new { area = "Manager", id = Model.Id, name = Model.Name },
+                                new
+                                {
+                                    @class = "btn btn-danger",
+                                    onclick = $"return confirm('Are you sure you want to delete *{Model.Name}*?');"
+                                })
                 }
             }
         </div>

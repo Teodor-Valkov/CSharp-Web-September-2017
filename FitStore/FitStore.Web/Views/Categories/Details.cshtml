@@ -1,23 +1,45 @@
 ﻿@model CategoryDetailsServiceModel
 
 @{
-    ViewData["Title"] = $"{Model.Name} - {Model.Subcategories.Count()} Subcategories";
+    ViewData["Title"] = $"Category: {Model.Name}";
 }
 
 <div class="row">
     <div class="col-md-offset-1 col-md-10">
-        <h2>@ViewData["Title"]</h2>
         <br />
 
         <div>
-            <a class="btn btn-default" asp-area="" asp-controller="Categories" asp-action="Index">Back To All Categories</a>
+            <h2>@ViewData["Title"]</h2>
+            <h4>Subcategories: @Model.Subcategories.Count()</h4>
+            <h4>Supplements: @Model.Supplements.Count()</h4>
         </div>
+
+        <br />
         <br />
 
-        @foreach (var subcategory in Model.Subcategories)
+        <div class="text-center">
+            @foreach (var subcategory in Model.Subcategories)
+            {
+                <a asp-area="" asp-controller="Subcategories" asp-action="Details" asp-route-id="@subcategory.Id" asp-route-name="@subcategory.Name" id="subcategory-links" class="btn btn-default">@subcategory.Name (@subcategory.Supplements)</a>
+            }
+        </div>
+        <br />
+        <br />
+
+        @foreach (var supplement in Model.Supplements)
         {
-            <div class="text-center">
-                <h1><a asp-area="" asp-controller="Subcategories" asp-action="Details" asp-route-id="@subcategory.Id" asp-route-name="@subcategory.Name">@subcategory.Name</a></h1>
+            <div class="card col-md-4">
+                <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name">
+                    <img class="card-img-top" id="category-supplement-image" src="@supplement.Picture" alt="supplement-picture">
+                </a>
+                <div class="card-block">
+                    <h4 class="card-title text-center">@supplement.Name</h4>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Manufacturer: @supplement.ManufacturerName</li>
+                    <li class="list-group-item">Quantity: @supplement.Quantity</li>
+                    <li class="list-group-item">Price: @supplement.Price $</li>
+                </ul>
             </div>
         }
     </div>

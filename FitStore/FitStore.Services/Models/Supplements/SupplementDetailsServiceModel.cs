@@ -18,8 +18,6 @@
         [Display(Name = CategoryEntity)]
         public string CategoryName { get; set; }
 
-        public int CategoryId { get; set; }
-
         [Display(Name = SubcategoryEntity)]
         public string SubcategoryName { get; set; }
 
@@ -27,7 +25,6 @@
         {
             mapper
                 .CreateMap<Supplement, SupplementDetailsServiceModel>()
-                    .ForMember(dest => dest.CategoryId, opt => opt.MapFrom(src => src.Subcategory.CategoryId))
                     .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Subcategory.Category.Name))
                     .ForMember(dest => dest.SubcategoryName, opt => opt.MapFrom(src => src.Subcategory.Name))
                     .ForMember(dest => dest.Picture, opt => opt.MapFrom(src => src.Picture.FromByteArrayToString()))

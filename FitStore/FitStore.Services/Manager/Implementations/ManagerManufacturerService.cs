@@ -6,8 +6,11 @@
     using Data.Models;
     using Microsoft.EntityFrameworkCore;
     using Models.Manufacturers;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+
+    using static Common.CommonConstants;
 
     public class ManagerManufacturerService : IManagerManufacturerService
     {
@@ -16,6 +19,24 @@
         public ManagerManufacturerService(FitStoreDbContext database)
         {
             this.database = database;
+        }
+
+        public async Task<IEnumerable<ManufacturerAdvancedServiceModel>> GetAllPagedListingAsync(bool isDeleted, string searchToken, int page)
+        {
+            IQueryable<Manufacturer> manufacturers = this.database.Manufacturers;
+
+            if (!string.IsNullOrWhiteSpace(searchToken))
+            {
+                manufacturers = manufacturers.Where(c => c.Name.ToLower().Contains(searchToken.ToLower()));
+            }
+
+            return await manufacturers
+               .Where(m => m.IsDeleted == isDeleted)
+               .OrderBy(m => m.Name)
+               .Skip((page - 1) * ManufacturerPageSize)
+               .Take(ManufacturerPageSize)
+               .ProjectTo<ManufacturerAdvancedServiceModel>()
+               .ToListAsync();
         }
 
         public async Task CreateAsync(string name, string address)
@@ -91,6 +112,19 @@
             manufacturer.IsDeleted = false;
 
             await this.database.SaveChangesAsync();
+        }
+
+        public async Task<int> TotalCountAsync(bool isDeleted, string searchToken)
+        {
+            if (string.IsNullOrWhiteSpace(searchToken))
+            {
+                return await this.database.Manufacturers.Where(m => m.IsDeleted == isDeleted).CountAsync();
+            }
+
+            return await this.database
+              .Manufacturers
+              .Where(m => m.IsDeleted == isDeleted && m.Name.ToLower().Contains(searchToken.ToLower()))
+              .CountAsync();
         }
     }
 }

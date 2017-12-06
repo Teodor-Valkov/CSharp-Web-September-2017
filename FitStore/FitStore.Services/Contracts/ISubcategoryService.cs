@@ -6,16 +6,14 @@
 
     public interface ISubcategoryService
     {
-        Task<IEnumerable<SubcategoryAdvancedServiceModel>> GetAllListingAsync(string searchToken, int page);
-
         Task<IEnumerable<SubcategoryBasicServiceModel>> GetAllBasicListingAsync(int categoryId);
 
         Task<SubcategoryDetailsServiceModel> GetDetailsByIdAsync(int categoryId);
 
+        Task<int> GetCategoryIdBySubcategoryId(int subcategoryId);
+
         Task<bool> IsSubcategoryExistingById(int subcategoryId);
 
         Task<bool> IsSubcategoryExistingByName(string name);
-
-        Task<int> TotalCountAsync(string searchToken);
     }
 }

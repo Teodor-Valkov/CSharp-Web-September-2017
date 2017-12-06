@@ -7,6 +7,7 @@
     using Microsoft.EntityFrameworkCore;
     using System.Linq;
     using System.Threading.Tasks;
+    using System.Collections.Generic;
 
     public class SupplementService : ISupplementService
     {
@@ -15,6 +16,14 @@
         public SupplementService(FitStoreDbContext database)
         {
             this.database = database;
+        }
+
+        public async Task<IEnumerable<SupplementAdvancedServiceModel>> GetAllAdvancedListingAsync()
+        {
+            return await this.database
+              .Supplements
+              .ProjectTo<SupplementAdvancedServiceModel>()
+              .ToListAsync();
         }
 
         public async Task<SupplementDetailsServiceModel> GetDetailsByIdAsync(int supplementId)

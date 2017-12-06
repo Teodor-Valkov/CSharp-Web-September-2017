@@ -1,0 +1,18 @@
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Common\bin\Debug\netstandard2.0\FitStore.Common.deps.json
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Common\bin\Debug\netstandard2.0\FitStore.Common.dll
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Common\obj\Debug\netstandard2.0\FitStore.Common.csproj.CoreCompileInputs.cache
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Common\obj\Debug\netstandard2.0\FitStore.Common.AssemblyInfoInputs.cache
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Common\obj\Debug\netstandard2.0\FitStore.Common.AssemblyInfo.cs
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Common\bin\Debug\netstandard2.0\FitStore.Common.pdb
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Common\obj\Debug\netstandard2.0\FitStore.Common.csprojResolveAssemblyReference.cache
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Common\obj\Debug\netstandard2.0\FitStore.Common.dll
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Common\obj\Debug\netstandard2.0\FitStore.Common.pdb
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Common\bin\Debug\netstandard2.0\FitStore.Common.deps.json
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Common\bin\Debug\netstandard2.0\FitStore.Common.dll
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Common\bin\Debug\netstandard2.0\FitStore.Common.pdb
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Common\obj\Debug\netstandard2.0\FitStore.Common.csprojResolveAssemblyReference.cache
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Common\obj\Debug\netstandard2.0\FitStore.Common.csproj.CoreCompileInputs.cache
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Common\obj\Debug\netstandard2.0\FitStore.Common.AssemblyInfoInputs.cache
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Common\obj\Debug\netstandard2.0\FitStore.Common.AssemblyInfo.cs
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Common\obj\Debug\netstandard2.0\FitStore.Common.dll
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Common\obj\Debug\netstandard2.0\FitStore.Common.pdb

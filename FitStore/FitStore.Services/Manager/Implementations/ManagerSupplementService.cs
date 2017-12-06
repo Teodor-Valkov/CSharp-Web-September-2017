@@ -7,8 +7,11 @@
     using Microsoft.EntityFrameworkCore;
     using Models.Supplements;
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+
+    using static Common.CommonConstants;
 
     public class ManagerSupplementService : IManagerSupplementService
     {
@@ -17,6 +20,24 @@
         public ManagerSupplementService(FitStoreDbContext database)
         {
             this.database = database;
+        }
+
+        public async Task<IEnumerable<SupplementAdvancedServiceModel>> GetAllPagedListingAsync(bool isDeleted, string searchToken, int page)
+        {
+            IQueryable<Supplement> supplements = this.database.Supplements;
+
+            if (!string.IsNullOrWhiteSpace(searchToken))
+            {
+                supplements = supplements.Where(s => s.Name.ToLower().Contains(searchToken.ToLower()));
+            }
+
+            return await supplements
+               .Where(s => s.IsDeleted == isDeleted)
+               .OrderBy(s => s.Name)
+               .Skip((page - 1) * SupplementPageSize)
+               .Take(SupplementPageSize)
+               .ProjectTo<SupplementAdvancedServiceModel>()
+               .ToListAsync();
         }
 
         public async Task CreateAsync(string name, string description, int quantity, decimal price, byte[] picture, DateTime bestBeforeDate, int subcategoryId, int manufacturerId)
@@ -88,6 +109,19 @@
             supplement.IsDeleted = false;
 
             await this.database.SaveChangesAsync();
+        }
+
+        public async Task<int> TotalCountAsync(bool isDeleted, string searchToken)
+        {
+            if (string.IsNullOrWhiteSpace(searchToken))
+            {
+                return await this.database.Supplements.Where(s => s.IsDeleted == isDeleted).CountAsync();
+            }
+
+            return await this.database
+              .Supplements
+              .Where(s => s.IsDeleted == isDeleted && s.Name.ToLower().Contains(searchToken.ToLower()))
+              .CountAsync();
         }
     }
 }

@@ -2,7 +2,6 @@
 {
     using Infrastructure.Extensions;
     using Microsoft.AspNetCore.Mvc;
-    using Models.Pagination;
     using Services.Contracts;
     using Services.Models.Categories;
     using System.Threading.Tasks;
@@ -19,43 +18,18 @@
             this.categoryService = categoryService;
         }
 
-        public async Task<IActionResult> Index(string searchToken, int page = 1)
-        {
-            if (page < 1)
-            {
-                return RedirectToAction(nameof(Index));
-            }
-
-            PagingElementsViewModel<CategoryAdvancedServiceModel> model = new PagingElementsViewModel<CategoryAdvancedServiceModel>
-            {
-                Elements = await this.categoryService.GetAllListingAsync(searchToken, page),
-                SearchToken = searchToken,
-                Pagination = new PaginationViewModel
-                {
-                    TotalElements = await this.categoryService.TotalCountAsync(searchToken),
-                    PageSize = CategoryPageSize,
-                    CurrentPage = page
-                }
-            };
-
-            if (page > model.Pagination.TotalPages && model.Pagination.TotalPages != 0)
-            {
-                return RedirectToAction(nameof(Index), new { page = model.Pagination.TotalPages });
-            }
-
-            return View(model);
-        }
-
         public async Task<IActionResult> Details(int id, string name)
         {
-            CategoryDetailsServiceModel model = await this.categoryService.GetDetailsByIdAsync(id);
+            bool isCategoryExisting = await this.categoryService.IsCategoryExistingById(id);
 
-            if (model == null)
+            if (!isCategoryExisting)
             {
-                TempData.AddErrorMessage(string.Format(EntityNotFound, CategoryEntity, name));
+                TempData.AddErrorMessage(string.Format(EntityNotFound, CategoryEntity));
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(HomeController.Index), Home);
             }
+
+            CategoryDetailsServiceModel model = await this.categoryService.GetDetailsByIdAsync(id);
 
             return View(model);
         }

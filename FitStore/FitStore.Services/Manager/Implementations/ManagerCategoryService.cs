@@ -6,8 +6,11 @@
     using Data.Models;
     using Microsoft.EntityFrameworkCore;
     using Models.Categories;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+
+    using static Common.CommonConstants;
 
     public class ManagerCategoryService : IManagerCategoryService
     {
@@ -16,6 +19,24 @@
         public ManagerCategoryService(FitStoreDbContext database)
         {
             this.database = database;
+        }
+
+        public async Task<IEnumerable<CategoryAdvancedServiceModel>> GetAllPagedListingAsync(bool isDeleted, string searchToken, int page)
+        {
+            IQueryable<Category> categories = this.database.Categories;
+
+            if (!string.IsNullOrWhiteSpace(searchToken))
+            {
+                categories = categories.Where(c => c.Name.ToLower().Contains(searchToken.ToLower()));
+            }
+
+            return await categories
+               .Where(c => c.IsDeleted == isDeleted)
+               .OrderBy(c => c.Name)
+               .Skip((page - 1) * CategoryPageSize)
+               .Take(CategoryPageSize)
+               .ProjectTo<CategoryAdvancedServiceModel>()
+               .ToListAsync();
         }
 
         public async Task CreateAsync(string name)
@@ -97,18 +118,17 @@
             await this.database.SaveChangesAsync();
         }
 
-        public async Task<bool> IsCategoryExistingById(int categoryId)
+        public async Task<int> TotalCountAsync(bool isDeleted, string searchToken)
         {
-            return await this.database
-                .Categories
-                .AnyAsync(c => c.Id == categoryId);
-        }
+            if (string.IsNullOrWhiteSpace(searchToken))
+            {
+                return await this.database.Categories.Where(c => c.IsDeleted == isDeleted).CountAsync();
+            }
 
-        public async Task<bool> IsCategoryExistingByName(string name)
-        {
             return await this.database
-                .Categories
-                .AnyAsync(c => c.Name.ToLower() == name.ToLower());
+              .Categories
+              .Where(c => c.IsDeleted == isDeleted && c.Name.ToLower().Contains(searchToken.ToLower()))
+              .CountAsync();
         }
     }
 }

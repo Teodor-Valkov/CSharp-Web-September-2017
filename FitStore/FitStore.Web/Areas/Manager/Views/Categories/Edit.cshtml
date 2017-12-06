@@ -19,8 +19,10 @@
                 <input class="form-control" asp-for="Name" />
                 <span class="form-text text-danger" asp-validation-for="Name"></span>
             </div>
+            <br />
             <div class="text-center">
-                <a asp-area="" asp-controller="Categories" asp-action="Index" class="btn btn-default">Back To All Categories</a>
+                <a asp-area="Manager" asp-controller="Categories" asp-action="Index" class="btn btn-default">Back To Categories</a>
+                <input type="hidden" name="name" value="@Model.Name" />
                 <input class="btn btn-success" type="submit" value="Edit Category" />
             </div>
         </form>

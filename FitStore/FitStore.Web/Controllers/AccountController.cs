@@ -293,7 +293,7 @@
                 ViewData["ReturnUrl"] = returnUrl;
                 ViewData["LoginProvider"] = info.LoginProvider;
                 var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-                return View("ExternalLogin", new ExternalLoginViewModel { Email = email });
+                return View("ExternalLogin", new ExternalLoginViewModel { Email = email, BirthDate = DateTime.UtcNow });
             }
         }
 
@@ -313,7 +313,11 @@
                 var user = new User
                 {
                     UserName = model.Email,
-                    Email = model.Email
+                    FullName = model.FullName,
+                    Email = model.Email,
+                    Address = model.Address,
+                    BirthDate = model.BirthDate,
+                    RegistrationDate = DateTime.UtcNow
                 };
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)

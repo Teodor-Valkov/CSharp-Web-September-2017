@@ -5,7 +5,6 @@
     using Data.Models;
     using Supplements;
     using System.Collections.Generic;
-    using System.Linq;
 
     public class SubcategoryDetailsServiceModel : SubcategoryBasicServiceModel, IMapFrom<Subcategory>, IHaveCustomMapping
     {

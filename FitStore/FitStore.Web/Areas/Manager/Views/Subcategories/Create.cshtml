@@ -24,8 +24,9 @@
                 <select class="form-control" asp-for="CategoryId" asp-items="Model.Categories"></select>
                 <span class="form-text text-danger" asp-validation-for="CategoryId"></span>
             </div>
+            <br />
             <div class="text-center">
-                <a asp-area="" asp-controller="Subcategories" asp-action="Index" class="btn btn-default">Back To All Subcategories</a>
+                <a asp-area="Manager" asp-controller="Subcategories" asp-action="Index" class="btn btn-default">Back To Subcategories</a>
                 <input class="btn btn-success" type="submit" value="Create Subcategory" />
             </div>
         </form>

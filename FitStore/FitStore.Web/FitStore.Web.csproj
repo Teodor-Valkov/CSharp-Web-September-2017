@@ -26,11 +26,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\Manager\Models\Supplements\" />
     <Folder Include="Areas\Moderator\Controllers\" />
     <Folder Include="Areas\Moderator\Models\" />
     <Folder Include="Areas\Moderator\Views\" />
-    <Folder Include="Models\Supplements\" />
+    <Folder Include="Models\Subcategories\" />
   </ItemGroup>
 
 </Project>

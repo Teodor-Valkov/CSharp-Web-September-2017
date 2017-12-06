@@ -10,8 +10,6 @@
     using System.Linq;
     using System.Threading.Tasks;
 
-    using static Common.CommonConstants;
-
     public class SubcategoryService : ISubcategoryService
     {
         private readonly FitStoreDbContext database;
@@ -19,23 +17,6 @@
         public SubcategoryService(FitStoreDbContext database)
         {
             this.database = database;
-        }
-
-        public async Task<IEnumerable<SubcategoryAdvancedServiceModel>> GetAllListingAsync(string searchToken, int page)
-        {
-            IQueryable<Subcategory> subcategories = this.database.Subcategories;
-
-            if (!string.IsNullOrWhiteSpace(searchToken))
-            {
-                subcategories = subcategories.Where(c => c.Name.ToLower().Contains(searchToken.ToLower()));
-            }
-
-            return await subcategories
-               .OrderBy(c => c.Name)
-               .Skip((page - 1) * SubcategoryPageSize)
-               .Take(CategoryPageSize)
-               .ProjectTo<SubcategoryAdvancedServiceModel>()
-               .ToListAsync();
         }
 
         public async Task<IEnumerable<SubcategoryBasicServiceModel>> GetAllBasicListingAsync(int categoryId)
@@ -51,9 +32,19 @@
         {
             return await this.database
               .Subcategories
-              .Where(c => c.Id == subcategoryId)
+              .Where(s => s.Id == subcategoryId)
               .ProjectTo<SubcategoryDetailsServiceModel>()
               .FirstOrDefaultAsync();
+        }
+
+        public async Task<int> GetCategoryIdBySubcategoryId(int subcategoryId)
+        {
+            Subcategory subcategory = await this.database
+             .Subcategories
+             .Where(s => s.Id == subcategoryId)
+             .FirstOrDefaultAsync();
+
+            return subcategory.CategoryId;
         }
 
         public async Task<bool> IsSubcategoryExistingById(int subcategoryId)
@@ -68,19 +59,6 @@
             return await this.database
                 .Subcategories
                 .AnyAsync(s => s.Name.ToLower() == name.ToLower());
-        }
-
-        public async Task<int> TotalCountAsync(string searchToken)
-        {
-            if (string.IsNullOrWhiteSpace(searchToken))
-            {
-                return await this.database.Subcategories.CountAsync();
-            }
-
-            return await this.database
-              .Subcategories
-              .Where(c => c.Name.ToLower().Contains(searchToken.ToLower()))
-              .CountAsync();
         }
     }
 }

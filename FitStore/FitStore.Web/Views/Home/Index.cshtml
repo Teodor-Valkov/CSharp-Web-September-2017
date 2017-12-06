@@ -4,52 +4,85 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="jumbotron">
-    <div class="text-center">
-
-        @*<div class="col-md-12">
-                <form action="Search">
-                    <div class="col-md-8">
-                        <input asp-for="SearchToken" placeholder="Search" class="form-control" />
-                    </div>
-                    <div class="col-md-1">
-                        <input asp-for="SearchInUsers" />
-                        <label asp-for="SearchInUsers"></label>
-                    </div>
-                    <div class="col-md-1">
-                        <input asp-for="SearchInCourses" />
-                        <label asp-for="SearchInCourses"></label>
-                    </div>
-                    <div class="col-md-1">
-                        <input asp-for="SearchInArticles" />
-                        <label asp-for="SearchInArticles"></label>
-                    </div>
-                    <div class="col-md-1">
-                        <input type="submit" class="btn btn-default" value="Search" />
-                    </div>
-                </form>
-            </div>*@
-
-        <div class="home-text">
-            <div>
-                <h1>Welcome to the Fit Store!</h1>
+@*<div class="col-md-12">
+        <form action="Search">
+            <div class="col-md-8">
+                <input asp-for="SearchToken" placeholder="Search" class="form-control" />
             </div>
-
-            <div>
-                @if (User.Identity.IsAuthenticated && User.IsInRole(WebConstants.AdministratorRole))
-                {
-                    <a class="btn btn-default btn-lg" asp-area="Admin" asp-controller="Users" asp-action="Index">Users</a>
-                }
-                <a class="btn btn-default btn-lg" asp-area="" asp-controller="Categories" asp-action="Index">Categories</a>
-                <a class="btn btn-default btn-lg" asp-area="" asp-controller="Subcategories" asp-action="Index">Subcategories</a>
-                <a class="btn btn-default btn-lg" asp-area="" asp-controller="Manufacturers" asp-action="Index">Manufacturers</a>
+            <div class="col-md-1">
+                <input asp-for="SearchInUsers" />
+                <label asp-for="SearchInUsers"></label>
             </div>
+            <div class="col-md-1">
+                <input asp-for="SearchInCourses" />
+                <label asp-for="SearchInCourses"></label>
+            </div>
+            <div class="col-md-1">
+                <input asp-for="SearchInArticles" />
+                <label asp-for="SearchInArticles"></label>
+            </div>
+            <div class="col-md-1">
+                <input type="submit" class="btn btn-default" value="Search" />
+            </div>
+        </form>
+    </div>*@
+
+@*<div class="home-text">
+        <div>
+            <h1>Welcome to the Fit Store!</h1>
+        </div>
+
+        <div>
+            <h3>
+                <a asp-area="" asp-controller="Supplements" asp-action="Index">Believe in us, Believe in yourself!</a>
+            </h3>
+        </div>
+
+        <br />
+        <br />
+
+        <div>
+            <img src="~/images/2.jpg" alt="fit-store-photo" width="1000" height="600" />
+        </div>
+    </div>*@
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2">
+            <br />
+            @foreach (var category in Model.Categories)
+            {
+                <ul class="nav nav-pills nav-stacked">
+                    <li id="home-category-link"><a asp-area="" asp-controller="Categories" asp-action="Details" asp-route-id="@category.Id" asp-route-name="@category.Name">@category.Name</a></li>
+                    @foreach (var subcategory in category.Subcategories)
+                    {
+                        <li id="home-subcategory-link"><a asp-area="" asp-controller="Subcategories" asp-action="Details" asp-route-id="@subcategory.Id" asp-route-name="@subcategory.Name" class="col-md-offset-2">@subcategory.Name</a></li>
+                    }
+                </ul>
+            }
+        </div>
+
+        <div class="col-md-offset-1 col-md-9">
             <br />
             <br />
-
-            <div>
-                <img src="~/images/2.jpg" alt="fit-store-photo" width="1000" height="600" />
-            </div>
+            @foreach (var supplement in Model.Supplements)
+            {
+                <div class="card col-md-4">
+                    <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name">
+                        <img class="card-img-top" id="home-supplement-image" src="@supplement.Picture" alt="supplement-picture">
+                    </a>
+                    <br />
+                    <br />
+                    <div class="card-block">
+                        <h4 class="card-title text-center">@supplement.Name</h4>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item text-center"><strong>Manufacturer:</strong> @supplement.ManufacturerName</li>
+                        <li class="list-group-item text-center"><strong>Quantity:</strong> @supplement.Quantity</li>
+                        <li class="list-group-item text-center"><strong>Price:</strong> @supplement.Price &euro;</li>
+                    </ul>
+                </div>
+            }
         </div>
     </div>
 </div>

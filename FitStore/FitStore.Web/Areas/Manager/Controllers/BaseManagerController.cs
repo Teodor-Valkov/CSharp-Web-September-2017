@@ -1,6 +1,5 @@
 ﻿namespace FitStore.Web.Areas.Manager.Controllers
 {
-    using Infrastructure.Extensions;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
 
@@ -11,29 +10,24 @@
     [Authorize(Roles = AdministratorRole)]
     public class BaseManagerController : Controller
     {
-        protected void AddSuccessMessage(string message)
+        protected RedirectToActionResult RedirectToCategoriesIndex(bool isDeleted)
         {
-            TempData.AddSuccessMessage(message);
+            return RedirectToAction(nameof(CategoriesController.Index), Categories, new { isDeleted });
         }
 
-        protected void AddErrorMessage(string message)
+        protected RedirectToActionResult RedirectToSubcategoriesIndex(bool isDeleted)
         {
-            TempData.AddErrorMessage(message);
+            return RedirectToAction(nameof(SubcategoriesController.Index), Subcategories, new { isDeleted });
         }
 
-        protected RedirectToActionResult RedirectToCategoriesIndex()
+        protected RedirectToActionResult RedirectToSupplementsIndex(bool isDeleted)
         {
-            return RedirectToAction(nameof(Web.Controllers.CategoriesController.Index), Categories, new { area = "" });
+            return RedirectToAction(nameof(SupplementsController.Index), Supplements, new { isDeleted });
         }
 
-        protected RedirectToActionResult RedirectToSubcategoriesIndex()
+        protected RedirectToActionResult RedirectToManufacturersIndex(bool isDeleted)
         {
-            return RedirectToAction(nameof(Web.Controllers.SubcategoriesController.Index), Subcategories, new { area = "" });
-        }
-
-        protected RedirectToActionResult RedirectToManufacturersIndex()
-        {
-            return RedirectToAction(nameof(Web.Controllers.ManufacturersController.Index), Manufacturers, new { area = "" });
+            return RedirectToAction(nameof(ManufacturersController.Index), Manufacturers, new { isDeleted });
         }
     }
 }

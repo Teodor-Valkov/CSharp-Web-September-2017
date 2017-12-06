@@ -1,10 +1,13 @@
 ﻿namespace FitStore.Services.Manager.Contracts
 {
     using Models.Subcategories;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
 
     public interface IManagerSubcategoryService
     {
+        Task<IEnumerable<SubcategoryAdvancedServiceModel>> GetAllPagedListingAsync(bool isDeleted, string searchToken, int page);
+
         Task CreateAsync(string name, int categoryId);
 
         Task<SubcategoryBasicServiceModel> GetEditModelAsync(int subcategoryId);
@@ -14,5 +17,7 @@
         Task DeleteAsync(int subcategoryId);
 
         Task RestoreAsync(int subcategoryId);
+
+        Task<int> TotalCountAsync(bool isDeleted, string searchToken);
     }
 }

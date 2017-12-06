@@ -1,8 +1,10 @@
 ﻿namespace FitStore.Web.Areas.Manager.Controllers
 {
+    using AutoMapper;
     using Infrastructure.Extensions;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
+    using Models.Supplements;
     using Services.Contracts;
     using Services.Manager.Contracts;
     using Services.Models.Manufacturers;
@@ -12,6 +14,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Web.Models.Pagination;
 
     using static Common.CommonConstants;
     using static Common.CommonMessages;
@@ -31,32 +34,63 @@
             this.manufacturerService = manufacturerService;
         }
 
+        public async Task<IActionResult> Index(string searchToken, bool isDeleted, int page = 1)
+        {
+            if (page < 1)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            PagingElementsViewModel<SupplementAdvancedServiceModel> model = new PagingElementsViewModel<SupplementAdvancedServiceModel>
+            {
+                Elements = await this.managerSupplementService.GetAllPagedListingAsync(isDeleted, searchToken, page),
+                SearchToken = searchToken,
+                IsDeleted = isDeleted,
+                Pagination = new PaginationViewModel
+                {
+                    TotalElements = await this.managerSupplementService.TotalCountAsync(isDeleted, searchToken),
+                    PageSize = SupplementPageSize,
+                    CurrentPage = page
+                }
+            };
+
+            if (page > model.Pagination.TotalPages && model.Pagination.TotalPages != 0)
+            {
+                return RedirectToAction(nameof(Index), new { page = model.Pagination.TotalPages });
+            }
+
+            return View(model);
+        }
+
         public async Task<IActionResult> Create(int categoryId)
         {
-            SupplementServiceModel formModel = new SupplementServiceModel();
+            SupplementFormViewModel model = new SupplementFormViewModel
+            {
+                CategoryId = categoryId
+            };
 
-            await PrepareModelToReturn(categoryId, formModel);
+            await PrepareModelToReturn(model.CategoryId, model);
 
-            return View(formModel);
+            return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(int categoryId, SupplementServiceModel model)
+        public async Task<IActionResult> Create(SupplementFormViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                await PrepareModelToReturn(categoryId, model);
+                await PrepareModelToReturn(model.CategoryId, model);
 
                 return View(model);
             }
 
             bool isSupplementExisting = await this.supplementService.IsSupplementExistingByName(model.Name);
 
-            if (isSupplementExisting)
+            if (!isSupplementExisting)
             {
-                this.AddErrorMessage(string.Format(EntityExists, SupplementEntity));
+                TempData.AddErrorMessage(string.Format(EntityExists, SupplementEntity));
 
-                await PrepareModelToReturn(categoryId, model);
+                await PrepareModelToReturn(model.CategoryId, model);
 
                 return View(model);
             }
@@ -65,9 +99,9 @@
 
             if (!isSubcategoryExisting)
             {
-                this.AddErrorMessage(string.Format(EntityExists, SubcategoryEntity));
+                TempData.AddErrorMessage(string.Format(EntityExists, SubcategoryEntity));
 
-                await PrepareModelToReturn(categoryId, model);
+                await PrepareModelToReturn(model.CategoryId, model);
 
                 return View(model);
             }
@@ -76,9 +110,9 @@
 
             if (!isManufacturerExisting)
             {
-                this.AddErrorMessage(string.Format(EntityExists, ManufacturerEntity));
+                TempData.AddErrorMessage(string.Format(EntityExists, ManufacturerEntity));
 
-                await PrepareModelToReturn(categoryId, model);
+                await PrepareModelToReturn(model.CategoryId, model);
 
                 return View(model);
             }
@@ -87,48 +121,72 @@
 
             await this.managerSupplementService.CreateAsync(model.Name, model.Description, model.Quantity, model.Price, picture, model.BestBeforeDate, model.SubcategoryId, model.ManufacturerId);
 
-            this.AddSuccessMessage(string.Format(EntityCreated, SupplementEntity, model.Name));
+            TempData.AddSuccessMessage(string.Format(EntityCreated, SupplementEntity, model.Name));
 
-            return this.RedirectToSubcategoriesIndex();
+            return this.RedirectToSupplementsIndex(false);
         }
 
-        public async Task<IActionResult> Edit(int categoryId, int id)
+        public async Task<IActionResult> Edit(int id, string name)
         {
-            SupplementServiceModel formModel = await this.managerSupplementService.GetEditModelAsync(id);
+            bool isSuplementExisting = await this.supplementService.IsSupplementExistingById(id);
 
-            await PrepareModelToReturn(categoryId, formModel);
+            if (!isSuplementExisting)
+            {
+                TempData.AddErrorMessage(string.Format(EntityNotFound, SupplementEntity));
 
-            return View(formModel);
+                return this.RedirectToSupplementsIndex(false);
+            }
+
+            SupplementServiceModel supplement = await this.managerSupplementService.GetEditModelAsync(id);
+
+            SupplementFormViewModel model = new SupplementFormViewModel()
+            {
+                Name = supplement.Name,
+                Description = supplement.Description,
+                Quantity = supplement.Quantity,
+                Price = supplement.Price,
+                BestBeforeDate = supplement.BestBeforeDate,
+                SubcategoryId = supplement.SubcategoryId,
+                ManufacturerId = supplement.ManufacturerId,
+                CategoryId = await this.subcategoryService.GetCategoryIdBySubcategoryId(supplement.SubcategoryId)
+            };
+
+            await PrepareModelToReturn(model.CategoryId, model);
+
+            return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int categoryId, int id, SupplementServiceModel model)
+        public async Task<IActionResult> Edit(int id, string name, SupplementFormViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                await PrepareModelToReturn(categoryId, model);
+                await PrepareModelToReturn(model.CategoryId, model);
 
                 return View(model);
             }
 
-            bool isSupplementExisting = await this.supplementService.IsSupplementExistingByName(model.Name);
-
-            if (isSupplementExisting)
+            if (name != model.Name)
             {
-                this.AddErrorMessage(string.Format(EntityExists, SupplementEntity));
+                bool isSupplementExisting = await this.supplementService.IsSupplementExistingByName(model.Name);
 
-                await PrepareModelToReturn(categoryId, model);
+                if (!isSupplementExisting)
+                {
+                    TempData.AddErrorMessage(string.Format(EntityExists, SupplementEntity));
 
-                return View(model);
+                    await PrepareModelToReturn(model.CategoryId, model);
+
+                    return View(model);
+                }
             }
 
             bool isSubcategoryExisting = await this.subcategoryService.IsSubcategoryExistingById(model.SubcategoryId);
 
             if (!isSubcategoryExisting)
             {
-                this.AddErrorMessage(string.Format(EntityExists, SubcategoryEntity));
+                TempData.AddErrorMessage(string.Format(EntityExists, SubcategoryEntity));
 
-                await PrepareModelToReturn(categoryId, model);
+                await PrepareModelToReturn(model.CategoryId, model);
 
                 return View(model);
             }
@@ -137,20 +195,20 @@
 
             if (!isManufacturerExisting)
             {
-                this.AddErrorMessage(string.Format(EntityExists, ManufacturerEntity));
+                TempData.AddErrorMessage(string.Format(EntityExists, ManufacturerEntity));
 
-                await PrepareModelToReturn(categoryId, model);
+                await PrepareModelToReturn(model.CategoryId, model);
 
                 return View(model);
             }
 
             byte[] picture = await model.Picture.ToByteArray();
 
-            await this.managerSupplementService.CreateAsync(model.Name, model.Description, model.Quantity, model.Price, picture, model.BestBeforeDate, model.SubcategoryId, model.ManufacturerId);
+            await this.managerSupplementService.EditAsync(id, model.Name, model.Description, model.Quantity, model.Price, picture, model.BestBeforeDate, model.SubcategoryId, model.ManufacturerId);
 
-            this.AddSuccessMessage(string.Format(EntityEdited, SupplementEntity, model.Name));
+            TempData.AddSuccessMessage(string.Format(EntityEdited, SupplementEntity, model.Name));
 
-            return this.RedirectToSubcategoriesIndex();
+            return this.RedirectToSupplementsIndex(false);
         }
 
         public async Task<IActionResult> Delete(int id, string name)
@@ -159,16 +217,16 @@
 
             if (!isSupplementExisting)
             {
-                this.AddErrorMessage(string.Format(EntityNotFound, SupplementEntity, name));
+                TempData.AddErrorMessage(string.Format(EntityNotFound, SupplementEntity));
 
-                return this.RedirectToSubcategoriesIndex();
+                return this.RedirectToSupplementsIndex(false);
             }
 
             await this.managerSupplementService.DeleteAsync(id);
 
-            this.AddSuccessMessage(string.Format(EntityDeleted, SupplementEntity, name));
+            TempData.AddSuccessMessage(string.Format(EntityDeleted, SupplementEntity, name));
 
-            return this.RedirectToSubcategoriesIndex();
+            return this.RedirectToSupplementsIndex(false);
         }
 
         public async Task<IActionResult> Restore(int id, string name)
@@ -177,19 +235,19 @@
 
             if (!isSupplementExisting)
             {
-                this.AddErrorMessage(string.Format(EntityNotFound, SupplementEntity, name));
+                TempData.AddErrorMessage(string.Format(EntityNotFound, SupplementEntity));
 
-                return this.RedirectToSubcategoriesIndex();
+                return this.RedirectToSupplementsIndex(true);
             }
 
             await this.managerSupplementService.RestoreAsync(id);
 
-            this.AddSuccessMessage(string.Format(EntityRestored, SupplementEntity, name));
+            TempData.AddSuccessMessage(string.Format(EntityRestored, SupplementEntity, name));
 
-            return this.RedirectToSubcategoriesIndex();
+            return this.RedirectToSupplementsIndex(true);
         }
 
-        private async Task PrepareModelToReturn(int categoryId, SupplementServiceModel model)
+        private async Task PrepareModelToReturn(int categoryId, SupplementFormViewModel model)
         {
             model.BestBeforeDate = DateTime.UtcNow;
             model.Subcategories = await this.GetSubcategoriesSelectListItems(categoryId);

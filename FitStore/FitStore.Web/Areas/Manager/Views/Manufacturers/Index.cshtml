@@ -1,0 +1,112 @@
+﻿@model PagingElementsViewModel<ManufacturerAdvancedServiceModel>
+@{
+    string isDeletedValue = "false";
+    string type = "Active";
+
+    if (Model.IsDeleted)
+    {
+        isDeletedValue = "true";
+        type = "Deleted";
+    }
+
+    ViewData["Title"] = $"All {type} Manufacturers";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (User.Identity.IsAuthenticated && User.IsInRole(WebConstants.ManagerRole))
+{
+    <div>
+        <a asp-area="Manager" asp-controller="Manufacturers" asp-action="Create" class="btn btn-success">Create Manufacturer</a>
+
+        <br />
+        <br />
+
+        @if (Model.IsDeleted)
+        {
+            <form>
+                <input type="hidden" name="isDeleted" value="false" />
+                <input class="btn btn-default" type="submit" value="Active Manufacturers" />
+            </form>
+        }
+        else
+        {
+            <form>
+                <input type="hidden" name="isDeleted" value="true" />
+                <input class="btn btn-default" type="submit" value="Deleted Manufacturers" />
+            </form>
+        }
+    </div>
+    <br />
+}
+
+<br />
+
+<div class="row">
+    <div class="col-md-4">
+        <form>
+            <label asp-for="SearchToken"></label>
+            <div class="input-group">
+                <input class="form-control" asp-for="@Model.SearchToken" />
+                <span class="input-group-btn">
+                    <input type="hidden" name="isDeleted" value="@isDeletedValue" />
+                    <input class="btn btn-primary" type="submit" value="Search" />
+                </span>
+            </div>
+        </form>
+    </div>
+</div>
+<br />
+
+@if (!Model.Elements.Any())
+{
+    <h2>No Manufacturers Found.</h2>
+}
+else
+{
+    <table class="table table-bordered table-responsive">
+        <thead>
+            <tr>
+                <th class="text-center">Name</th>
+                <th class="text-center">Supplements</th>
+                <th class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var manufacturer in Model.Elements)
+                {
+                <tr class="text-center">
+                    <td>@manufacturer.Name</td>
+                    <td>@manufacturer.Supplements</td>
+                    <td>
+                        <a asp-area="" asp-controller="Manufacturers" asp-action="Details" asp-route-id="@manufacturer.Id" asp-route-name="@manufacturer.Name" class="btn btn-primary">Details</a>
+                        <a asp-area="Manager" asp-controller="Manufacturers" asp-action="Edit" asp-route-id="@manufacturer.Id" asp-route-name="@manufacturer.Name" class="btn btn-warning">Edit</a>
+                        @if (Model.IsDeleted)
+                        {
+                            <a asp-area="Manager" asp-controller="Manufacturers" asp-action="Restore" asp-route-id="@manufacturer.Id" asp-route-name="@manufacturer.Name" class="btn btn-success">Restore</a>
+                        }
+                        else
+                        {@Html.ActionLink("Delete", "Delete", "Manufacturers", new { area = "Manager", id = manufacturer.Id, name = manufacturer.Name },
+                                new
+                                {
+                                    @class = "btn btn-danger",
+                                    onclick = $"return confirm('Are you sure you want to delete *{manufacturer.Name}*?');"
+                                })
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    if (Model.Pagination.TotalPages > 1)
+    {
+        string actionLink = string.IsNullOrWhiteSpace(Model.SearchToken)
+            ? $"/manager/manufacturers?IsDeleted={Model.IsDeleted}&"
+            : $"/manager/manufacturers?SearchToken={Model.SearchToken}&IsDeleted={Model.IsDeleted}&";
+
+        Model.Pagination.ActionLink = actionLink;
+
+        @Html.Partial("_Pagination", Model.Pagination)
+    }
+}

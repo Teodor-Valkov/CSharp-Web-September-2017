@@ -1,6 +1,6 @@
 ﻿namespace FitStore.Web.Areas.Manager.Controllers
 {
-    using AutoMapper;
+    using Infrastructure.Extensions;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
     using Models.Subcategories;
@@ -11,6 +11,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Web.Models.Pagination;
 
     using static Common.CommonConstants;
     using static Common.CommonMessages;
@@ -28,14 +29,42 @@
             this.categoryService = categoryService;
         }
 
+        public async Task<IActionResult> Index(string searchToken, bool isDeleted, int page = 1)
+        {
+            if (page < 1)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            PagingElementsViewModel<SubcategoryAdvancedServiceModel> model = new PagingElementsViewModel<SubcategoryAdvancedServiceModel>
+            {
+                Elements = await this.managerSubcategoryService.GetAllPagedListingAsync(isDeleted, searchToken, page),
+                SearchToken = searchToken,
+                IsDeleted = isDeleted,
+                Pagination = new PaginationViewModel
+                {
+                    TotalElements = await this.managerSubcategoryService.TotalCountAsync(isDeleted, searchToken),
+                    PageSize = CategoryPageSize,
+                    CurrentPage = page
+                }
+            };
+
+            if (page > model.Pagination.TotalPages && model.Pagination.TotalPages != 0)
+            {
+                return RedirectToAction(nameof(Index), new { page = model.Pagination.TotalPages });
+            }
+
+            return View(model);
+        }
+
         public async Task<IActionResult> Create()
         {
-            SubcategoryFormViewModel formModel = new SubcategoryFormViewModel
+            SubcategoryFormViewModel model = new SubcategoryFormViewModel
             {
                 Categories = await this.GetCategoriesSelectListItems()
             };
 
-            return View(formModel);
+            return View(model);
         }
 
         [HttpPost]
@@ -52,16 +81,18 @@
 
             if (isSubcategoryExisting)
             {
-                this.AddErrorMessage(string.Format(EntityExists, SubcategoryEntity));
+                TempData.AddErrorMessage(string.Format(EntityExists, SubcategoryEntity));
+
+                model.Categories = await this.GetCategoriesSelectListItems();
 
                 return View(model);
             }
 
             await this.managerSubcategoryService.CreateAsync(model.Name, model.CategoryId);
 
-            this.AddSuccessMessage(string.Format(EntityCreated, SubcategoryEntity, model.Name));
+            TempData.AddSuccessMessage(string.Format(EntityCreated, SubcategoryEntity, model.Name));
 
-            return this.RedirectToSubcategoriesIndex();
+            return this.RedirectToSubcategoriesIndex(false);
         }
 
         public async Task<IActionResult> Edit(int id, string name)
@@ -70,22 +101,25 @@
 
             if (!isSubcategoryExisting)
             {
-                this.AddErrorMessage(string.Format(EntityNotFound, SubcategoryEntity, name));
+                TempData.AddErrorMessage(string.Format(EntityNotFound, SubcategoryEntity));
 
-                return this.RedirectToSubcategoriesIndex();
+                return this.RedirectToSubcategoriesIndex(false);
             }
 
-            SubcategoryBasicServiceModel model = await this.managerSubcategoryService.GetEditModelAsync(id);
+            SubcategoryBasicServiceModel subcategory = await this.managerSubcategoryService.GetEditModelAsync(id);
 
-            SubcategoryFormViewModel formModel = Mapper.Map<SubcategoryFormViewModel>(model);
+            SubcategoryFormViewModel model = new SubcategoryFormViewModel
+            {
+                Name = subcategory.Name,
+                CategoryId = await this.subcategoryService.GetCategoryIdBySubcategoryId(subcategory.Id),
+                Categories = await this.GetCategoriesSelectListItems()
+            };
 
-            formModel.Categories = await this.GetCategoriesSelectListItems();
-
-            return View(formModel);
+            return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, SubcategoryFormViewModel model)
+        public async Task<IActionResult> Edit(int id, string name, SubcategoryFormViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -94,20 +128,25 @@
                 return View(model);
             }
 
-            bool isSubcategoryExisting = await this.subcategoryService.IsSubcategoryExistingByName(model.Name);
-
-            if (isSubcategoryExisting)
+            if (name != model.Name)
             {
-                this.AddErrorMessage(string.Format(EntityExists, SubcategoryEntity));
+                bool isSubcategoryExisting = await this.subcategoryService.IsSubcategoryExistingByName(model.Name);
 
-                return View(model);
+                if (isSubcategoryExisting)
+                {
+                    TempData.AddErrorMessage(string.Format(EntityExists, SubcategoryEntity));
+
+                    model.Categories = await this.GetCategoriesSelectListItems();
+
+                    return View(model);
+                }
             }
 
             await this.managerSubcategoryService.EditAsync(id, model.Name, model.CategoryId);
 
-            this.AddSuccessMessage(string.Format(EntityEdited, SubcategoryEntity, model.Name));
+            TempData.AddSuccessMessage(string.Format(EntityEdited, SubcategoryEntity, model.Name));
 
-            return this.RedirectToSubcategoriesIndex();
+            return this.RedirectToSubcategoriesIndex(false);
         }
 
         public async Task<IActionResult> Delete(int id, string name)
@@ -116,16 +155,16 @@
 
             if (!isSubcategoryExisting)
             {
-                this.AddErrorMessage(string.Format(EntityNotFound, SubcategoryEntity, name));
+                TempData.AddErrorMessage(string.Format(EntityNotFound, SubcategoryEntity));
 
-                return this.RedirectToSubcategoriesIndex();
+                return this.RedirectToSubcategoriesIndex(false);
             }
 
             await this.managerSubcategoryService.DeleteAsync(id);
 
-            this.AddSuccessMessage(string.Format(EntityDeleted, SubcategoryEntity, name));
+            TempData.AddSuccessMessage(string.Format(EntityDeleted, SubcategoryEntity, name));
 
-            return this.RedirectToSubcategoriesIndex();
+            return this.RedirectToSubcategoriesIndex(false);
         }
 
         public async Task<IActionResult> Restore(int id, string name)
@@ -134,16 +173,16 @@
 
             if (!isSubcategoryExisting)
             {
-                this.AddErrorMessage(string.Format(EntityNotFound, SubcategoryEntity, name));
+                TempData.AddErrorMessage(string.Format(EntityNotFound, SubcategoryEntity));
 
-                return this.RedirectToSubcategoriesIndex();
+                return this.RedirectToSubcategoriesIndex(true);
             }
 
             await this.managerSubcategoryService.RestoreAsync(id);
 
-            this.AddSuccessMessage(string.Format(EntityRestored, SubcategoryEntity, name));
+            TempData.AddSuccessMessage(string.Format(EntityRestored, SubcategoryEntity, name));
 
-            return this.RedirectToSubcategoriesIndex();
+            return this.RedirectToSubcategoriesIndex(true);
         }
 
         private async Task<IEnumerable<SelectListItem>> GetCategoriesSelectListItems()

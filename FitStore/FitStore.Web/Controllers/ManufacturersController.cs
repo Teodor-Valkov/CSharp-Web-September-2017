@@ -2,7 +2,6 @@
 {
     using Infrastructure.Extensions;
     using Microsoft.AspNetCore.Mvc;
-    using Models.Pagination;
     using Services.Contracts;
     using Services.Models.Manufacturers;
     using System.Threading.Tasks;
@@ -19,43 +18,18 @@
             this.manufacturerService = manufacturerService;
         }
 
-        public async Task<IActionResult> Index(string searchToken, int page = 1)
-        {
-            if (page < 1)
-            {
-                return RedirectToAction(nameof(Index));
-            }
-
-            PagingElementsViewModel<ManufacturerAdvancedServiceModel> model = new PagingElementsViewModel<ManufacturerAdvancedServiceModel>
-            {
-                Elements = await this.manufacturerService.GetAllListingAsync(searchToken, page),
-                SearchToken = searchToken,
-                Pagination = new PaginationViewModel
-                {
-                    TotalElements = await this.manufacturerService.TotalCountAsync(searchToken),
-                    PageSize = ManufacturerPageSize,
-                    CurrentPage = page
-                }
-            };
-
-            if (page > model.Pagination.TotalPages && model.Pagination.TotalPages != 0)
-            {
-                return RedirectToAction(nameof(Index), new { page = model.Pagination.TotalPages });
-            }
-
-            return View(model);
-        }
-
         public async Task<IActionResult> Details(int id, string name)
         {
-            ManufacturerDetailsServiceModel model = await this.manufacturerService.GetDetailsByIdAsync(id);
+            bool isManufacturerExisting = await this.manufacturerService.IsManufacturerExistingById(id);
 
-            if (model == null)
+            if (!isManufacturerExisting)
             {
-                TempData.AddErrorMessage(string.Format(EntityNotFound, ManufacturerEntity, name));
+                TempData.AddErrorMessage(string.Format(EntityNotFound, ManufacturerEntity));
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(HomeController.Index), Home);
             }
+
+            ManufacturerDetailsServiceModel model = await this.manufacturerService.GetDetailsByIdAsync(id);
 
             return View(model);
         }

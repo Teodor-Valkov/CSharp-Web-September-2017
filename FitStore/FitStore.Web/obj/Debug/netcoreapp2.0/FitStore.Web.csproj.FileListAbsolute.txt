@@ -1,0 +1,36 @@
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Web\bin\Debug\netcoreapp2.0\FitStore.Data.dll
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Web\bin\Debug\netcoreapp2.0\FitStore.Services.dll
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Web\obj\Debug\netcoreapp2.0\FitStore.Web.csprojResolveAssemblyReference.cache
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Web\obj\Debug\netcoreapp2.0\FitStore.Web.csproj.CoreCompileInputs.cache
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Web\obj\Debug\netcoreapp2.0\FitStore.Web.AssemblyInfoInputs.cache
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Web\obj\Debug\netcoreapp2.0\FitStore.Web.AssemblyInfo.cs
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Web\bin\Debug\netcoreapp2.0\FitStore.Web.deps.json
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Web\bin\Debug\netcoreapp2.0\FitStore.Web.runtimeconfig.json
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Web\bin\Debug\netcoreapp2.0\FitStore.Web.runtimeconfig.dev.json
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Web\bin\Debug\netcoreapp2.0\FitStore.Web.dll
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Web\bin\Debug\netcoreapp2.0\FitStore.Web.pdb
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Web\bin\Debug\netcoreapp2.0\FitStore.Common.dll
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Web\bin\Debug\netcoreapp2.0\FitStore.Common.pdb
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Web\bin\Debug\netcoreapp2.0\FitStore.Data.pdb
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Web\bin\Debug\netcoreapp2.0\FitStore.Services.pdb
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Web\obj\Debug\netcoreapp2.0\UserSecretsAssemblyInfo.cs
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Web\obj\Debug\netcoreapp2.0\FitStore.Web.dll
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore\FitStore.Web\obj\Debug\netcoreapp2.0\FitStore.Web.pdb
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Web\bin\Debug\netcoreapp2.0\FitStore.Web.deps.json
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Web\bin\Debug\netcoreapp2.0\FitStore.Web.runtimeconfig.json
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Web\bin\Debug\netcoreapp2.0\FitStore.Web.runtimeconfig.dev.json
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Web\bin\Debug\netcoreapp2.0\FitStore.Web.dll
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Web\bin\Debug\netcoreapp2.0\FitStore.Web.pdb
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Web\bin\Debug\netcoreapp2.0\FitStore.Common.dll
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Web\bin\Debug\netcoreapp2.0\FitStore.Data.dll
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Web\bin\Debug\netcoreapp2.0\FitStore.Services.dll
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Web\bin\Debug\netcoreapp2.0\FitStore.Common.pdb
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Web\bin\Debug\netcoreapp2.0\FitStore.Data.pdb
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Web\bin\Debug\netcoreapp2.0\FitStore.Services.pdb
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Web\obj\Debug\netcoreapp2.0\FitStore.Web.csprojResolveAssemblyReference.cache
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Web\obj\Debug\netcoreapp2.0\FitStore.Web.csproj.CoreCompileInputs.cache
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Web\obj\Debug\netcoreapp2.0\UserSecretsAssemblyInfo.cs
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Web\obj\Debug\netcoreapp2.0\FitStore.Web.AssemblyInfoInputs.cache
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Web\obj\Debug\netcoreapp2.0\FitStore.Web.AssemblyInfo.cs
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Web\obj\Debug\netcoreapp2.0\FitStore.Web.dll
+C:\Users\valko\Documents\Visual Studio 2017\Projects\FitStore - Back Up\FitStore.Web\obj\Debug\netcoreapp2.0\FitStore.Web.pdb

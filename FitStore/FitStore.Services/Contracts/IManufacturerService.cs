@@ -6,8 +6,6 @@
 
     public interface IManufacturerService
     {
-        Task<IEnumerable<ManufacturerAdvancedServiceModel>> GetAllListingAsync(string searchToken, int page);
-
         Task<IEnumerable<ManufacturerBasicServiceModel>> GetAllBasicListingAsync();
 
         Task<ManufacturerDetailsServiceModel> GetDetailsByIdAsync(int manufacturerId);
@@ -15,7 +13,5 @@
         Task<bool> IsManufacturerExistingById(int manufacturerId);
 
         Task<bool> IsManufacturerExistingByName(string name);
-
-        Task<int> TotalCountAsync(string searchToken);
     }
 }

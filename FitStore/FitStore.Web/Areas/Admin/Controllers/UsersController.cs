@@ -16,6 +16,7 @@
     using Web.Models.Pagination;
 
     using static Common.CommonConstants;
+    using static Common.CommonMessages;
 
     public class UsersController : BaseAdminController
     {
@@ -59,16 +60,13 @@
 
         public async Task<IActionResult> Details(string username)
         {
-            if (string.IsNullOrEmpty(username))
-            {
-                return NotFound();
-            }
-
             User user = await this.userManager.FindByNameAsync(username);
 
             if (user == null)
             {
-                return NotFound();
+                TempData.AddErrorMessage(string.Format(EntityNotFound, UserEntity));
+
+                return this.RedirectToAction(nameof(Index));
             }
 
             AdminUserDetailsServiceModel model = await this.adminUserService.GetDetailsByUsernameAsync(username);

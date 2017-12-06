@@ -1,24 +1,51 @@
 ﻿@model ManufacturerDetailsServiceModel
 
 @{
-    ViewData["Title"] = $"{Model.Name} - {Model.Supplements.Count()} Supplements";
+    ViewData["Title"] = $"{Model.Name}";
 }
 
 <div class="row">
     <div class="col-md-offset-1 col-md-10">
         <h2>@ViewData["Title"]</h2>
-        <h4>Address - @Model.Address</h4>
-        <br />
-
-        <div>
-            <a class="btn btn-default" asp-area="" asp-controller="Manufacturers" asp-action="Index">Back To All Manufacturers</a>
-        </div>
+        <h4>@Model.Address</h4>
+        <h4>Supplements: @Model.Supplements.Count()</h4>
         <br />
 
         @foreach (var supplement in Model.Supplements)
         {
-            <div class="text-center">
-                <h1>@supplement</h1>
+            <div class="card col-md-3">
+                <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name">
+                    <img class="card-img-top" id="manufacturer-supplement-image" src="@supplement.Picture" alt="supplement-picture">
+                </a>
+                <div class="card-block">
+                    <h4 class="card-title text-center">@supplement.Name</h4>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Manufacturer: @supplement.ManufacturerName</li>
+                    <li class="list-group-item">Quantity: @supplement.Quantity</li>
+                    <li class="list-group-item">Price: @supplement.Price $</li>
+                </ul>
+                <div class="card-block">
+                    <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" class="btn btn-primary">Details</a>
+                    @if (User.Identity.IsAuthenticated && User.IsInRole(WebConstants.ManagerRole))
+                    {
+                        <a asp-area="Manager" asp-controller="Supplements" asp-action="Edit" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" class="btn btn-warning">Edit</a>
+                        if (supplement.IsDeleted)
+                        {
+                            <a asp-area="Manager" asp-controller="Supplements" asp-action="Delete" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" class="btn btn-success">Restore</a>
+
+                        }
+                        else
+                        {
+                            @Html.ActionLink("Delete", "Delete", "Supplements", new { area = "Manager", id = supplement.Id, name = supplement.Name },
+                                new
+                                {
+                                    @class = "btn btn-danger",
+                                    onclick = $"return confirm('Are you sure you want to delete *{supplement.Name}*?');"
+                                })
+                        }
+                    }
+                </div>
             </div>
         }
     </div>

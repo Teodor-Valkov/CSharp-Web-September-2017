@@ -5,14 +5,14 @@
 
 <div class="row">
     <div class="col-md-offset-3 col-md-6">
-        <h2>@ViewData["Title"]</h2>
+        <h2 class="text-center">@ViewData["Title"]</h2>
         <hr />
 
-        <p class="text-info">
+        <p class="text-info text-center">
             You've successfully authenticated with <strong>@ViewData["LoginProvider"]</strong>.
         </p>
-        <p class="text-info">
-            Please enter an email address for this site below and click the Register button to finish logging in.
+        <p class="text-info text-center">
+            Please enter an email address for this site below and your birth date and click the Register button to finish logging in. You can also enter your full name and address.
         </p>
 
         <br />
@@ -24,8 +24,25 @@
                 <input asp-for="Email" class="form-control" />
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
-            <a asp-controller="Home" asp-action="Index" class="btn btn-default">Back To Home</a>
-            <button type="submit" class="btn btn-default">Register</button>
+            <div class="form-group">
+                <label asp-for="FullName"></label>
+                <input asp-for="FullName" class="form-control" />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Address"></label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BirthDate"></label>
+                <input asp-for="BirthDate" class="form-control" />
+                <span asp-validation-for="BirthDate" class="text-danger"></span>
+            </div>
+            <div class="text-center">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-default">Back To Home</a>
+                <button type="submit" class="btn btn-success">Register</button>
+            </div>
         </form>
     </div>
 </div>

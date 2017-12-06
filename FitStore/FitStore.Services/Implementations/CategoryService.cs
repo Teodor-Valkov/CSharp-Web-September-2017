@@ -3,14 +3,11 @@
     using AutoMapper.QueryableExtensions;
     using Contracts;
     using Data;
-    using Data.Models;
     using Microsoft.EntityFrameworkCore;
     using Models.Categories;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-
-    using static Common.CommonConstants;
 
     public class CategoryService : ICategoryService
     {
@@ -21,19 +18,11 @@
             this.database = database;
         }
 
-        public async Task<IEnumerable<CategoryAdvancedServiceModel>> GetAllListingAsync(string searchToken, int page)
+        public async Task<IEnumerable<CategoryAdvancedServiceModel>> GetAllAdvancedListingAsync()
         {
-            IQueryable<Category> categories = this.database.Categories;
-
-            if (!string.IsNullOrWhiteSpace(searchToken))
-            {
-                categories = categories.Where(c => c.Name.ToLower().Contains(searchToken.ToLower()));
-            }
-
-            return await categories
+            return await this.database
+               .Categories
                .OrderBy(c => c.Name)
-               .Skip((page - 1) * CategoryPageSize)
-               .Take(CategoryPageSize)
                .ProjectTo<CategoryAdvancedServiceModel>()
                .ToListAsync();
         }
@@ -55,17 +44,18 @@
               .FirstOrDefaultAsync();
         }
 
-        public async Task<int> TotalCountAsync(string searchToken)
+        public async Task<bool> IsCategoryExistingById(int categoryId)
         {
-            if (string.IsNullOrWhiteSpace(searchToken))
-            {
-                return await this.database.Categories.CountAsync();
-            }
-
             return await this.database
-              .Categories
-              .Where(c => c.Name.ToLower().Contains(searchToken.ToLower()))
-              .CountAsync();
+                .Categories
+                .AnyAsync(c => c.Id == categoryId);
+        }
+
+        public async Task<bool> IsCategoryExistingByName(string name)
+        {
+            return await this.database
+                .Categories
+                .AnyAsync(c => c.Name.ToLower() == name.ToLower());
         }
     }
 }
