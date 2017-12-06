@@ -8,6 +8,8 @@
     {
         Task<IEnumerable<CategoryAdvancedServiceModel>> GetAllListingAsync(string searchToken, int page);
 
+        Task<IEnumerable<CategoryBasicServiceModel>> GetAllBasicListingAsync();
+
         Task<CategoryDetailsServiceModel> GetDetailsByIdAsync(int categoryId);
 
         Task<int> TotalCountAsync(string searchToken);

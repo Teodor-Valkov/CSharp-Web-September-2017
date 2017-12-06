@@ -52,7 +52,7 @@
 
             if (model == null)
             {
-                TempData.AddErrorMessage(string.Format(ManufacturerNotFound, name));
+                TempData.AddErrorMessage(string.Format(EntityNotFound, ManufacturerEntity, name));
 
                 return RedirectToAction(nameof(Index));
             }

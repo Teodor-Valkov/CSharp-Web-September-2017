@@ -1,21 +1,24 @@
 ﻿namespace FitStore.Web.Areas.Manager.Controllers
 {
-    using Infrastructure.Extensions;
+    using FitStore.Services.Contracts;
     using Microsoft.AspNetCore.Mvc;
     using Models.Manufacturers;
     using Services.Manager.Contracts;
     using Services.Models.Manufacturers;
     using System.Threading.Tasks;
 
+    using static Common.CommonConstants;
     using static Common.CommonMessages;
 
     public class ManufacturersController : BaseManagerController
     {
         private readonly IManagerManufacturerService managerManufacturerService;
+        private readonly IManufacturerService manufacturerService;
 
-        public ManufacturersController(IManagerManufacturerService managerManufacturerService)
+        public ManufacturersController(IManagerManufacturerService managerManufacturerService, IManufacturerService manufacturerService)
         {
             this.managerManufacturerService = managerManufacturerService;
+            this.manufacturerService = manufacturerService;
         }
 
         public IActionResult Create()
@@ -31,31 +34,31 @@
                 return View(model);
             }
 
-            bool isManufacturerExisting = await this.managerManufacturerService.IsManufacturerExistingByName(model.Name);
+            bool isManufacturerExisting = await this.manufacturerService.IsManufacturerExistingByName(model.Name);
 
             if (isManufacturerExisting)
             {
-                TempData.AddErrorMessage(ManufacturerExists);
+                this.AddErrorMessage(string.Format(EntityExists, ManufacturerEntity));
 
                 return View(model);
             }
 
             await this.managerManufacturerService.CreateAsync(model.Name, model.Address);
 
-            TempData.AddSuccessMessage(string.Format(ManufacturerCreated, model.Name));
+            this.AddSuccessMessage(string.Format(EntityCreated, ManufacturerEntity, model.Name));
 
-            return RedirectToAction(nameof(Web.Controllers.ManufacturersController.Index), "Manufacturers", new { area = "" });
+            return this.RedirectToManufacturersIndex();
         }
 
         public async Task<IActionResult> Edit(int id, string name)
         {
-            bool isManufacturerExisting = await this.managerManufacturerService.IsManufacturerExistingById(id);
+            bool isManufacturerExisting = await this.manufacturerService.IsManufacturerExistingById(id);
 
             if (!isManufacturerExisting)
             {
-                TempData.AddErrorMessage(string.Format(ManufacturerNotFound, name));
+                this.AddErrorMessage(string.Format(EntityNotFound, ManufacturerEntity, name));
 
-                return RedirectToAction(nameof(Web.Controllers.ManufacturersController.Index), "Manufacturers", new { area = "" });
+                return this.RedirectToManufacturersIndex();
             }
 
             ManufacturerBasicServiceModel model = await this.managerManufacturerService.GetEditModelAsync(id);
@@ -71,56 +74,56 @@
                 return View(model);
             }
 
-            bool isManufacturerExisting = await this.managerManufacturerService.IsManufacturerExistingByName(model.Name);
+            bool isManufacturerExisting = await this.manufacturerService.IsManufacturerExistingByName(model.Name);
 
             if (isManufacturerExisting)
             {
-                TempData.AddErrorMessage(ManufacturerExists);
+                this.AddErrorMessage(string.Format(EntityExists, ManufacturerEntity));
 
                 return View(model);
             }
 
             await this.managerManufacturerService.EditAsync(id, model.Name, model.Address);
 
-            TempData.AddSuccessMessage(string.Format(ManufacturerEdited, model.Name));
+            this.AddSuccessMessage(string.Format(EntityEdited, ManufacturerEntity, model.Name));
 
-            return RedirectToAction(nameof(Web.Controllers.ManufacturersController.Index), "Manufacturers", new { area = "" });
+            return this.RedirectToManufacturersIndex();
         }
 
         public async Task<IActionResult> Delete(int id, string name)
         {
-            bool isManufacturerExisting = await this.managerManufacturerService.IsManufacturerExistingById(id);
+            bool isManufacturerExisting = await this.manufacturerService.IsManufacturerExistingById(id);
 
             if (!isManufacturerExisting)
             {
-                TempData.AddErrorMessage(string.Format(ManufacturerNotFound, name));
+                this.AddErrorMessage(string.Format(EntityNotFound, ManufacturerEntity, name));
 
-                return RedirectToAction(nameof(Web.Controllers.ManufacturersController.Index), "Manufacturers", new { area = "" });
+                return this.RedirectToManufacturersIndex();
             }
 
             await this.managerManufacturerService.DeleteAsync(id);
 
-            TempData.AddSuccessMessage(string.Format(ManufacturerDeleted, name));
+            this.AddSuccessMessage(string.Format(EntityDeleted, ManufacturerEntity, name));
 
-            return RedirectToAction(nameof(Web.Controllers.ManufacturersController.Index), "Manufacturers", new { area = "" });
+            return this.RedirectToManufacturersIndex();
         }
 
         public async Task<IActionResult> Restore(int id, string name)
         {
-            bool isManufacturerExisting = await this.managerManufacturerService.IsManufacturerExistingById(id);
+            bool isManufacturerExisting = await this.manufacturerService.IsManufacturerExistingById(id);
 
             if (!isManufacturerExisting)
             {
-                TempData.AddErrorMessage(string.Format(ManufacturerNotFound, name));
+                this.AddErrorMessage(string.Format(EntityNotFound, ManufacturerEntity, name));
 
-                return RedirectToAction(nameof(Web.Controllers.ManufacturersController.Index), "Manufacturers", new { area = "" });
+                return this.RedirectToManufacturersIndex();
             }
 
             await this.managerManufacturerService.RestoreAsync(id);
 
-            TempData.AddSuccessMessage(string.Format(ManufacturerRestored, name));
+            this.AddSuccessMessage(string.Format(EntityRestored, ManufacturerEntity, name));
 
-            return RedirectToAction(nameof(Web.Controllers.ManufacturersController.Index), "Manufacturers", new { area = "" });
+            return this.RedirectToManufacturersIndex();
         }
     }
 }

@@ -55,6 +55,7 @@
         {
             Category category = await this.database
                 .Categories
+                .Include(c => c.Subcategories)
                 .Where(c => c.Id == categoryId)
                 .FirstOrDefaultAsync();
 
@@ -77,6 +78,7 @@
         {
             Category category = await this.database
                 .Categories
+                .Include(c => c.Subcategories)
                 .Where(c => c.Id == categoryId)
                 .FirstOrDefaultAsync();
 

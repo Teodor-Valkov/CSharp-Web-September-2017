@@ -57,7 +57,8 @@
         {
             Manufacturer manufacturer = await this.database
                .Manufacturers
-               .Where(c => c.Id == manufacturerId)
+               .Include(m => m.Supplements)
+               .Where(m => m.Id == manufacturerId)
                .FirstOrDefaultAsync();
 
             foreach (Supplement supplement in manufacturer.Supplements)
@@ -74,31 +75,22 @@
         {
             Manufacturer manufacturer = await this.database
                .Manufacturers
-               .Where(c => c.Id == manufacturerId)
+               .Include(m => m.Supplements)
+               .ThenInclude(s => s.Subcategory)
+               .Where(m => m.Id == manufacturerId)
                .FirstOrDefaultAsync();
 
             foreach (Supplement supplement in manufacturer.Supplements)
             {
-                supplement.IsDeleted = false;
+                if (!supplement.Subcategory.IsDeleted)
+                {
+                    supplement.IsDeleted = false;
+                }
             }
 
             manufacturer.IsDeleted = false;
 
             await this.database.SaveChangesAsync();
-        }
-
-        public async Task<bool> IsManufacturerExistingById(int manufacturerId)
-        {
-            return await this.database
-                .Manufacturers
-                .AnyAsync(m => m.Id == manufacturerId);
-        }
-
-        public async Task<bool> IsManufacturerExistingByName(string name)
-        {
-            return await this.database
-                .Manufacturers
-                .AnyAsync(m => m.Name.ToLower() == name.ToLower());
         }
     }
 }

@@ -38,6 +38,14 @@
                .ToListAsync();
         }
 
+        public async Task<IEnumerable<ManufacturerBasicServiceModel>> GetAllBasicListingAsync()
+        {
+            return await this.database
+               .Manufacturers
+               .ProjectTo<ManufacturerBasicServiceModel>()
+               .ToListAsync();
+        }
+
         public async Task<ManufacturerDetailsServiceModel> GetDetailsByIdAsync(int manufacturerId)
         {
             return await this.database
@@ -45,6 +53,20 @@
               .Where(m => m.Id == manufacturerId)
               .ProjectTo<ManufacturerDetailsServiceModel>()
               .FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> IsManufacturerExistingById(int manufacturerId)
+        {
+            return await this.database
+                .Manufacturers
+                .AnyAsync(m => m.Id == manufacturerId);
+        }
+
+        public async Task<bool> IsManufacturerExistingByName(string name)
+        {
+            return await this.database
+                .Manufacturers
+                .AnyAsync(m => m.Name.ToLower() == name.ToLower());
         }
 
         public async Task<int> TotalCountAsync(string searchToken)

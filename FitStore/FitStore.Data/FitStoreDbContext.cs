@@ -18,6 +18,8 @@
 
         public DbSet<Review> Reviews { get; set; }
 
+        public DbSet<Subcategory> Subcategories { get; set; }
+
         public DbSet<Supplement> Supplements { get; set; }
 
         public FitStoreDbContext(DbContextOptions<FitStoreDbContext> options)

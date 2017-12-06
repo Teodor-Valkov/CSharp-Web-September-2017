@@ -1,0 +1,37 @@
+﻿@model SubcategoryFormViewModel
+
+@{
+    ViewData["Title"] = "Edit Subcategory";
+}
+
+<div class="row">
+    <div class="col-md-offset-3 col-md-6">
+
+        <div class="text-center">
+            <h2>@ViewData["Title"]</h2>
+            <br />
+        </div>
+
+        <form method="post">
+            <div class="form-text text-danger" asp-validation-summary="ModelOnly"></div>
+            <div class="form-group">
+                <label asp-for="Name"></label>
+                <input class="form-control" asp-for="Name" />
+                <span class="form-text text-danger" asp-validation-for="Name"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CategoryId"></label>
+                <select class="form-control" asp-for="CategoryId" asp-items="Model.Categories"></select>
+                <span class="form-text text-danger" asp-validation-for="CategoryId"></span>
+            </div>
+            <div class="text-center">
+                <a asp-area="" asp-controller="Subcategories" asp-action="Index" class="btn btn-default">Back To All Subcategories</a>
+                <input class="btn btn-success" type="submit" value="Edit Subcategory" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

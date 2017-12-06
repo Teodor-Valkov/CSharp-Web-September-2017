@@ -1,13 +1,13 @@
 ﻿namespace FitStore.Web.Areas.Manager.Controllers
 {
     using AutoMapper;
-    using Infrastructure.Extensions;
     using Microsoft.AspNetCore.Mvc;
     using Models.Categories;
     using Services.Manager.Contracts;
     using Services.Models.Categories;
     using System.Threading.Tasks;
 
+    using static Common.CommonConstants;
     using static Common.CommonMessages;
 
     public class CategoriesController : BaseManagerController
@@ -36,16 +36,16 @@
 
             if (isCategoryExisting)
             {
-                TempData.AddErrorMessage(CategoryExists);
+                this.AddErrorMessage(string.Format(EntityExists, CategoryEntity));
 
                 return View(model);
             }
 
             await this.managerCategoryService.CreateAsync(model.Name);
 
-            TempData.AddSuccessMessage(string.Format(CategoryCreated, model.Name));
+            this.AddSuccessMessage(string.Format(EntityCreated, CategoryEntity, model.Name));
 
-            return RedirectToAction(nameof(Web.Controllers.CategoriesController.Index), "Categories", new { area = "" });
+            return this.RedirectToCategoriesIndex();
         }
 
         public async Task<IActionResult> Edit(int id, string name)
@@ -54,9 +54,9 @@
 
             if (!isCategoryExisting)
             {
-                TempData.AddErrorMessage(string.Format(CategoryNotFound, name));
+                this.AddErrorMessage(string.Format(EntityNotFound, CategoryEntity, name));
 
-                return RedirectToAction(nameof(Web.Controllers.CategoriesController.Index), "Categories", new { area = "" });
+                return this.RedirectToCategoriesIndex();
             }
 
             CategoryBasicServiceModel model = await this.managerCategoryService.GetEditModelAsync(id);
@@ -78,16 +78,16 @@
 
             if (isCategoryExisting)
             {
-                TempData.AddErrorMessage(CategoryExists);
+                this.AddErrorMessage(string.Format(EntityExists, CategoryEntity));
 
                 return View(model);
             }
 
             await this.managerCategoryService.EditAsync(id, model.Name);
 
-            TempData.AddSuccessMessage(string.Format(CategoryEdited, model.Name));
+            this.AddSuccessMessage(string.Format(EntityEdited, CategoryEntity, model.Name));
 
-            return RedirectToAction(nameof(Web.Controllers.CategoriesController.Index), "Categories", new { area = "" });
+            return this.RedirectToCategoriesIndex();
         }
 
         public async Task<IActionResult> Delete(int id, string name)
@@ -96,16 +96,16 @@
 
             if (!isCategoryExisting)
             {
-                TempData.AddErrorMessage(string.Format(CategoryNotFound, name));
+                this.AddErrorMessage(string.Format(EntityNotFound, CategoryEntity, name));
 
-                return RedirectToAction(nameof(Web.Controllers.CategoriesController.Index), "Categories", new { area = "" });
+                return this.RedirectToCategoriesIndex();
             }
 
             await this.managerCategoryService.DeleteAsync(id);
 
-            TempData.AddSuccessMessage(string.Format(CategoryDeleted, name));
+            this.AddSuccessMessage(string.Format(EntityDeleted, CategoryEntity, name));
 
-            return RedirectToAction(nameof(Web.Controllers.CategoriesController.Index), "Categories", new { area = "" });
+            return this.RedirectToCategoriesIndex();
         }
 
         public async Task<IActionResult> Restore(int id, string name)
@@ -114,16 +114,16 @@
 
             if (!isCategoryExisting)
             {
-                TempData.AddErrorMessage(string.Format(CategoryNotFound, name));
+                this.AddErrorMessage(string.Format(EntityNotFound, CategoryEntity, name));
 
-                return RedirectToAction(nameof(Web.Controllers.CategoriesController.Index), "Categories", new { area = "" });
+                return this.RedirectToCategoriesIndex();
             }
 
             await this.managerCategoryService.RestoreAsync(id);
 
-            TempData.AddSuccessMessage(string.Format(CategoryRestored, name));
+            this.AddSuccessMessage(string.Format(EntityRestored, CategoryEntity, name));
 
-            return RedirectToAction(nameof(Web.Controllers.CategoriesController.Index), "Categories", new { area = "" });
+            return this.RedirectToCategoriesIndex();
         }
     }
 }

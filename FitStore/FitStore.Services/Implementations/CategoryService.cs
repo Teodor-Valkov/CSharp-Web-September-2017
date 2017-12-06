@@ -38,6 +38,14 @@
                .ToListAsync();
         }
 
+        public async Task<IEnumerable<CategoryBasicServiceModel>> GetAllBasicListingAsync()
+        {
+            return await this.database
+               .Categories
+               .ProjectTo<CategoryBasicServiceModel>()
+               .ToListAsync();
+        }
+
         public async Task<CategoryDetailsServiceModel> GetDetailsByIdAsync(int categoryId)
         {
             return await this.database

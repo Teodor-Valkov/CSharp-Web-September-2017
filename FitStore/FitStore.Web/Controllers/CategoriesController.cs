@@ -52,7 +52,7 @@
 
             if (model == null)
             {
-                TempData.AddErrorMessage(string.Format(CategoryNotFound, name));
+                TempData.AddErrorMessage(string.Format(EntityNotFound, CategoryEntity, name));
 
                 return RedirectToAction(nameof(Index));
             }

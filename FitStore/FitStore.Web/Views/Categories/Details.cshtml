@@ -1,7 +1,7 @@
 ﻿@model CategoryDetailsServiceModel
 
 @{
-    ViewData["Title"] = $"{Model.Name} - {Model.Supplements.Count()} Supplements";
+    ViewData["Title"] = $"{Model.Name} - {Model.Subcategories.Count()} Subcategories";
 }
 
 <div class="row">
@@ -14,10 +14,10 @@
         </div>
         <br />
 
-        @foreach (var supplement in Model.Supplements)
+        @foreach (var subcategory in Model.Subcategories)
         {
             <div class="text-center">
-                <h1>@supplement</h1>
+                <h1><a asp-area="" asp-controller="Subcategories" asp-action="Details" asp-route-id="@subcategory.Id" asp-route-name="@subcategory.Name">@subcategory.Name</a></h1>
             </div>
         }
     </div>

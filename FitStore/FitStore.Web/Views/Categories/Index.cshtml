@@ -40,6 +40,7 @@ else
         <thead>
             <tr>
                 <th class="text-center">Name</th>
+                <th class="text-center">Subcategories</th>
                 <th class="text-center">Supplements</th>
                 <th class="text-center">Actions</th>
             </tr>
@@ -49,6 +50,7 @@ else
                 {
                 <tr class="text-center">
                     <td>@category.Name</td>
+                    <td>@category.Subcategories</td>
                     <td>@category.Supplements</td>
                     <td>
                         <a asp-area="" asp-controller="Categories" asp-action="Details" asp-route-id="@category.Id" asp-route-name="@category.Name" class="btn btn-primary">Details</a>

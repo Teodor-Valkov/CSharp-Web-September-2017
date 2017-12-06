@@ -46,3 +46,8 @@ a.disabled {
 #external-login-provider {
     width: 275px;
 }
+
+div img#supplement-image {
+    width: 200px;
+    height: 300px;
+}

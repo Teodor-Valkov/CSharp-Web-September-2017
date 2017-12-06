@@ -1,0 +1,67 @@
+﻿@model SupplementServiceModel
+
+@{
+    ViewData["Title"] = "Create Supplement";
+}
+
+<div class="row">
+    <div class="col-md-offset-3 col-md-6">
+
+        <div class="text-center">
+            <h2>@ViewData["Title"]</h2>
+            <br />
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+            <div class="form-text text-danger" asp-validation-summary="ModelOnly"></div>
+            <div class="form-group">
+                <label asp-for="Name"></label>
+                <input class="form-control" asp-for="Name" />
+                <span class="form-text text-danger" asp-validation-for="Name"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description"></label>
+                <textarea class="form-control" asp-for="Description" rows="5"></textarea>
+                <span class="form-text text-danger" asp-validation-for="Description"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Quantity"></label>
+                <input class="form-control" asp-for="Quantity" />
+                <span class="form-text text-danger" asp-validation-for="Quantity"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Price"></label>
+                <input class="form-control" asp-for="Price" />
+                <span class="form-text text-danger" asp-validation-for="Price"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BestBeforeDate"></label>
+                <input class="form-control" asp-for="BestBeforeDate" />
+                <span class="form-text text-danger" asp-validation-for="BestBeforeDate"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SubcategoryId"></label>
+                <select class="form-control" asp-for="SubcategoryId" asp-items="Model.Subcategories"></select>
+                <span class="form-text text-danger" asp-validation-for="SubcategoryId"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ManufacturerId"></label>
+                <select class="form-control" asp-for="ManufacturerId" asp-items="Model.Manufacturers"></select>
+                <span class="form-text text-danger" asp-validation-for="ManufacturerId"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Picture"></label>
+                <input asp-for="Picture" />
+                <span class="form-text text-danger" asp-validation-for="Picture"></span>
+            </div>
+            <div class="text-center">
+                <a asp-area="" asp-controller="Subcategories" asp-action="Index" class="btn btn-default">Back To All Subcategories</a>
+                <input class="btn btn-success" type="submit" value="Create Supplement" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

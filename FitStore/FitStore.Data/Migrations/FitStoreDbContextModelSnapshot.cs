@@ -160,7 +160,7 @@ namespace FitStore.Data.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Subcategory");
+                    b.ToTable("Subcategories");
                 });
 
             modelBuilder.Entity("FitStore.Data.Models.Supplement", b =>

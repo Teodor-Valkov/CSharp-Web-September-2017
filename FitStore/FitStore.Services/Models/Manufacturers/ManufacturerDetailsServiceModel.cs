@@ -6,14 +6,8 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    public class ManufacturerDetailsServiceModel : IMapFrom<Manufacturer>, IHaveCustomMapping
+    public class ManufacturerDetailsServiceModel : ManufacturerBasicServiceModel, IMapFrom<Manufacturer>, IHaveCustomMapping
     {
-        public int Id { get; set; }
-
-        public string Name { get; set; }
-
-        public string Address { get; set; }
-
         public IEnumerable<string> Supplements { get; set; }
 
         public void ConfigureMapping(Profile mapper)

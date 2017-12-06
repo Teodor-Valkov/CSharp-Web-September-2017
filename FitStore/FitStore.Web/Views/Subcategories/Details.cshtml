@@ -1,0 +1,59 @@
+﻿@model SubcategoryDetailsServiceModel
+
+@{
+    ViewData["Title"] = $"{Model.Name} - Supplements";
+}
+
+<div class="row">
+    <div class="col-md-offset-1 col-md-10">
+        <h2>@ViewData["Title"]</h2>
+
+        @if (User.Identity.IsAuthenticated && User.IsInRole(WebConstants.ManagerRole))
+        {
+            <div>
+                <a asp-area="Manager" asp-controller="Supplements" asp-action="Create" asp-route-categoryId="@Model.CategoryId" class="btn btn-default">Create Supplement</a>
+            </div>
+            <br />
+        }
+
+        <br />
+
+        <div>
+            <a class="btn btn-default" asp-area="" asp-controller="Subcategories" asp-action="Index">Back To All Subcategories</a>
+        </div>
+        <br />
+
+        @foreach (var supplement in Model.Supplements)
+        {
+            <div class="card col-md-3">
+                <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name">
+                    <img class="card-img-top" id="supplement-image" src="@supplement.Picture" alt="supplement-picture">
+                </a>
+                <div class="card-block">
+                    <h4 class="card-title text-center">@supplement.Name</h4>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Manufacturer: @supplement.ManufacturerName</li>
+                    <li class="list-group-item">Quantity: @supplement.Quantity</li>
+                    <li class="list-group-item">Price: @supplement.Price $</li>
+                </ul>
+                <div class="card-block">
+                    <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" class="card-link">Details</a>
+                    @if (User.Identity.IsAuthenticated && User.IsInRole(WebConstants.ManagerRole))
+                    {
+                        <a asp-area="Manager" asp-controller="Supplements" asp-action="Edit" asp-route-categoryId="@Model.CategoryId" asp-route-id="@supplement.Id" class="card-link">Edit</a>
+                        if (supplement.IsDeleted)
+                        {
+                            <a asp-area="Manager" asp-controller="Supplements" asp-action="Delete" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" class="card-link">Restore</a>
+
+                        }
+                        else
+                        {
+                            <a asp-area="Manager" asp-controller="Supplements" asp-action="Delete" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" class="card-link">Delete</a>
+                        }
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>

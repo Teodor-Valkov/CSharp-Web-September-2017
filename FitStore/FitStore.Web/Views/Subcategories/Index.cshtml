@@ -1,0 +1,89 @@
+﻿@model SubcategoryPageViewModel
+@{
+    ViewData["Title"] = $"All Subcategories in {Model.Category}";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (User.Identity.IsAuthenticated && User.IsInRole(WebConstants.ManagerRole))
+{
+    <div>
+        <a asp-area="Manager" asp-controller="Subcategories" asp-action="Create" class="btn btn-default">Create Subcategory</a>
+    </div>
+    <br />
+}
+
+<br />
+
+<div class="row">
+    <div class="col-md-4">
+        <form>
+            <label asp-for="SearchToken"></label>
+            <div class="input-group">
+                <input class="form-control" asp-for="@Model.SearchToken" />
+                <span class="input-group-btn">
+                    <input class="btn btn-primary" type="submit" value="Search" />
+                </span>
+            </div>
+        </form>
+    </div>
+</div>
+<br />
+
+@if (!Model.Elements.Any())
+{
+    <h2>No Subcategories Found.</h2>
+}
+else
+{
+    <table class="table table-bordered table-responsive">
+        <thead>
+            <tr>
+                <th class="text-center">Name</th>
+                <th class="text-center">Supplements</th>
+                <th class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var subcategory in Model.Elements)
+                {
+                <tr class="text-center">
+                    <td>@subcategory.Name</td>
+                    <td>@subcategory.Supplements</td>
+                    <td>
+                        <a asp-area="" asp-controller="Subcategories" asp-action="Details" asp-route-id="@subcategory.Id" asp-route-name="@subcategory.Name" class="btn btn-primary">Details</a>
+                        @if (User.Identity.IsAuthenticated && User.IsInRole(WebConstants.ManagerRole))
+                        {
+                            <a asp-area="Manager" asp-controller="Subcategories" asp-action="Edit" asp-route-id="@subcategory.Id" asp-route-name="@subcategory.Name" class="btn btn-warning">Edit</a>
+                            if (subcategory.IsDeleted)
+                            {
+                                <a asp-area="Manager" asp-controller="Subcategories" asp-action="Restore" asp-route-id="@subcategory.Id" asp-route-name="@subcategory.Name" class="btn btn-success">Restore</a>
+                            }
+                            else
+                            {
+
+                                @Html.ActionLink("Delete", "Delete", "Subcategories", new { area = "Manager", id = subcategory.Id, name = subcategory.Name },
+                                new
+                                {
+                                    @class = "btn btn-danger",
+                                    onclick = $"return confirm('Are you sure you want to delete *{subcategory.Name}*?');"
+                                })
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    if (Model.Pagination.TotalPages > 1)
+    {
+        string actionLink = string.IsNullOrWhiteSpace(Model.SearchToken)
+            ? $"/subcategories?"
+            : $"/subcategories?SearchToken={Model.SearchToken}&";
+
+        Model.Pagination.ActionLink = actionLink;
+
+        @Html.Partial("_Pagination", Model.Pagination)
+    }
+}

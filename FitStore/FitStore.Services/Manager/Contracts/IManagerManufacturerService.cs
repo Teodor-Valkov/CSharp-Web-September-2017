@@ -14,9 +14,5 @@
         Task DeleteAsync(int manufacturerId);
 
         Task RestoreAsync(int manufacturerId);
-
-        Task<bool> IsManufacturerExistingById(int manufacturerId);
-
-        Task<bool> IsManufacturerExistingByName(string name);
     }
 }
