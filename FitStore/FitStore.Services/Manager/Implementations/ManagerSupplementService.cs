@@ -115,7 +115,10 @@
         {
             if (string.IsNullOrWhiteSpace(searchToken))
             {
-                return await this.database.Supplements.Where(s => s.IsDeleted == isDeleted).CountAsync();
+                return await this.database
+                    .Supplements
+                    .Where(s => s.IsDeleted == isDeleted)
+                    .CountAsync();
             }
 
             return await this.database

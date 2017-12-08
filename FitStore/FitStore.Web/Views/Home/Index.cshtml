@@ -67,9 +67,9 @@
             <br />
             @foreach (var supplement in Model.Supplements)
             {
-                <div class="card col-md-4">
+                <div class="card col-md-4 text-center">
                     <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name">
-                        <img class="card-img-top" id="home-supplement-image" src="@supplement.Picture" alt="supplement-picture">
+                        <img class="card-img-top img-rounded" id="home-supplement-image" src="@supplement.Picture" alt="supplement-picture">
                     </a>
                     <br />
                     <br />
@@ -77,9 +77,9 @@
                         <h4 class="card-title text-center">@supplement.Name</h4>
                     </div>
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item text-center"><strong>Manufacturer:</strong> @supplement.ManufacturerName</li>
-                        <li class="list-group-item text-center"><strong>Quantity:</strong> @supplement.Quantity</li>
-                        <li class="list-group-item text-center"><strong>Price:</strong> @supplement.Price &euro;</li>
+                        <li class="list-group-item"><strong>Manufacturer:</strong> @supplement.ManufacturerName</li>
+                        <li class="list-group-item"><strong>Quantity:</strong> @supplement.Quantity</li>
+                        <li class="list-group-item"><strong>Price:</strong> @supplement.Price &euro;</li>
                     </ul>
                 </div>
             }

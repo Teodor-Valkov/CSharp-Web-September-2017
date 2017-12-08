@@ -8,5 +8,16 @@
         public const string EntityEdited = "{0} *{1}* was edited successfully.";
         public const string EntityDeleted = "{0} *{1}* was deleted successfully.";
         public const string EntityRestored = "{0} *{1}* was restored successfully.";
+
+        public const string InvalidIdentityDetailsErroMessage = "Invalid identity details.";
+        public const string ChangeRoleErrorMessage = "Error. {0}";
+        public const string ChangeRoleSuccessMessage = "User *{0}* has been added to role *{1}*.";
+
+        public const string UserEditProfileErrorMessage = "Error. Your profile could not be changed. Please try again.";
+        public const string UserEditProfileSuccessMessage = "Your profile was successfully changed.";
+
+        public const string UserChangePasswordExternalLoginErrorMessage = "You do not have a password. You are using an external login provider.";
+        public const string UserChangePasswordErrorMessage = "Error. Your password could not be changed. Please try again.";
+        public const string UserChangePasswordSuccessMessage = "Your password was successfully changed.";
     }
 }

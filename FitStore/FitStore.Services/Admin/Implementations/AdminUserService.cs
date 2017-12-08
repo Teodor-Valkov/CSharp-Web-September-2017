@@ -54,7 +54,9 @@
         {
             if (string.IsNullOrWhiteSpace(searchToken))
             {
-                return await this.database.Users.CountAsync();
+                return await this.database
+                    .Users
+                    .CountAsync();
             }
 
             return await this.database

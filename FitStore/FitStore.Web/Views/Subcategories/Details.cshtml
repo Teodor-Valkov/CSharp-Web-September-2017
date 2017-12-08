@@ -16,14 +16,14 @@
 
         @foreach (var supplement in Model.Supplements)
         {
-            <div class="card col-md-4">
+            <div class="card col-md-4 text-center">
                 <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name">
                     <img class="card-img-top" id="subcategory-supplement-image" src="@supplement.Picture" alt="supplement-picture">
                 </a>
                 <br />
                 <br />
                 <div class="card-block">
-                    <h4 class="card-title text-center">@supplement.Name</h4>
+                    <h4 class="card-title">@supplement.Name</h4>
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item"><strong>Manufacturer:</strong> @supplement.ManufacturerName</li>
@@ -43,11 +43,11 @@
                         else
                         {
                             @Html.ActionLink("Delete", "Delete", "Supplements", new { area = "Manager", id = supplement.Id, name = supplement.Name },
-                                new
-                                {
-                                    @class = "btn btn-danger",
-                                    onclick = $"return confirm('Are you sure you want to delete *{supplement.Name}*?');"
-                                })
+                                     new
+                                     {
+                                         @class = "btn btn-danger",
+                                         onclick = $"return confirm('Are you sure you want to delete *{supplement.Name}*?');"
+                                     })
                         }
                     }
                 </div>

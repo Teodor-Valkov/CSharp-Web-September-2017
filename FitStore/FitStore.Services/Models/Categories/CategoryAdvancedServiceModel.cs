@@ -3,7 +3,7 @@
     using AutoMapper;
     using Common.Mapping;
     using Data.Models;
-    using FitStore.Services.Models.Subcategories;
+    using Models.Subcategories;
     using System.Collections.Generic;
     using System.Linq;
 

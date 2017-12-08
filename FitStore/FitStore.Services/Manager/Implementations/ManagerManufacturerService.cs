@@ -118,7 +118,10 @@
         {
             if (string.IsNullOrWhiteSpace(searchToken))
             {
-                return await this.database.Manufacturers.Where(m => m.IsDeleted == isDeleted).CountAsync();
+                return await this.database
+                    .Manufacturers
+                    .Where(m => m.IsDeleted == isDeleted)
+                    .CountAsync();
             }
 
             return await this.database

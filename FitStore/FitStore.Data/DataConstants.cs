@@ -35,5 +35,7 @@
         public const int UserAddressMaxLength = 100;
         public const int UserPasswordMinLength = 3;
         public const int UserPasswordMaxLength = 100;
+        public const int UserPhoneNumberMinLength = 6;
+        public const int UserPhoneNumberMaxLength = 12;
     }
 }

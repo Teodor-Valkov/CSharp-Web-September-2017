@@ -47,46 +47,24 @@ a.disabled {
     width: 275px;
 }
 
-div img#home-supplement-image {
-    width: 180px;
-    height: 180px;
-    padding-left: 50px;
-}
-
-div img#category-supplement-image {
-    width: 200px;
-    height: 200px;
-    padding-left: 80px;
-}
-
-div img#subcategory-supplement-image {
-    width: 200px;
-    height: 200px;
-    padding-left: 80px;
-}
-
-div img#supplement-details-image {
-    width: 200px;
-    height: 300px;
-}
-
 div img#supplements-index-image {
     width: 25px;
     height: 50px;
 }
 
-div img#subcategory-supplement-image {
-    width: 200px;
-    height: 200px;
-    padding-left: 80px;
-}
-
+div img#home-supplement-image,
+div img#supplement-details-image,
+div img#category-supplement-image,
+div img#subcategory-supplement-image,
 div img#manufacturer-supplement-image {
-    width: 150px;
+    width: 100px;
     height: 150px;
-    padding-left: 60px;
 }
 
 div li#home-category-link a:hover {
-    background-color: ActiveCaption;
+    background-color: wheat;
+}
+
+div li#home-subcategory-link a:hover {
+    background-color: aliceblue;
 }

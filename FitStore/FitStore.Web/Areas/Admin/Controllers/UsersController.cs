@@ -107,7 +107,7 @@
 
             if (!ModelState.IsValid || !isRoleExisting || !isUserExisting)
             {
-                TempData.AddErrorMessage("Invalid identity details.");
+                TempData.AddErrorMessage(InvalidIdentityDetailsErroMessage);
 
                 return RedirectToAction(nameof(Details), new { model.Username });
             }
@@ -120,14 +120,14 @@
             {
                 string errors = string.Join(Environment.NewLine, addToRoleResult.Errors.Select(e => e.Description));
 
-                TempData.AddErrorMessage($"Error. {errors}");
+                TempData.AddErrorMessage(string.Format(ChangeRoleErrorMessage, errors));
 
                 return RedirectToAction(nameof(Details), new { model.Username });
             }
 
             await this.userManager.UpdateAsync(user);
 
-            TempData.AddSuccessMessage($"User '{user.UserName}' has been added to role '{model.Role}'.");
+            TempData.AddSuccessMessage(string.Format(ChangeRoleSuccessMessage, user.UserName, model.Role));
 
             return RedirectToAction(nameof(Details), new { model.Username });
         }
@@ -140,7 +140,7 @@
 
             if (!ModelState.IsValid || !isRoleExisting || !isUserExisting)
             {
-                TempData.AddErrorMessage("Invalid identity details.");
+                TempData.AddErrorMessage(InvalidIdentityDetailsErroMessage);
 
                 return RedirectToAction(nameof(Details), new { model.Username });
             }
@@ -153,14 +153,14 @@
             {
                 string errors = string.Join(Environment.NewLine, removeFromRoleResult.Errors.Select(e => e.Description));
 
-                TempData.AddErrorMessage($"Error. {errors}");
+                TempData.AddErrorMessage(string.Format(ChangeRoleErrorMessage, errors));
 
                 return RedirectToAction(nameof(Details), new { model.Username });
             }
 
             await this.userManager.UpdateAsync(user);
 
-            TempData.AddSuccessMessage($"User '{user.UserName}' has been removed from role '{model.Role}'.");
+            TempData.AddSuccessMessage(string.Format(ChangeRoleSuccessMessage, user.UserName, model.Role));
 
             return RedirectToAction(nameof(Details), new { model.Username });
         }

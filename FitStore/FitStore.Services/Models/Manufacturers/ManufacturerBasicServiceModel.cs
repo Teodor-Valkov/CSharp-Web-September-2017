@@ -1,6 +1,9 @@
 ﻿namespace FitStore.Services.Models.Manufacturers
 {
-    public class ManufacturerBasicServiceModel
+    using Common.Mapping;
+    using Data.Models;
+
+    public class ManufacturerBasicServiceModel : IMapFrom<Manufacturer>
     {
         public int Id { get; set; }
 

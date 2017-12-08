@@ -3,6 +3,7 @@
     public class CommonConstants
     {
         public const int UserPageSize = 5;
+        public const int UserProfilePageSize = 3;
         public const int CategoryPageSize = 3;
         public const int SubcategoryPageSize = 3;
         public const int ManufacturerPageSize = 3;
@@ -23,6 +24,10 @@
         public const string UserFullNameName = "Full Name";
         public const string UserBirthDateName = "Birth Date";
         public const string UserRegistrationDateName = "Registration Date";
+        public const string UserPhoneNumberName = "Phone";
+        public const string UserPasswordName = "Password";
+        public const string UserConfirmPasswordName = "Confirm password";
+        public const string UserCurrentPasswordName = "Current password";
         public const string UserCurrentRolesName = "Current Roles";
         public const string UserAllRolesName = "All Roles";
 

@@ -12,7 +12,7 @@
         <br />
         <br />
         <div>
-            <img id="supplement-details-image" src="@Model.Picture" alt="supplement-picture">
+            <img id="supplement-details-image" class="text-center" src="@Model.Picture" alt="supplement-picture">
         </div>
         <br />
         <br />
@@ -43,11 +43,11 @@
                 else
                 {
                     @Html.ActionLink("Delete", "Delete", "Supplements", new { area = "Manager", id = Model.Id, name = Model.Name },
-                                new
-                                {
-                                    @class = "btn btn-danger",
-                                    onclick = $"return confirm('Are you sure you want to delete *{Model.Name}*?');"
-                                })
+                                          new
+                                          {
+                                              @class = "btn btn-danger",
+                                              onclick = $"return confirm('Are you sure you want to delete *{Model.Name}*?');"
+                                          })
                 }
             }
         </div>

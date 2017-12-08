@@ -77,6 +77,7 @@
             Category category = await this.database
                 .Categories
                 .Include(c => c.Subcategories)
+                .ThenInclude(s => s.Supplements)
                 .Where(c => c.Id == categoryId)
                 .FirstOrDefaultAsync();
 
@@ -100,6 +101,7 @@
             Category category = await this.database
                 .Categories
                 .Include(c => c.Subcategories)
+                .ThenInclude(s => s.Supplements)
                 .Where(c => c.Id == categoryId)
                 .FirstOrDefaultAsync();
 
@@ -122,7 +124,10 @@
         {
             if (string.IsNullOrWhiteSpace(searchToken))
             {
-                return await this.database.Categories.Where(c => c.IsDeleted == isDeleted).CountAsync();
+                return await this.database
+                    .Categories
+                    .Where(c => c.IsDeleted == isDeleted)
+                    .CountAsync();
             }
 
             return await this.database

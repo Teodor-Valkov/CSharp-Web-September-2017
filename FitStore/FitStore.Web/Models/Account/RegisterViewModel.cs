@@ -3,6 +3,7 @@
     using System;
     using System.ComponentModel.DataAnnotations;
 
+    using static Common.CommonConstants;
     using static Data.DataConstants;
 
     public class RegisterViewModel
@@ -12,9 +13,9 @@
         [MaxLength(UserUsernameMaxLength, ErrorMessage = "The {0} must be less than {1} characters long.")]
         public string Username { get; set; }
 
-        [Display(Name = "Full Name")]
         [MinLength(UserFullNameMinLength, ErrorMessage = "The {0} must be at least {1} symbols long.")]
         [MaxLength(UserFullNameMaxLength, ErrorMessage = "The {0} must be less than {1} characters long.")]
+        [Display(Name = UserFullNameName)]
         public string FullName { get; set; }
 
         [Required]
@@ -33,13 +34,18 @@
         [MaxLength(UserPasswordMaxLength, ErrorMessage = "The {0} must be less than {1} characters long.")]
         public string Password { get; set; }
 
+        [Compare(nameof(Password), ErrorMessage = "The password and confirmation password do not match.")]
         [DataType(DataType.Password)]
-        [Display(Name = "Confirm password")]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        [Display(Name = UserConfirmPasswordName)]
         public string ConfirmPassword { get; set; }
 
-        [Display(Name = "Birth Date")]
+        [MinLength(UserPhoneNumberMinLength, ErrorMessage = "The {0} must be at least {1} symbols long.")]
+        [MaxLength(UserPhoneNumberMaxLength, ErrorMessage = "The {0} must be less than {1} characters long.")]
+        [Display(Name = UserPhoneNumberName)]
+        public string PhoneNumber { get; set; }
+
         [DataType(DataType.Date)]
+        [Display(Name = UserBirthDateName)]
         public DateTime BirthDate { get; set; }
     }
 }
