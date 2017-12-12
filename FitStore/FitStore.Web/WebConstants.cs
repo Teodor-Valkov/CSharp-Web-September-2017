@@ -11,6 +11,7 @@
         public const string ManagerRole = "Manager";
 
         public const string TempDataSuccessMessageKey = "SuccessMessage";
+        public const string TempDataWarningMessageKey = "WarningMessage";
         public const string TempDataErrorMessageKey = "ErrorMessage";
     }
 }

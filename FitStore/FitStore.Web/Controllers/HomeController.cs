@@ -1,13 +1,13 @@
 ﻿namespace FitStore.Web.Controllers
 {
-    using FitStore.Services.Contracts;
-    using FitStore.Web.Models.Home;
     using Microsoft.AspNetCore.Mvc;
     using Models;
+    using Models.Home;
+    using Services.Contracts;
     using System.Diagnostics;
     using System.Threading.Tasks;
 
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly ICategoryService categoryService;
         private readonly ISupplementService supplementService;
@@ -25,6 +25,8 @@
                 Categories = await this.categoryService.GetAllAdvancedListingAsync(),
                 Supplements = await this.supplementService.GetAllAdvancedListingAsync()
             };
+
+            ViewData["ReturnUrl"] = this.RedirectToHomeIndex();
 
             return View(model);
         }

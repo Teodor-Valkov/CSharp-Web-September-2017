@@ -4,12 +4,13 @@
     using Microsoft.AspNetCore.Mvc;
     using Services.Contracts;
     using Services.Models.Categories;
+    using System;
     using System.Threading.Tasks;
 
     using static Common.CommonConstants;
     using static Common.CommonMessages;
 
-    public class CategoriesController : Controller
+    public class CategoriesController : BaseController
     {
         private ICategoryService categoryService;
 
@@ -20,7 +21,7 @@
 
         public async Task<IActionResult> Details(int id, string name)
         {
-            bool isCategoryExisting = await this.categoryService.IsCategoryExistingById(id);
+            bool isCategoryExisting = await this.categoryService.IsCategoryExistingById(id, false);
 
             if (!isCategoryExisting)
             {
@@ -30,6 +31,8 @@
             }
 
             CategoryDetailsServiceModel model = await this.categoryService.GetDetailsByIdAsync(id);
+
+            ViewData["ReturnUrl"] = this.RedirectToCategoryDetails(id, name);
 
             return View(model);
         }

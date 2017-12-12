@@ -10,8 +10,12 @@
 
         Task<ManufacturerDetailsServiceModel> GetDetailsByIdAsync(int manufacturerId);
 
+        Task<bool> IsManufacturerExistingById(int manufacturerId, bool isDeleted);
+
         Task<bool> IsManufacturerExistingById(int manufacturerId);
 
         Task<bool> IsManufacturerExistingByName(string name);
+
+        Task<bool> IsManufacturerExistingByIdAndName(int manufacturerId, string name);
     }
 }

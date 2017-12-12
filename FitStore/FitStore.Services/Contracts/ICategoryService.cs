@@ -12,8 +12,12 @@
 
         Task<CategoryDetailsServiceModel> GetDetailsByIdAsync(int categoryId);
 
+        Task<bool> IsCategoryExistingById(int categoryId, bool isDeleted);
+
         Task<bool> IsCategoryExistingById(int categoryId);
 
         Task<bool> IsCategoryExistingByName(string name);
+
+        Task<bool> IsCategoryExistingByIdAndName(int categoryId, string name);
     }
 }

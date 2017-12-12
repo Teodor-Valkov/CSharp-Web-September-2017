@@ -1,0 +1,44 @@
+﻿@model PagingElementViewModel<UserProfileServiceModel>
+
+@{
+    ViewData["Title"] = "Profile Details";
+}
+
+<div class="row">
+    <div class="col-md-offset-2 col-md-8">
+        <br />
+        <h2 class="text-center">@ViewData["Title"]</h2>
+        <hr />
+
+        <table class="table table-bordered table-responsive">
+            <tr>
+                <th><label asp-for="@Model.Element.Username"></label></th>
+                <td>@Model.Element.Username</td>
+            </tr>
+            <tr>
+                <th><label asp-for="@Model.Element.FullName"></label></th>
+                <td>@Model.Element.FullName</td>
+            </tr>
+            <tr>
+                <th><label asp-for="@Model.Element.Email"></label></th>
+                <td>@Model.Element.Email</td>
+            </tr>
+            <tr>
+                <th><label asp-for="@Model.Element.Address"></label></th>
+                <td>@Model.Element.Address</td>
+            </tr>
+            <tr>
+                <th><label asp-for="@Model.Element.BirthDate"></label></th>
+                <td>@Model.Element.BirthDate.ToShortDateString()</td>
+            </tr>
+        </table>
+
+        @if (Model.Element.Username == User.Identity.Name)
+            {
+            <div class="text-center">
+                <a asp-action="EditProfile" asp-route-username="@User.Identity.Name" class="btn btn-default">Edit Profile</a>
+                <a asp-action="ChangePassword" asp-route-username="@User.Identity.Name" class="btn btn-default">Change Password</a>
+            </div>
+        }
+    </div>
+</div>

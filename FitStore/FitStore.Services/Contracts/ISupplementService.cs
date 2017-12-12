@@ -10,8 +10,12 @@
 
         Task<SupplementDetailsServiceModel> GetDetailsByIdAsync(int supplementId);
 
+        Task<bool> IsSupplementExistingById(int supplementId, bool isDeleted);
+
         Task<bool> IsSupplementExistingById(int supplementId);
 
         Task<bool> IsSupplementExistingByName(string name);
+
+        Task<bool> IsSupplementExistingByIdAndName(int supplementId, string name);
     }
 }

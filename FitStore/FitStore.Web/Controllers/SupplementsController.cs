@@ -18,9 +18,11 @@
             this.supplementService = supplementService;
         }
 
-        public async Task<IActionResult> Details(int id, string name)
+        public async Task<IActionResult> Details(int id, string name, string returnUrl)
         {
-            bool isSupplementExisting = await this.supplementService.IsSupplementExistingById(id);
+            ViewData["ReturnUrl"] = returnUrl;
+
+            bool isSupplementExisting = await this.supplementService.IsSupplementExistingById(id, false);
 
             if (!isSupplementExisting)
             {

@@ -18,6 +18,8 @@
 
         Task RestoreAsync(int manufacturerId);
 
+        Task<bool> IsManufacturerModified(int manufacturerId, string name, string address);
+
         Task<int> TotalCountAsync(bool isDeleted, string searchToken);
     }
 }

@@ -14,12 +14,17 @@
 
         public IEnumerable<SupplementAdvancedServiceModel> Supplements { get; set; }
 
+        public bool IsDeleted { get; set; }
+
         public void ConfigureMapping(Profile mapper)
         {
             mapper
                 .CreateMap<Category, CategoryDetailsServiceModel>()
-                    .ForMember(dest => dest.Subcategories, opt => opt.MapFrom(src => src.Subcategories))
-                    .ForMember(dest => dest.Supplements, opt => opt.MapFrom(src => src.Subcategories.SelectMany(s => s.Supplements)));
+                    .ForMember(dest => dest.Subcategories, opt => opt
+                        .MapFrom(src => src.Subcategories.Where(sc => sc.IsDeleted == false)))
+                    .ForMember(dest => dest.Supplements, opt => opt
+                        .MapFrom(src => src.Subcategories.Where(sc => sc.IsDeleted == false)
+                            .SelectMany(s => s.Supplements.Where(sup => sup.IsDeleted == false))));
         }
     }
 }

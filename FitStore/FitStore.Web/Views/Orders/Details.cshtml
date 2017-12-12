@@ -1,0 +1,73 @@
+﻿@model ShoppingCart
+
+@{
+    ViewData["Title"] = "Your Cart";
+}
+
+<div class="row">
+    <br />
+
+    <div class="col-12 text-center">
+        <h2>@ViewData["Title"] </h2>
+    </div>
+
+    <br />
+
+    @if (!Model.Supplements.Any())
+    {
+        <h2 class="text-center">No Supplents In Cart.</h2>
+    }
+    else
+    {
+        <table class="table table-bordered table-responsive">
+            <thead>
+                <tr>
+                    <th class="text-center">Picture</th>
+                    <th class="text-center">Name</th>
+                    <th class="text-center">Manufacturer</th>
+                    <th class="text-center">Price</th>
+                    <th class="text-center">Quantity</th>
+                    <th class="text-center">Subtotal</th>
+                    <th class="text-center">Remove</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var supplement in Model.Supplements)
+                {
+                    <tr class="text-center">
+                        <td>
+                            <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name">
+                                <img id="supplements-index-image" src="@supplement.Picture" alt="supplement-picture">
+                            </a>
+                        </td>
+                        <td>@supplement.Name</td>
+                        <td>@supplement.ManufacturerName</td>
+                        <td>@supplement.Price &euro;</td>
+                        <td>
+                            <a asp-area="" asp-controller="Orders" asp-action="Remove" asp-route-id="@supplement.Id" class="btn btn-default btn-xs">-</a>
+                            @supplement.Quantity
+                            <a asp-area="" asp-controller="Orders" asp-action="Add" asp-route-id="@supplement.Id" asp-route-returnUrl="@Context.Request.Path" class="btn btn-default btn-xs">+</a>
+                        </td>
+                        <td>@(@supplement.Price * @supplement.Quantity) &euro;</td>
+                        <td>
+                            <a asp-area="" asp-controller="Orders" asp-action="RemoveAll" asp-route-id="@supplement.Id" class="btn btn-danger">X</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <br />
+
+        <div class="text-center">
+            <h2>Total Price: @Model.TotalPrice &euro;</h2>
+        </div>
+
+        <br />
+
+        <div class="text-center">
+            <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-default">Continue Shopping</a>
+            <a asp-area="" asp-controller="orders" asp-action="Checkout" class="btn btn-success">Checkout</a>
+        </div>
+    }
+</div>

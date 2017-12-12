@@ -4,6 +4,7 @@
     using Common.Mapping;
     using Data.Models;
     using Models.Categories;
+    using System.Linq;
 
     public class SubcategoryCountServiceModel : CategoryBasicServiceModel, IMapFrom<Subcategory>, IHaveCustomMapping
     {
@@ -13,7 +14,7 @@
         {
             mapper
              .CreateMap<Subcategory, SubcategoryCountServiceModel>()
-                 .ForMember(dest => dest.Supplements, opt => opt.MapFrom(src => src.Supplements.Count));
+                 .ForMember(dest => dest.Supplements, opt => opt.MapFrom(src => src.Supplements.Count(s => s.IsDeleted == false)));
         }
     }
 }

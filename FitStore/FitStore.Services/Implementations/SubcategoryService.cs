@@ -47,6 +47,13 @@
             return subcategory.CategoryId;
         }
 
+        public async Task<bool> IsSubcategoryExistingById(int subcategoryId, bool isDeleted)
+        {
+            return await this.database
+                .Subcategories
+                .AnyAsync(s => s.Id == subcategoryId && s.IsDeleted == isDeleted);
+        }
+
         public async Task<bool> IsSubcategoryExistingById(int subcategoryId)
         {
             return await this.database
@@ -59,6 +66,13 @@
             return await this.database
                 .Subcategories
                 .AnyAsync(s => s.Name.ToLower() == name.ToLower());
+        }
+
+        public async Task<bool> IsSubcategoryExistingByIdAndName(int subcategoryId, string name)
+        {
+            return await this.database
+                .Subcategories
+                .AnyAsync(s => s.Id != subcategoryId && s.Name.ToLower() == name.ToLower());
         }
     }
 }

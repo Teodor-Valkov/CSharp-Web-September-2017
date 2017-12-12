@@ -3,6 +3,7 @@
     using AutoMapper;
     using Common.Mapping;
     using Data.Models;
+    using System.Linq;
 
     public class SubcategoryAdvancedServiceModel : SubcategoryBasicServiceModel, IMapFrom<Subcategory>, IHaveCustomMapping
     {
@@ -14,7 +15,7 @@
         {
             mapper
                 .CreateMap<Subcategory, SubcategoryAdvancedServiceModel>()
-                    .ForMember(dest => dest.Supplements, opt => opt.MapFrom(src => src.Supplements.Count));
+                    .ForMember(dest => dest.Supplements, opt => opt.MapFrom(src => src.Supplements.Count(s => s.IsDeleted == false)));
         }
     }
 }

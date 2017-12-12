@@ -18,6 +18,8 @@
 
         Task RestoreAsync(int categoryId);
 
+        Task<bool> IsCategoryModified(int categoryId, string name);
+
         Task<int> TotalCountAsync(bool isDeleted, string searchToken);
     }
 }

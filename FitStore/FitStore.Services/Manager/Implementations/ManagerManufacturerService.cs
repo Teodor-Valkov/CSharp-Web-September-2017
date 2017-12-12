@@ -114,6 +114,21 @@
             await this.database.SaveChangesAsync();
         }
 
+        public async Task<bool> IsManufacturerModified(int manufacturerId, string name, string address)
+        {
+            Manufacturer manufacturer = await this.database
+             .Manufacturers
+             .Where(m => m.Id == manufacturerId)
+             .FirstOrDefaultAsync();
+
+            if (name == manufacturer.Name && address == manufacturer.Address)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public async Task<int> TotalCountAsync(bool isDeleted, string searchToken)
         {
             if (string.IsNullOrWhiteSpace(searchToken))

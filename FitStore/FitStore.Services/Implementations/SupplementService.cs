@@ -22,6 +22,7 @@
         {
             return await this.database
               .Supplements
+              .Where(s => s.IsDeleted == false)
               .ProjectTo<SupplementAdvancedServiceModel>()
               .ToListAsync();
         }
@@ -33,6 +34,13 @@
               .Where(s => s.Id == supplementId)
               .ProjectTo<SupplementDetailsServiceModel>()
               .FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> IsSupplementExistingById(int supplementId, bool isDeleted)
+        {
+            return await this.database
+                .Supplements
+                .AnyAsync(s => s.Id == supplementId && s.IsDeleted == isDeleted);
         }
 
         public async Task<bool> IsSupplementExistingById(int supplementId)
@@ -47,6 +55,13 @@
             return await this.database
                 .Supplements
                 .AnyAsync(s => s.Name.ToLower() == name.ToLower());
+        }
+
+        public async Task<bool> IsSupplementExistingByIdAndName(int supplementId, string name)
+        {
+            return await this.database
+                .Supplements
+                .AnyAsync(s => s.Id != supplementId && s.Name.ToLower() == name.ToLower());
         }
     }
 }

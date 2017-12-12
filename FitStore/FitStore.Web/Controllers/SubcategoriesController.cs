@@ -9,7 +9,7 @@
     using static Common.CommonConstants;
     using static Common.CommonMessages;
 
-    public class SubcategoriesController : Controller
+    public class SubcategoriesController : BaseController
     {
         private ISubcategoryService subcategoryService;
 
@@ -20,7 +20,7 @@
 
         public async Task<IActionResult> Details(int id, string name)
         {
-            bool isSubcategoryExisting = await this.subcategoryService.IsSubcategoryExistingById(id);
+            bool isSubcategoryExisting = await this.subcategoryService.IsSubcategoryExistingById(id, false);
 
             if (!isSubcategoryExisting)
             {
@@ -30,6 +30,8 @@
             }
 
             SubcategoryDetailsServiceModel model = await this.subcategoryService.GetDetailsByIdAsync(id);
+
+            ViewData["ReturnUrl"] = this.RedirectToSubcategoryDetails(id, name);
 
             return View(model);
         }

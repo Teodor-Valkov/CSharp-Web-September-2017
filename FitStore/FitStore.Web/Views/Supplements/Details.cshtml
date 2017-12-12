@@ -32,6 +32,7 @@
             <p><strong>Best Before:</strong> @Model.BestBeforeDate.ToShortDateString()</p>
         </div>
         <div>
+            <a href="@ViewData["ReturnUrl"]" class="btn btn-default">Back</a>
             @if (User.Identity.IsAuthenticated && User.IsInRole(WebConstants.ManagerRole))
             {
                 <a asp-area="Manager" asp-controller="Supplements" asp-action="Edit" asp-route-id="@Model.Id" asp-route-name="@Model.Name" class="btn btn-warning">Edit</a>
@@ -43,11 +44,11 @@
                 else
                 {
                     @Html.ActionLink("Delete", "Delete", "Supplements", new { area = "Manager", id = Model.Id, name = Model.Name },
-                                          new
-                                          {
-                                              @class = "btn btn-danger",
-                                              onclick = $"return confirm('Are you sure you want to delete *{Model.Name}*?');"
-                                          })
+                                     new
+                                     {
+                                         @class = "btn btn-danger",
+                                         onclick = $"return confirm('Are you sure you want to delete *{Model.Name}*?');"
+                                     })
                 }
             }
         </div>

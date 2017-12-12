@@ -9,7 +9,7 @@
     using static Common.CommonConstants;
     using static Common.CommonMessages;
 
-    public class ManufacturersController : Controller
+    public class ManufacturersController : BaseController
     {
         private IManufacturerService manufacturerService;
 
@@ -20,7 +20,7 @@
 
         public async Task<IActionResult> Details(int id, string name)
         {
-            bool isManufacturerExisting = await this.manufacturerService.IsManufacturerExistingById(id);
+            bool isManufacturerExisting = await this.manufacturerService.IsManufacturerExistingById(id, false);
 
             if (!isManufacturerExisting)
             {
@@ -30,6 +30,8 @@
             }
 
             ManufacturerDetailsServiceModel model = await this.manufacturerService.GetDetailsByIdAsync(id);
+
+            ViewData["ReturnUrl"] = this.RedirectToManufacturerDetails(id, name);
 
             return View(model);
         }

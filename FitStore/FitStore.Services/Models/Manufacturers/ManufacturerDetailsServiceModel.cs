@@ -5,6 +5,7 @@
     using Data.Models;
     using Models.Supplements;
     using System.Collections.Generic;
+    using System.Linq;
 
     public class ManufacturerDetailsServiceModel : ManufacturerBasicServiceModel, IMapFrom<Manufacturer>, IHaveCustomMapping
     {
@@ -14,7 +15,7 @@
         {
             mapper
                 .CreateMap<Manufacturer, ManufacturerDetailsServiceModel>()
-                    .ForMember(dest => dest.Supplements, opt => opt.MapFrom(src => src.Supplements));
+                    .ForMember(dest => dest.Supplements, opt => opt.MapFrom(src => src.Supplements.Where(s => s.IsDeleted == false)));
         }
     }
 }

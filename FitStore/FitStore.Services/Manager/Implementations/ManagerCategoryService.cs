@@ -120,6 +120,21 @@
             await this.database.SaveChangesAsync();
         }
 
+        public async Task<bool> IsCategoryModified(int categoryId, string name)
+        {
+            Category category = await this.database
+                .Categories
+                .Where(c => c.Id == categoryId)
+                .FirstOrDefaultAsync();
+
+            if (name == category.Name)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public async Task<int> TotalCountAsync(bool isDeleted, string searchToken)
         {
             if (string.IsNullOrWhiteSpace(searchToken))

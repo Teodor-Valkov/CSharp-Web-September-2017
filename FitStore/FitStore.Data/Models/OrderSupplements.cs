@@ -9,5 +9,7 @@
         public int SupplementId { get; set; }
 
         public Supplement Supplement { get; set; }
+
+        public int Quantity { get; set; }
     }
 }

@@ -12,8 +12,12 @@
 
         Task<int> GetCategoryIdBySubcategoryId(int subcategoryId);
 
+        Task<bool> IsSubcategoryExistingById(int subcategoryId, bool isDeleted);
+
         Task<bool> IsSubcategoryExistingById(int subcategoryId);
 
         Task<bool> IsSubcategoryExistingByName(string name);
+
+        Task<bool> IsSubcategoryExistingByIdAndName(int subcategoryId, string name);
     }
 }

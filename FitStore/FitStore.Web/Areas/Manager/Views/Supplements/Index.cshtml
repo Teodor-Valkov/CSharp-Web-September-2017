@@ -76,10 +76,10 @@ else
         </thead>
         <tbody>
             @foreach (var supplement in Model.Elements)
-                {
+            {
                 <tr class="text-center">
                     <td>
-                        <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name">
+                        <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">
                             <img id="supplements-index-image" src="@supplement.Picture" alt="supplement-picture">
                         </a>
                     </td>
@@ -87,7 +87,7 @@ else
                     <td>@supplement.Quantity</td>
                     <td>@supplement.Price</td>
                     <td>
-                        <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" class="btn btn-primary">Details</a>
+                        <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" class="btn btn-primary" asp-route-returnUrl="@ViewData["ReturnUrl"]">Details</a>
                         <a asp-area="Manager" asp-controller="Supplements" asp-action="Edit" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" class="btn btn-warning">Edit</a>
                         @if (Model.IsDeleted)
                         {
@@ -95,12 +95,12 @@ else
                         }
                         else
                         {@Html.ActionLink("Delete", "Delete", "Supplements", new { area = "Manager", id = supplement.Id, name = supplement.Name },
-                                new
-                                {
-                                    @class = "btn btn-danger",
-                                    onclick = $"return confirm('Are you sure you want to delete *{supplement.Name}*?');"
-                                })
-                        }
+                                                        new
+                                                        {
+                                                            @class = "btn btn-danger",
+                                                            onclick = $"return confirm('Are you sure you want to delete *{supplement.Name}*?');"
+                                                        })
+                    }
                     </td>
                 </tr>
             }

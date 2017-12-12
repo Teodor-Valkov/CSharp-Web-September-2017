@@ -22,6 +22,7 @@
         {
             return await this.database
                .Categories
+               .Where(c => c.IsDeleted == false)
                .OrderBy(c => c.Name)
                .ProjectTo<CategoryAdvancedServiceModel>()
                .ToListAsync();
@@ -44,6 +45,13 @@
               .FirstOrDefaultAsync();
         }
 
+        public async Task<bool> IsCategoryExistingById(int categoryId, bool isDeleted)
+        {
+            return await this.database
+                .Categories
+                .AnyAsync(c => c.Id == categoryId && c.IsDeleted == isDeleted);
+        }
+
         public async Task<bool> IsCategoryExistingById(int categoryId)
         {
             return await this.database
@@ -56,6 +64,13 @@
             return await this.database
                 .Categories
                 .AnyAsync(c => c.Name.ToLower() == name.ToLower());
+        }
+
+        public async Task<bool> IsCategoryExistingByIdAndName(int categoryId, string name)
+        {
+            return await this.database
+                .Categories
+                .AnyAsync(c => c.Id != categoryId && c.Name.ToLower() == name.ToLower());
         }
     }
 }

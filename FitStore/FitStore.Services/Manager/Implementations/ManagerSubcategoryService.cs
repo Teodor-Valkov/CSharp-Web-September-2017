@@ -114,6 +114,21 @@
             await this.database.SaveChangesAsync();
         }
 
+        public async Task<bool> IsSubcategoryModified(int subcategoryId, string name, int categoryId)
+        {
+            Subcategory subcategory = await this.database
+                .Subcategories
+                .Where(s => s.Id == subcategoryId)
+                .FirstOrDefaultAsync();
+
+            if (name == subcategory.Name && categoryId == subcategory.CategoryId)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public async Task<int> TotalCountAsync(bool isDeleted, string searchToken)
         {
             if (string.IsNullOrWhiteSpace(searchToken))

@@ -20,14 +20,19 @@
             return RedirectToAction(nameof(SubcategoriesController.Index), Subcategories, new { isDeleted });
         }
 
+        protected RedirectToActionResult RedirectToManufacturersIndex(bool isDeleted)
+        {
+            return RedirectToAction(nameof(ManufacturersController.Index), Manufacturers, new { isDeleted });
+        }
+
         protected RedirectToActionResult RedirectToSupplementsIndex(bool isDeleted)
         {
             return RedirectToAction(nameof(SupplementsController.Index), Supplements, new { isDeleted });
         }
 
-        protected RedirectToActionResult RedirectToManufacturersIndex(bool isDeleted)
+        protected string ReturnToSupplementsIndex()
         {
-            return RedirectToAction(nameof(ManufacturersController.Index), Manufacturers, new { isDeleted });
+            return $"/{ManagerRole.ToLower()}/{Supplements.ToLower()}";
         }
     }
 }

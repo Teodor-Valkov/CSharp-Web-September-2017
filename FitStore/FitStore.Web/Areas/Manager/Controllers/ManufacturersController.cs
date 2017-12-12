@@ -65,9 +65,9 @@
                 return View(model);
             }
 
-            bool isManufacturerExisting = await this.manufacturerService.IsManufacturerExistingByName(model.Name);
+            bool isManufacturerExistingByName = await this.manufacturerService.IsManufacturerExistingByName(model.Name);
 
-            if (isManufacturerExisting)
+            if (isManufacturerExistingByName)
             {
                 TempData.AddErrorMessage(string.Format(EntityExists, ManufacturerEntity));
 
@@ -81,11 +81,11 @@
             return this.RedirectToManufacturersIndex(false);
         }
 
-        public async Task<IActionResult> Edit(int id, string name)
+        public async Task<IActionResult> Edit(int id)
         {
-            bool isManufacturerExisting = await this.manufacturerService.IsManufacturerExistingById(id);
+            bool isManufacturerExistingById = await this.manufacturerService.IsManufacturerExistingById(id);
 
-            if (!isManufacturerExisting)
+            if (!isManufacturerExistingById)
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, ManufacturerEntity));
 
@@ -100,37 +100,52 @@
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, string name, ManufacturerFormViewModel model)
+        public async Task<IActionResult> Edit(int id, ManufacturerFormViewModel model)
         {
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
-            if (name != model.Name)
+            bool isManufacturerExistingById = await this.manufacturerService.IsManufacturerExistingById(id);
+
+            if (!isManufacturerExistingById)
             {
-                bool isManufacturerExisting = await this.manufacturerService.IsManufacturerExistingByName(model.Name);
+                TempData.AddErrorMessage(string.Format(EntityNotFound, ManufacturerEntity));
 
-                if (isManufacturerExisting)
-                {
-                    TempData.AddErrorMessage(string.Format(EntityExists, ManufacturerEntity));
+                return this.RedirectToManufacturersIndex(false);
+            }
 
-                    return View(model);
-                }
+            bool isManufacturerModified = await this.managerManufacturerService.IsManufacturerModified(id, model.Name, model.Address);
+
+            if (!isManufacturerModified)
+            {
+                TempData.AddWarningMessage(EntityNotModified);
+
+                return View(model);
+            }
+
+            bool isManufacturerExistingByIdAndName = await this.manufacturerService.IsManufacturerExistingByIdAndName(id, model.Name);
+
+            if (isManufacturerExistingByIdAndName)
+            {
+                TempData.AddErrorMessage(string.Format(EntityExists, ManufacturerEntity));
+
+                return View(model);
             }
 
             await this.managerManufacturerService.EditAsync(id, model.Name, model.Address);
 
-            TempData.AddSuccessMessage(string.Format(EntityEdited, ManufacturerEntity, model.Name));
+            TempData.AddSuccessMessage(string.Format(EntityModified, ManufacturerEntity, model.Name));
 
             return this.RedirectToManufacturersIndex(false);
         }
 
         public async Task<IActionResult> Delete(int id, string name)
         {
-            bool isManufacturerExisting = await this.manufacturerService.IsManufacturerExistingById(id);
+            bool isManufacturerExistingById = await this.manufacturerService.IsManufacturerExistingById(id, false);
 
-            if (!isManufacturerExisting)
+            if (!isManufacturerExistingById)
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, ManufacturerEntity));
 
@@ -146,9 +161,9 @@
 
         public async Task<IActionResult> Restore(int id, string name)
         {
-            bool isManufacturerExisting = await this.manufacturerService.IsManufacturerExistingById(id);
+            bool isManufacturerExistingById = await this.manufacturerService.IsManufacturerExistingById(id, true);
 
-            if (!isManufacturerExisting)
+            if (!isManufacturerExistingById)
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, ManufacturerEntity));
 

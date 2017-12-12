@@ -111,6 +111,23 @@
             await this.database.SaveChangesAsync();
         }
 
+        public async Task<bool> IsSupplementModified(int supplementId, string name, string description, int quantity, decimal price, byte[] picture, DateTime bestBeforeDate, int subcategoryId, int manufacturerId)
+        {
+            Supplement supplement = await this.database
+                  .Supplements
+                  .Where(s => s.Id == supplementId)
+                  .FirstOrDefaultAsync();
+
+            if (name == supplement.Name && description == supplement.Description && quantity == supplement.Quantity
+                && price == supplement.Price && picture.SequenceEqual(supplement.Picture) && bestBeforeDate == supplement.BestBeforeDate
+                && subcategoryId == supplement.SubcategoryId && manufacturerId == supplement.ManufacturerId)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public async Task<int> TotalCountAsync(bool isDeleted, string searchToken)
         {
             if (string.IsNullOrWhiteSpace(searchToken))

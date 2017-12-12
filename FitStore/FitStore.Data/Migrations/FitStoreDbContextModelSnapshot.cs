@@ -106,6 +106,8 @@ namespace FitStore.Data.Migrations
 
                     b.Property<int>("SupplementId");
 
+                    b.Property<int>("Quantity");
+
                     b.HasKey("OrderId", "SupplementId");
 
                     b.HasIndex("SupplementId");

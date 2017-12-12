@@ -12,13 +12,13 @@
 {
     <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="navbar-right">
         <ul class="nav navbar-nav navbar-right">
+            <li><a asp-area="" asp-controller="orders" asp-action="Details"><i class="fa fa-shopping-cart fa-lg"></i> </a></li>
             <li class="dropdown">
                 <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                    Hello, @username!
+                    Settings
                     <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
-
                     <li><a asp-area="" asp-controller="Users" asp-action="Profile" asp-route-username="@username">My Profile</a></li>
                     <li><a asp-area="" asp-controller="Users" asp-action="EditProfile" asp-route-username="@username">Edit Profile</a></li>
                     <li><a asp-area="" asp-controller="Users" asp-action="ChangePassword" asp-route-username="@username">Change Password</a></li>
@@ -36,6 +36,7 @@
 else
 {
     <ul class="nav navbar-nav navbar-right">
+        <li><a asp-area="" asp-controller="orders" asp-action="Details"><i class="fa fa-shopping-cart fa-lg"></i> </a></li>
         <li><a asp-area="" asp-controller="Account" asp-action="Register">Register</a></li>
         <li><a asp-area="" asp-controller="Account" asp-action="Login">Log in</a></li>
     </ul>

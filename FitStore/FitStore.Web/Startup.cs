@@ -11,7 +11,9 @@
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using System;
 
+    using static Common.CommonConstants;
     using static Data.DataConstants;
 
     public class Startup
@@ -58,7 +60,17 @@
                 googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
             });
 
-            services.AddMvc(options => options.Filters.Add<AutoValidateAntiforgeryTokenAttribute>());
+            services.AddDistributedMemoryCache();
+
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromSeconds(300);
+                options.Cookie.Name = UserSessionShoppingCartKeyName;
+                options.Cookie.HttpOnly = true;
+            });
+
+            services.AddMvc(options => options.Filters.Add<AutoValidateAntiforgeryTokenAttribute>())
+                .AddSessionStateTempDataProvider();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -77,6 +89,8 @@
             }
 
             app.UseStaticFiles();
+
+            app.UseSession();
 
             app.UseAuthentication();
 

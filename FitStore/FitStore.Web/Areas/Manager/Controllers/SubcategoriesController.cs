@@ -77,9 +77,9 @@
                 return View(model);
             }
 
-            bool isSubcategoryExisting = await this.subcategoryService.IsSubcategoryExistingByName(model.Name);
+            bool isSubcategoryExistingByName = await this.subcategoryService.IsSubcategoryExistingByName(model.Name);
 
-            if (isSubcategoryExisting)
+            if (isSubcategoryExistingByName)
             {
                 TempData.AddErrorMessage(string.Format(EntityExists, SubcategoryEntity));
 
@@ -95,11 +95,11 @@
             return this.RedirectToSubcategoriesIndex(false);
         }
 
-        public async Task<IActionResult> Edit(int id, string name)
+        public async Task<IActionResult> Edit(int id)
         {
-            bool isSubcategoryExisting = await this.subcategoryService.IsSubcategoryExistingById(id);
+            bool isSubcategoryExistingById = await this.subcategoryService.IsSubcategoryExistingById(id);
 
-            if (!isSubcategoryExisting)
+            if (!isSubcategoryExistingById)
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, SubcategoryEntity));
 
@@ -119,7 +119,7 @@
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, string name, SubcategoryFormViewModel model)
+        public async Task<IActionResult> Edit(int id, SubcategoryFormViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -128,32 +128,49 @@
                 return View(model);
             }
 
-            if (name != model.Name)
+            bool isSubcategoryExistingById = await this.subcategoryService.IsSubcategoryExistingById(id);
+
+            if (!isSubcategoryExistingById)
             {
-                bool isSubcategoryExisting = await this.subcategoryService.IsSubcategoryExistingByName(model.Name);
+                TempData.AddErrorMessage(string.Format(EntityNotFound, SubcategoryEntity));
 
-                if (isSubcategoryExisting)
-                {
-                    TempData.AddErrorMessage(string.Format(EntityExists, SubcategoryEntity));
+                return this.RedirectToSubcategoriesIndex(false);
+            }
 
-                    model.Categories = await this.GetCategoriesSelectListItems();
+            bool isSubcategoryModified = await this.managerSubcategoryService.IsSubcategoryModified(id, model.Name, model.CategoryId);
 
-                    return View(model);
-                }
+            if (!isSubcategoryModified)
+            {
+                TempData.AddWarningMessage(EntityNotModified);
+
+                model.Categories = await this.GetCategoriesSelectListItems();
+
+                return View(model);
+            }
+
+            bool isSubcategoryExistingByIdAndName = await this.subcategoryService.IsSubcategoryExistingByIdAndName(id, model.Name);
+
+            if (isSubcategoryExistingByIdAndName)
+            {
+                TempData.AddErrorMessage(string.Format(EntityExists, SubcategoryEntity));
+
+                model.Categories = await this.GetCategoriesSelectListItems();
+
+                return View(model);
             }
 
             await this.managerSubcategoryService.EditAsync(id, model.Name, model.CategoryId);
 
-            TempData.AddSuccessMessage(string.Format(EntityEdited, SubcategoryEntity, model.Name));
+            TempData.AddSuccessMessage(string.Format(EntityModified, SubcategoryEntity, model.Name));
 
             return this.RedirectToSubcategoriesIndex(false);
         }
 
         public async Task<IActionResult> Delete(int id, string name)
         {
-            bool isSubcategoryExisting = await this.subcategoryService.IsSubcategoryExistingById(id);
+            bool isSubcategoryExistingById = await this.subcategoryService.IsSubcategoryExistingById(id, false);
 
-            if (!isSubcategoryExisting)
+            if (!isSubcategoryExistingById)
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, SubcategoryEntity));
 
@@ -169,9 +186,9 @@
 
         public async Task<IActionResult> Restore(int id, string name)
         {
-            bool isSubcategoryExisting = await this.subcategoryService.IsSubcategoryExistingById(id);
+            bool isSubcategoryExistingById = await this.subcategoryService.IsSubcategoryExistingById(id, true);
 
-            if (!isSubcategoryExisting)
+            if (!isSubcategoryExistingById)
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, SubcategoryEntity));
 

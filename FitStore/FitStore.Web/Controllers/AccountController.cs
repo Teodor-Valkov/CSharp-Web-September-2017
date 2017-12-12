@@ -1,6 +1,9 @@
 ﻿namespace FitStore.Web.Controllers
 {
     using Data.Models;
+    using FitStore.Services.Contracts;
+    using FitStore.Services.Models;
+    using FitStore.Web.Infrastructure.Extensions;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
@@ -8,8 +11,11 @@
     using Microsoft.Extensions.Logging;
     using Models.Account;
     using System;
+    using System.Collections.Generic;
     using System.Security.Claims;
     using System.Threading.Tasks;
+
+    using static Common.CommonConstants;
 
     [Authorize]
     [Route("[controller]/[action]")]
@@ -18,15 +24,18 @@
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly ILogger _logger;
+        private readonly IOrderService _orderService;
 
         public AccountController(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
-            ILogger<AccountController> logger)
+            ILogger<AccountController> logger,
+            IOrderService orderService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+            _orderService = orderService;
         }
 
         [TempData]
@@ -247,6 +256,19 @@
         {
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
+
+            IList<string> sessionKeys = new List<string>(HttpContext.Session.Keys);
+
+            if (sessionKeys.Contains(UserSessionShoppingCartKeyName))
+            {
+                ShoppingCart shoppingCart = HttpContext.Session.GetShoppingCart(UserSessionShoppingCartKeyName);
+
+                await this._orderService.CancelOrderAsync(shoppingCart);
+
+                HttpContext.Session.Remove(UserSessionShoppingCartKeyName);
+                //HttpContext.Session.Clear();
+            }
+
             return RedirectToAction(nameof(HomeController.Index), "Home");
         }
 

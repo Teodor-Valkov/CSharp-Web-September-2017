@@ -65,9 +65,9 @@
                 return View(model);
             }
 
-            bool isCategoryExisting = await this.categoryService.IsCategoryExistingByName(model.Name);
+            bool isCategoryExistingByName = await this.categoryService.IsCategoryExistingByName(model.Name);
 
-            if (isCategoryExisting)
+            if (isCategoryExistingByName)
             {
                 TempData.AddErrorMessage(string.Format(EntityExists, CategoryEntity));
 
@@ -81,11 +81,11 @@
             return this.RedirectToCategoriesIndex(false);
         }
 
-        public async Task<IActionResult> Edit(int id, string name)
+        public async Task<IActionResult> Edit(int id)
         {
-            bool isCategoryExisting = await this.categoryService.IsCategoryExistingById(id);
+            bool isCategoryExistingById = await this.categoryService.IsCategoryExistingById(id);
 
-            if (!isCategoryExisting)
+            if (!isCategoryExistingById)
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, CategoryEntity));
 
@@ -100,37 +100,52 @@
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, string name, CategoryFormViewModel model)
+        public async Task<IActionResult> Edit(int id, CategoryFormViewModel model)
         {
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
-            if (name != model.Name)
+            bool isCategoryExistingById = await this.categoryService.IsCategoryExistingById(id);
+
+            if (!isCategoryExistingById)
             {
-                bool isCategoryExisting = await this.categoryService.IsCategoryExistingByName(model.Name);
+                TempData.AddErrorMessage(string.Format(EntityNotFound, CategoryEntity));
 
-                if (isCategoryExisting)
-                {
-                    TempData.AddErrorMessage(string.Format(EntityExists, CategoryEntity));
+                return this.RedirectToCategoriesIndex(false);
+            }
 
-                    return View(model);
-                }
+            bool isCategoryModified = await this.managerCategoryService.IsCategoryModified(id, model.Name);
+
+            if (!isCategoryModified)
+            {
+                TempData.AddWarningMessage(EntityNotModified);
+
+                return View(model);
+            }
+
+            bool isCategoryExistingByIdAndName = await this.categoryService.IsCategoryExistingByIdAndName(id, model.Name);
+
+            if (isCategoryExistingByIdAndName)
+            {
+                TempData.AddErrorMessage(string.Format(EntityExists, CategoryEntity));
+
+                return View(model);
             }
 
             await this.managerCategoryService.EditAsync(id, model.Name);
 
-            TempData.AddSuccessMessage(string.Format(EntityEdited, CategoryEntity, model.Name));
+            TempData.AddSuccessMessage(string.Format(EntityModified, CategoryEntity, model.Name));
 
             return this.RedirectToCategoriesIndex(false);
         }
 
         public async Task<IActionResult> Delete(int id, string name)
         {
-            bool isCategoryExisting = await this.categoryService.IsCategoryExistingById(id);
+            bool isCategoryExistingById = await this.categoryService.IsCategoryExistingById(id, false);
 
-            if (!isCategoryExisting)
+            if (!isCategoryExistingById)
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, CategoryEntity));
 
@@ -146,9 +161,9 @@
 
         public async Task<IActionResult> Restore(int id, string name)
         {
-            bool isCategoryExisting = await this.categoryService.IsCategoryExistingById(id);
+            bool isCategoryExistingById = await this.categoryService.IsCategoryExistingById(id, true);
 
-            if (!isCategoryExisting)
+            if (!isCategoryExistingById)
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, CategoryEntity));
 

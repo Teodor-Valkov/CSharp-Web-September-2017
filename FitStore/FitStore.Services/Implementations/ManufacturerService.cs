@@ -36,6 +36,13 @@
               .FirstOrDefaultAsync();
         }
 
+        public async Task<bool> IsManufacturerExistingById(int manufacturerId, bool isDeleted)
+        {
+            return await this.database
+                .Manufacturers
+                .AnyAsync(m => m.Id == manufacturerId && m.IsDeleted == isDeleted);
+        }
+
         public async Task<bool> IsManufacturerExistingById(int manufacturerId)
         {
             return await this.database
@@ -48,6 +55,13 @@
             return await this.database
                 .Manufacturers
                 .AnyAsync(m => m.Name.ToLower() == name.ToLower());
+        }
+
+        public async Task<bool> IsManufacturerExistingByIdAndName(int manufacturerId, string name)
+        {
+            return await this.database
+                .Manufacturers
+                .AnyAsync(m => m.Id != manufacturerId && m.Name.ToLower() == name.ToLower());
         }
     }
 }

@@ -18,6 +18,8 @@
 
         Task RestoreAsync(int subcategoryId);
 
+        Task<bool> IsSubcategoryModified(int subcategoryId, string name, int categoryId);
+
         Task<int> TotalCountAsync(bool isDeleted, string searchToken);
     }
 }
