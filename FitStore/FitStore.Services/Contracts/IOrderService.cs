@@ -14,6 +14,6 @@
 
         Task CancelOrderAsync(ShoppingCart shoppingCart);
 
-        Task FinishOrderAsync(User user, ShoppingCart shoppingCart);
+        Task FinishOrderAsync(string userId, ShoppingCart shoppingCart);
     }
 }

@@ -76,7 +76,7 @@
 
             await this.managerManufacturerService.CreateAsync(model.Name, model.Address);
 
-            TempData.AddSuccessMessage(string.Format(EntityCreated, ManufacturerEntity, model.Name));
+            TempData.AddSuccessMessage(string.Format(EntityCreated, ManufacturerEntity));
 
             return this.RedirectToManufacturersIndex(false);
         }
@@ -136,12 +136,12 @@
 
             await this.managerManufacturerService.EditAsync(id, model.Name, model.Address);
 
-            TempData.AddSuccessMessage(string.Format(EntityModified, ManufacturerEntity, model.Name));
+            TempData.AddSuccessMessage(string.Format(EntityModified, ManufacturerEntity));
 
             return this.RedirectToManufacturersIndex(false);
         }
 
-        public async Task<IActionResult> Delete(int id, string name)
+        public async Task<IActionResult> Delete(int id)
         {
             bool isManufacturerExistingById = await this.manufacturerService.IsManufacturerExistingById(id, false);
 
@@ -154,12 +154,12 @@
 
             await this.managerManufacturerService.DeleteAsync(id);
 
-            TempData.AddSuccessMessage(string.Format(EntityDeleted, ManufacturerEntity, name));
+            TempData.AddSuccessMessage(string.Format(EntityDeleted, ManufacturerEntity));
 
             return this.RedirectToManufacturersIndex(false);
         }
 
-        public async Task<IActionResult> Restore(int id, string name)
+        public async Task<IActionResult> Restore(int id)
         {
             bool isManufacturerExistingById = await this.manufacturerService.IsManufacturerExistingById(id, true);
 
@@ -172,7 +172,7 @@
 
             await this.managerManufacturerService.RestoreAsync(id);
 
-            TempData.AddSuccessMessage(string.Format(EntityRestored, ManufacturerEntity, name));
+            TempData.AddSuccessMessage(string.Format(EntityRestored, ManufacturerEntity));
 
             return this.RedirectToManufacturersIndex(true);
         }

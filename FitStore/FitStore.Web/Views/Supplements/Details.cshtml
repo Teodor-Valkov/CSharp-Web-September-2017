@@ -5,7 +5,7 @@
 }
 
 <div class="row">
-    <div class="col-12 text-center">
+    <div class="text-center">
         <br />
         <h1>@Model.Name</h1>
         <h3>@Model.CategoryName (@Model.SubcategoryName)</h3>
@@ -44,15 +44,77 @@
                 else
                 {
                     @Html.ActionLink("Delete", "Delete", "Supplements", new { area = "Manager", id = Model.Id, name = Model.Name },
-                                     new
-                                     {
-                                         @class = "btn btn-danger",
-                                         onclick = $"return confirm('Are you sure you want to delete *{Model.Name}*?');"
-                                     })
+                                                                                                                                                                                           new
+                                                                                                                                                                                           {
+                                                                                                                                                                                               @class = "btn btn-danger",
+                                                                                                                                                                                               onclick = $"return confirm('Are you sure you want to delete *{Model.Name}*?');"
+                                                                                                                                                                                           })
                 }
             }
+            <a asp-area="" asp-controller="Comments" asp-action="Create" asp-route-id="@Model.Id" class="btn btn-success">Comment</a>
         </div>
         <br />
         <br />
     </div>
+</div>
+
+<div class="row">
+    @foreach (var comment in Model.Comments)
+    {
+        if (!comment.IsDeleted)
+        {
+            <div class="col-md-offset-2 col-md-8 well">
+                <p class="text-justify">@comment.Content</p>
+                <div class="text-right"><em>Author: @comment.Author</em></div>
+                <div class="text-right"><em>Publish Date: @comment.PublishDate.ToShortDateString()</em></div>
+                <br />
+                <div class="text-right">
+                    @if (this.User.IsInRole(WebConstants.ModeratorRole))
+                    {
+                        <a asp-area="" asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.Id" class="btn btn-warning btn-sm">Edit</a>
+                        if (comment.IsDeleted)
+                        {
+                            <a asp-area="" asp-controller="Comments" asp-action="Restore" asp-route-id="@comment.Id" asp-route-supplementId="@Model.Id" class="btn btn-success btn-sm">Restore</a>
+                        }
+                        else
+                        {
+                            @Html.ActionLink("Delete", "Delete", "Comments", new { id = comment.Id, supplementId = Model.Id },
+                                                                new
+                                                                {
+                                                                    @class = "btn btn-danger btn-sm",
+                                                                    onclick = $"return confirm('Are you sure you want to delete this comment?');"
+                                                                })
+                        }
+                    }
+                    else if (this.User.Identity.Name == comment.Author)
+                    {
+                        <a asp-area="" asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.Id" class="btn btn-warning btn-sm">Edit</a>
+                        if (!comment.IsDeleted)
+                        {
+                            @Html.ActionLink("Delete", "Delete", "Comments", new { id = comment.Id, supplementId = Model.Id },
+                                                               new
+                                                               {
+                                                                   @class = "btn btn-danger btn-sm",
+                                                                   onclick = $"return confirm('Are you sure you want to delete this comment?');"
+                                                               })
+                        }
+                    }
+                </div>
+            </div>
+        }
+        else if (comment.IsDeleted && this.User.IsInRole(WebConstants.ModeratorRole))
+        {
+            <div class="col-md-offset-2 col-md-8 well">
+                <p class="text-justify">@comment.Content</p>
+                <div class="text-right"><em>Author: @comment.Author</em></div>
+                <div class="text-right"><em>Publish Date: @comment.PublishDate.ToShortDateString()</em></div>
+                <br />
+                <div class="text-right">
+                    <a asp-area="" asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.Id" class="btn btn-warning btn-sm">Edit</a>
+                    <a asp-area="" asp-controller="Comments" asp-action="Restore" asp-route-id="@comment.Id" asp-route-supplementId="@Model.Id" class="btn btn-success btn-sm">Restore</a>
+                </div>
+            </div>
+
+        }
+    }
 </div>

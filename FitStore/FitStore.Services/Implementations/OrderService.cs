@@ -127,11 +127,11 @@
             await this.database.SaveChangesAsync();
         }
 
-        public async Task FinishOrderAsync(User user, ShoppingCart shoppingCart)
+        public async Task FinishOrderAsync(string userId, ShoppingCart shoppingCart)
         {
             Order order = new Order
             {
-                UserId = user.Id,
+                UserId = userId,
                 PurchaseDate = DateTime.UtcNow,
                 TotalPrice = shoppingCart.TotalPrice
             };

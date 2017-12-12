@@ -130,7 +130,7 @@
 
             await this.managerSupplementService.CreateAsync(model.Name, model.Description, model.Quantity, model.Price, picture, model.BestBeforeDate, model.SubcategoryId, model.ManufacturerId);
 
-            TempData.AddSuccessMessage(string.Format(EntityCreated, SupplementEntity, model.Name));
+            TempData.AddSuccessMessage(string.Format(EntityCreated, SupplementEntity));
 
             return this.RedirectToSupplementsIndex(false);
         }
@@ -232,12 +232,12 @@
 
             await this.managerSupplementService.EditAsync(id, model.Name, model.Description, model.Quantity, model.Price, picture, model.BestBeforeDate, model.SubcategoryId, model.ManufacturerId);
 
-            TempData.AddSuccessMessage(string.Format(EntityModified, SupplementEntity, model.Name));
+            TempData.AddSuccessMessage(string.Format(EntityModified, SupplementEntity));
 
             return this.RedirectToSupplementsIndex(false);
         }
 
-        public async Task<IActionResult> Delete(int id, string name)
+        public async Task<IActionResult> Delete(int id)
         {
             bool isSupplementExistingById = await this.supplementService.IsSupplementExistingById(id, false);
 
@@ -250,12 +250,12 @@
 
             await this.managerSupplementService.DeleteAsync(id);
 
-            TempData.AddSuccessMessage(string.Format(EntityDeleted, SupplementEntity, name));
+            TempData.AddSuccessMessage(string.Format(EntityDeleted, SupplementEntity));
 
             return this.RedirectToSupplementsIndex(false);
         }
 
-        public async Task<IActionResult> Restore(int id, string name)
+        public async Task<IActionResult> Restore(int id)
         {
             bool isSupplementExistingById = await this.supplementService.IsSupplementExistingById(id, true);
 
@@ -268,7 +268,7 @@
 
             await this.managerSupplementService.RestoreAsync(id);
 
-            TempData.AddSuccessMessage(string.Format(EntityRestored, SupplementEntity, name));
+            TempData.AddSuccessMessage(string.Format(EntityRestored, SupplementEntity));
 
             return this.RedirectToSupplementsIndex(true);
         }

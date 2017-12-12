@@ -156,7 +156,7 @@
         [HttpPost]
         public async Task<IActionResult> Order()
         {
-            User user = await this.userManager.GetUserAsync(User);
+            string userId = this.userManager.GetUserId(User);
 
             ShoppingCart shoppingCart = HttpContext.Session.GetShoppingCart(UserSessionShoppingCartKeyName);
 
@@ -165,7 +165,7 @@
                 return RedirectToAction(nameof(HomeController.Index), Home);
             }
 
-            await this.orderService.FinishOrderAsync(user, shoppingCart);
+            await this.orderService.FinishOrderAsync(userId, shoppingCart);
 
             HttpContext.Session.Clear();
 

@@ -90,7 +90,7 @@
 
             await this.managerSubcategoryService.CreateAsync(model.Name, model.CategoryId);
 
-            TempData.AddSuccessMessage(string.Format(EntityCreated, SubcategoryEntity, model.Name));
+            TempData.AddSuccessMessage(string.Format(EntityCreated, SubcategoryEntity));
 
             return this.RedirectToSubcategoriesIndex(false);
         }
@@ -161,12 +161,12 @@
 
             await this.managerSubcategoryService.EditAsync(id, model.Name, model.CategoryId);
 
-            TempData.AddSuccessMessage(string.Format(EntityModified, SubcategoryEntity, model.Name));
+            TempData.AddSuccessMessage(string.Format(EntityModified, SubcategoryEntity));
 
             return this.RedirectToSubcategoriesIndex(false);
         }
 
-        public async Task<IActionResult> Delete(int id, string name)
+        public async Task<IActionResult> Delete(int id)
         {
             bool isSubcategoryExistingById = await this.subcategoryService.IsSubcategoryExistingById(id, false);
 
@@ -179,12 +179,12 @@
 
             await this.managerSubcategoryService.DeleteAsync(id);
 
-            TempData.AddSuccessMessage(string.Format(EntityDeleted, SubcategoryEntity, name));
+            TempData.AddSuccessMessage(string.Format(EntityDeleted, SubcategoryEntity));
 
             return this.RedirectToSubcategoriesIndex(false);
         }
 
-        public async Task<IActionResult> Restore(int id, string name)
+        public async Task<IActionResult> Restore(int id)
         {
             bool isSubcategoryExistingById = await this.subcategoryService.IsSubcategoryExistingById(id, true);
 
@@ -197,7 +197,7 @@
 
             await this.managerSubcategoryService.RestoreAsync(id);
 
-            TempData.AddSuccessMessage(string.Format(EntityRestored, SubcategoryEntity, name));
+            TempData.AddSuccessMessage(string.Format(EntityRestored, SubcategoryEntity));
 
             return this.RedirectToSubcategoriesIndex(true);
         }

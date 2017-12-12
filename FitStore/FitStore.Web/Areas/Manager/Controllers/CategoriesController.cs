@@ -76,7 +76,7 @@
 
             await this.managerCategoryService.CreateAsync(model.Name);
 
-            TempData.AddSuccessMessage(string.Format(EntityCreated, CategoryEntity, model.Name));
+            TempData.AddSuccessMessage(string.Format(EntityCreated, CategoryEntity));
 
             return this.RedirectToCategoriesIndex(false);
         }
@@ -136,12 +136,12 @@
 
             await this.managerCategoryService.EditAsync(id, model.Name);
 
-            TempData.AddSuccessMessage(string.Format(EntityModified, CategoryEntity, model.Name));
+            TempData.AddSuccessMessage(string.Format(EntityModified, CategoryEntity));
 
             return this.RedirectToCategoriesIndex(false);
         }
 
-        public async Task<IActionResult> Delete(int id, string name)
+        public async Task<IActionResult> Delete(int id)
         {
             bool isCategoryExistingById = await this.categoryService.IsCategoryExistingById(id, false);
 
@@ -154,12 +154,12 @@
 
             await this.managerCategoryService.DeleteAsync(id);
 
-            TempData.AddSuccessMessage(string.Format(EntityDeleted, CategoryEntity, name));
+            TempData.AddSuccessMessage(string.Format(EntityDeleted, CategoryEntity));
 
             return this.RedirectToCategoriesIndex(false);
         }
 
-        public async Task<IActionResult> Restore(int id, string name)
+        public async Task<IActionResult> Restore(int id)
         {
             bool isCategoryExistingById = await this.categoryService.IsCategoryExistingById(id, true);
 
@@ -172,7 +172,7 @@
 
             await this.managerCategoryService.RestoreAsync(id);
 
-            TempData.AddSuccessMessage(string.Format(EntityRestored, CategoryEntity, name));
+            TempData.AddSuccessMessage(string.Format(EntityRestored, CategoryEntity));
 
             return this.RedirectToCategoriesIndex(true);
         }

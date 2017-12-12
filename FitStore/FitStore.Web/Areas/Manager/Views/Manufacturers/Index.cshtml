@@ -74,25 +74,25 @@ else
         </thead>
         <tbody>
             @foreach (var manufacturer in Model.Elements)
-                {
+            {
                 <tr class="text-center">
                     <td>@manufacturer.Name</td>
                     <td>@manufacturer.Supplements</td>
                     <td>
                         <a asp-area="" asp-controller="Manufacturers" asp-action="Details" asp-route-id="@manufacturer.Id" asp-route-name="@manufacturer.Name" class="btn btn-primary">Details</a>
-                        <a asp-area="Manager" asp-controller="Manufacturers" asp-action="Edit" asp-route-id="@manufacturer.Id" asp-route-name="@manufacturer.Name" class="btn btn-warning">Edit</a>
+                        <a asp-area="Manager" asp-controller="Manufacturers" asp-action="Edit" asp-route-id="@manufacturer.Id" class="btn btn-warning">Edit</a>
                         @if (Model.IsDeleted)
                         {
-                            <a asp-area="Manager" asp-controller="Manufacturers" asp-action="Restore" asp-route-id="@manufacturer.Id" asp-route-name="@manufacturer.Name" class="btn btn-success">Restore</a>
+                            <a asp-area="Manager" asp-controller="Manufacturers" asp-action="Restore" asp-route-id="@manufacturer.Id" class="btn btn-success">Restore</a>
                         }
                         else
-                        {@Html.ActionLink("Delete", "Delete", "Manufacturers", new { area = "Manager", id = manufacturer.Id, name = manufacturer.Name },
-                                new
-                                {
-                                    @class = "btn btn-danger",
-                                    onclick = $"return confirm('Are you sure you want to delete *{manufacturer.Name}*?');"
-                                })
-                        }
+                        {@Html.ActionLink("Delete", "Delete", "Manufacturers", new { area = "Manager", id = manufacturer.Id },
+                                                new
+                                                {
+                                                    @class = "btn btn-danger",
+                                                    onclick = $"return confirm('Are you sure you want to delete this manufacturer?');"
+                                                })
+                    }
                     </td>
                 </tr>
             }

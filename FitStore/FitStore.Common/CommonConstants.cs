@@ -14,6 +14,7 @@
         public const string ManufacturerEntity = "Manufacturer";
         public const string SupplementEntity = "Supplement";
         public const string UserEntity = "User";
+        public const string CommentEntity = "Comment";
 
         public const string Home = "Home";
         public const string Categories = "Categories";
@@ -33,5 +34,7 @@
         public const string UserAllRolesName = "All Roles";
 
         public const string SupplementBestBeforeDateName = "Best Before Date";
+
+        public const string CommentPublishDateName = "Publish Date";
     }
 }

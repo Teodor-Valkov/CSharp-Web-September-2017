@@ -29,7 +29,6 @@
     <Folder Include="Areas\Moderator\Controllers\" />
     <Folder Include="Areas\Moderator\Models\" />
     <Folder Include="Areas\Moderator\Views\" />
-    <Folder Include="Models\Subcategories\" />
   </ItemGroup>
 
 </Project>
