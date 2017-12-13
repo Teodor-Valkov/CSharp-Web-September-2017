@@ -21,6 +21,8 @@
 
         public DateTime RegistrationDate { get; set; }
 
+        public bool IsRestricted { get; set; }
+
         public IList<Order> Orders { get; set; } = new List<Order>();
 
         public IList<Review> Reviews { get; set; } = new List<Review>();

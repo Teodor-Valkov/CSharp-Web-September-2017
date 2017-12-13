@@ -1,5 +1,6 @@
 ﻿namespace FitStore.Web.Controllers
 {
+    using FitStore.Web.Models.Pagination;
     using Infrastructure.Extensions;
     using Microsoft.AspNetCore.Mvc;
     using Services.Contracts;
@@ -8,6 +9,7 @@
 
     using static Common.CommonConstants;
     using static Common.CommonMessages;
+    using static WebConstants;
 
     public class SupplementsController : Controller
     {
@@ -18,7 +20,7 @@
             this.supplementService = supplementService;
         }
 
-        public async Task<IActionResult> Details(int id, string name, string returnUrl)
+        public async Task<IActionResult> Details(int id, string name, string returnUrl, int page = 1)
         {
             ViewData["ReturnUrl"] = returnUrl;
 
@@ -31,7 +33,26 @@
                 return RedirectToAction(nameof(HomeController.Index), Home);
             }
 
-            SupplementDetailsServiceModel model = await this.supplementService.GetDetailsByIdAsync(id);
+            if (page < 1)
+            {
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            PagingElementViewModel<SupplementDetailsServiceModel> model = new PagingElementViewModel<SupplementDetailsServiceModel>
+            {
+                Element = await this.supplementService.GetDetailsByIdAsync(id, page),
+                Pagination = new PaginationViewModel
+                {
+                    TotalElements = await this.supplementService.TotalCommentsAsync(id, false),
+                    PageSize = CommentPageSize,
+                    CurrentPage = page
+                }
+            };
+
+            if (page > model.Pagination.TotalPages && model.Pagination.TotalPages != 0)
+            {
+                return RedirectToAction(nameof(Details), new { id, page = model.Pagination.TotalPages });
+            }
 
             return View(model);
         }

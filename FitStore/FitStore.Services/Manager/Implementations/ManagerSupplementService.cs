@@ -91,8 +91,20 @@
         {
             Supplement supplement = await this.database
                   .Supplements
+                  .Include(s => s.Reviews)
+                  .Include(s => s.Comments)
                   .Where(s => s.Id == supplementId)
                   .FirstOrDefaultAsync();
+
+            foreach (Review review in supplement.Reviews)
+            {
+                review.IsDeleted = true;
+            }
+
+            foreach (Comment comment in supplement.Comments)
+            {
+                comment.IsDeleted = true;
+            }
 
             supplement.IsDeleted = true;
 
@@ -103,8 +115,20 @@
         {
             Supplement supplement = await this.database
                     .Supplements
+                    .Include(s => s.Reviews)
+                    .Include(s => s.Comments)
                     .Where(s => s.Id == supplementId)
                     .FirstOrDefaultAsync();
+
+            foreach (Review review in supplement.Reviews)
+            {
+                review.IsDeleted = false;
+            }
+
+            foreach (Comment comment in supplement.Comments)
+            {
+                comment.IsDeleted = false;
+            }
 
             supplement.IsDeleted = false;
 

@@ -1,4 +1,4 @@
-﻿@model SupplementDetailsServiceModel
+﻿@model PagingElementViewModel<SupplementDetailsServiceModel>
 
 @{
     ViewData["Title"] = "Supplement Details";
@@ -7,51 +7,69 @@
 <div class="row">
     <div class="text-center">
         <br />
-        <h1>@Model.Name</h1>
-        <h3>@Model.CategoryName (@Model.SubcategoryName)</h3>
+        <h1>@Model.Element.Name</h1>
+        <h3>@Model.Element.CategoryName (@Model.Element.SubcategoryName)</h3>
         <br />
         <br />
         <div>
-            <img id="supplement-details-image" class="text-center" src="@Model.Picture" alt="supplement-picture">
+            <img id="supplement-details-image" class="text-center" src="@Model.Element.Picture" alt="supplement-picture">
         </div>
         <br />
         <br />
         <div>
-            <p><strong>Description:</strong> @Model.Description</p>
+            <p><strong>Description:</strong> @Model.Element.Description</p>
         </div>
         <div>
-            <p><strong>Quantity:</strong> @Model.Quantity</p>
+            <p>
+                <strong>Quantity:</strong>
+                @if (Model.Element.Quantity > 0)
+                {
+                    @Model.Element.Quantity
+                }
+                else
+                {
+                    <span class="text-danger">Out of Stock</span>
+                }
+            </p>
         </div>
         <div>
-            <p><strong>Price:</strong> @Model.Price &euro;</p>
+            <p><strong>Price:</strong> @Model.Element.Price &euro;</p>
         </div>
         <div>
-            <p><strong>Manufacturer:</strong> @Model.ManufacturerName</p>
+            <p><strong>Manufacturer:</strong> @Model.Element.ManufacturerName</p>
         </div>
         <div>
-            <p><strong>Best Before:</strong> @Model.BestBeforeDate.ToShortDateString()</p>
+            <p><strong>Best Before:</strong> @Model.Element.BestBeforeDate.ToShortDateString()</p>
         </div>
         <div>
             <a href="@ViewData["ReturnUrl"]" class="btn btn-default">Back</a>
+            @if (Model.Element.Quantity > 0)
+            {
+                <a class="btn btn-success" asp-area="" asp-controller="Orders" asp-action="Add" asp-route-id="@Model.Element.Id">Buy</a>
+            }
             @if (User.Identity.IsAuthenticated && User.IsInRole(WebConstants.ManagerRole))
             {
-                <a asp-area="Manager" asp-controller="Supplements" asp-action="Edit" asp-route-id="@Model.Id" asp-route-name="@Model.Name" class="btn btn-warning">Edit</a>
-                if (Model.IsDeleted)
+                <a asp-area="Manager" asp-controller="Supplements" asp-action="Edit" asp-route-id="@Model.Element.Id" asp-route-name="@Model.Element.Name" class="btn btn-warning">Edit</a>
+                if (Model.Element.IsDeleted)
                 {
-                    <a asp-area="Manager" asp-controller="Supplements" asp-action="Restore" asp-route-id="@Model.Id" asp-route-name="@Model.Name" class="btn btn-success">Restore</a>
+                    <a asp-area="Manager" asp-controller="Supplements" asp-action="Restore" asp-route-id="@Model.Element.Id" asp-route-name="@Model.Element.Name" class="btn btn-success">Restore</a>
 
                 }
                 else
                 {
-                    @Html.ActionLink("Delete", "Delete", "Supplements", new { area = "Manager", id = Model.Id, name = Model.Name },
-                                                                                                                                                                                           new
-                                                                                                                                                                                           {
-                                                                                                                                                                                               @class = "btn btn-danger",
-                                                                                                                                                                                               onclick = $"return confirm('Are you sure you want to delete *{Model.Name}*?');"
-                                                                                                                                                                                           })
+                    @Html.ActionLink("Delete", "Delete", "Supplements", new { area = "Manager", id = Model.Element.Id, name = Model.Element.Name },
+                                                                  new
+                                                                  {
+                                                                      @class = "btn btn-danger",
+                                                                      onclick = $"return confirm('Are you sure you want to delete this supplement?');"
+                                                                  })
                 }
             }
-            <a asp-area="" asp-controller="Comments" asp-action="Create" asp-route-id="@Model.Id" class="btn btn-success">Comment</a>
+        </div>
+        <br />
+        <div>
+            <a asp-area="" asp-controller="Comments" asp-action="Create" asp-route-id="@Model.Element.Id" class="btn btn-primary">Add Comment</a>
+            <a asp-area="" asp-controller="Reviews" asp-action="Create" asp-route-id="@Model.Element.Id" class="btn btn-primary">Add Review</a>
         </div>
         <br />
         <br />
@@ -59,7 +77,7 @@
 </div>
 
 <div class="row">
-    @foreach (var comment in Model.Comments)
+    @foreach (var comment in Model.Element.Comments)
     {
         if (!comment.IsDeleted)
         {
@@ -69,52 +87,31 @@
                 <div class="text-right"><em>Publish Date: @comment.PublishDate.ToShortDateString()</em></div>
                 <br />
                 <div class="text-right">
-                    @if (this.User.IsInRole(WebConstants.ModeratorRole))
+                    @if (this.User.Identity.Name == comment.Author)
                     {
                         <a asp-area="" asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.Id" class="btn btn-warning btn-sm">Edit</a>
-                        if (comment.IsDeleted)
-                        {
-                            <a asp-area="" asp-controller="Comments" asp-action="Restore" asp-route-id="@comment.Id" asp-route-supplementId="@Model.Id" class="btn btn-success btn-sm">Restore</a>
-                        }
-                        else
-                        {
-                            @Html.ActionLink("Delete", "Delete", "Comments", new { id = comment.Id, supplementId = Model.Id },
-                                                                new
-                                                                {
-                                                                    @class = "btn btn-danger btn-sm",
-                                                                    onclick = $"return confirm('Are you sure you want to delete this comment?');"
-                                                                })
-                        }
-                    }
-                    else if (this.User.Identity.Name == comment.Author)
-                    {
-                        <a asp-area="" asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.Id" class="btn btn-warning btn-sm">Edit</a>
-                        if (!comment.IsDeleted)
-                        {
-                            @Html.ActionLink("Delete", "Delete", "Comments", new { id = comment.Id, supplementId = Model.Id },
-                                                               new
-                                                               {
-                                                                   @class = "btn btn-danger btn-sm",
-                                                                   onclick = $"return confirm('Are you sure you want to delete this comment?');"
-                                                               })
-                        }
-                    }
-                </div>
-            </div>
-        }
-        else if (comment.IsDeleted && this.User.IsInRole(WebConstants.ModeratorRole))
-        {
-            <div class="col-md-offset-2 col-md-8 well">
-                <p class="text-justify">@comment.Content</p>
-                <div class="text-right"><em>Author: @comment.Author</em></div>
-                <div class="text-right"><em>Publish Date: @comment.PublishDate.ToShortDateString()</em></div>
-                <br />
-                <div class="text-right">
-                    <a asp-area="" asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.Id" class="btn btn-warning btn-sm">Edit</a>
-                    <a asp-area="" asp-controller="Comments" asp-action="Restore" asp-route-id="@comment.Id" asp-route-supplementId="@Model.Id" class="btn btn-success btn-sm">Restore</a>
-                </div>
-            </div>
 
+                        @Html.ActionLink("Delete", "Delete", "Comments", new { id = comment.Id, supplementId = Model.Element.Id },
+                                                                   new
+                                                                   {
+                                                                       @class = "btn btn-danger btn-sm",
+                                                                       onclick = $"return confirm('Are you sure you want to delete this comment?');"
+
+                                                                   })
+                    }
+                </div>
+            </div>
         }
+    }
+</div>
+
+<div class="text-center">
+    @if (Model.Pagination.TotalPages > 1)
+    {
+        string actionLink = $"/supplements/details/{Model.Element.Id}?name={Model.Element.Name.ToLower()}&";
+
+        Model.Pagination.ActionLink = actionLink;
+
+        @Html.Partial("_Pagination", Model.Pagination)
     }
 </div>

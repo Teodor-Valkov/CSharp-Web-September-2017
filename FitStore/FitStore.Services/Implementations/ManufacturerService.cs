@@ -10,6 +10,8 @@
     using System.Linq;
     using System.Threading.Tasks;
 
+    using static Common.CommonConstants;
+
     public class ManufacturerService : IManufacturerService
     {
         private readonly FitStoreDbContext database;
@@ -19,12 +21,16 @@
             this.database = database;
         }
 
-        public async Task<IEnumerable<ManufacturerBasicServiceModel>> GetAllBasicListingAsync()
+        public async Task<IEnumerable<ManufacturerAdvancedServiceModel>> GetAllPagedListingAsync(int page)
         {
             return await this.database
-               .Manufacturers
-               .ProjectTo<ManufacturerBasicServiceModel>()
-               .ToListAsync();
+                .Manufacturers
+                .Where(m => m.IsDeleted == false)
+                .OrderBy(m => m.Name)
+                .Skip((page - 1) * ManufacturerPageSize)
+                .Take(ManufacturerPageSize)
+                .ProjectTo<ManufacturerAdvancedServiceModel>()
+                .ToListAsync();
         }
 
         public async Task<ManufacturerDetailsServiceModel> GetDetailsByIdAsync(int manufacturerId)
@@ -62,6 +68,14 @@
             return await this.database
                 .Manufacturers
                 .AnyAsync(m => m.Id != manufacturerId && m.Name.ToLower() == name.ToLower());
+        }
+
+        public async Task<int> TotalCountAsync()
+        {
+            return await this.database
+                .Manufacturers
+                .Where(m => m.IsDeleted == false)
+                .CountAsync();
         }
     }
 }

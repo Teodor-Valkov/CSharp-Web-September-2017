@@ -2,6 +2,7 @@
 {
     using Data.Models;
     using Infrastructure.Extensions;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
@@ -17,8 +18,11 @@
 
     using static Common.CommonConstants;
     using static Common.CommonMessages;
+    using static WebConstants;
 
-    public class UsersController : BaseAdminController
+    [Area(AdministratorArea)]
+    [Authorize(Roles = AdministratorRole)]
+    public class UsersController : Controller
     {
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly UserManager<User> userManager;
@@ -127,7 +131,7 @@
 
             await this.userManager.UpdateAsync(user);
 
-            TempData.AddSuccessMessage(string.Format(ChangeRoleSuccessMessage, user.UserName, model.Role));
+            TempData.AddSuccessMessage(string.Format(AddToRoleSuccessMessage, user.UserName, model.Role));
 
             return RedirectToAction(nameof(Details), new { model.Username });
         }
@@ -160,7 +164,7 @@
 
             await this.userManager.UpdateAsync(user);
 
-            TempData.AddSuccessMessage(string.Format(ChangeRoleSuccessMessage, user.UserName, model.Role));
+            TempData.AddSuccessMessage(string.Format(RemoveFromRoleSuccessMessage, user.UserName, model.Role));
 
             return RedirectToAction(nameof(Details), new { model.Username });
         }

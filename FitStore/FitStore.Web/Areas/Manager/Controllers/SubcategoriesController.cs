@@ -19,12 +19,14 @@
     public class SubcategoriesController : BaseManagerController
     {
         private readonly IManagerSubcategoryService managerSubcategoryService;
+        private readonly IManagerCategoryService managerCategoryService;
         private readonly ISubcategoryService subcategoryService;
         private readonly ICategoryService categoryService;
 
-        public SubcategoriesController(IManagerSubcategoryService managerSubcategoryService, ISubcategoryService subcategoryService, ICategoryService categoryService)
+        public SubcategoriesController(IManagerSubcategoryService managerSubcategoryService, IManagerCategoryService managerCategoryService, ISubcategoryService subcategoryService, ICategoryService categoryService)
         {
             this.managerSubcategoryService = managerSubcategoryService;
+            this.managerCategoryService = managerCategoryService;
             this.subcategoryService = subcategoryService;
             this.categoryService = categoryService;
         }
@@ -204,7 +206,7 @@
 
         private async Task<IEnumerable<SelectListItem>> GetCategoriesSelectListItems()
         {
-            IEnumerable<CategoryBasicServiceModel> categories = await this.categoryService.GetAllBasicListingAsync();
+            IEnumerable<CategoryBasicServiceModel> categories = await this.managerCategoryService.GetAllBasicListingAsync(false);
 
             return categories.Select(c => new SelectListItem
             {

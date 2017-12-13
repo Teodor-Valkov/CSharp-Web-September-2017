@@ -61,6 +61,11 @@ div img#manufacturer-supplement-image {
     height: 150px;
 }
 
+div img#review-details-image {
+    width: 200px;
+    height: 300px;
+}
+
 div li#home-category-link a:hover {
     background-color: wheat;
 }

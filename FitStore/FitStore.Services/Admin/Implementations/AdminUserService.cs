@@ -16,12 +16,10 @@
     public class AdminUserService : IAdminUserService
     {
         private readonly FitStoreDbContext database;
-        private readonly UserManager<User> userManager;
 
-        public AdminUserService(FitStoreDbContext database, UserManager<User> userManager)
+        public AdminUserService(FitStoreDbContext database)
         {
             this.database = database;
-            this.userManager = userManager;
         }
 
         public async Task<IEnumerable<AdminUserBasicServiceModel>> GetAllListingAsync(string searchToken, int page)

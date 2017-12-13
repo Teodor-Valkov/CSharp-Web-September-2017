@@ -6,6 +6,7 @@
     using Models.Supplements;
     using Services.Contracts;
     using Services.Manager.Contracts;
+    using Services.Models.Categories;
     using Services.Models.Manufacturers;
     using Services.Models.Supplements;
     using Services.Models.Subcategories;
@@ -21,14 +22,20 @@
     public class SupplementsController : BaseManagerController
     {
         private readonly IManagerSupplementService managerSupplementService;
+        private readonly IManagerCategoryService managerCategoryService;
+        private readonly IManagerSubcategoryService managerSubcategoryService;
+        private readonly IManagerManufacturerService managerManufacturerService;
         private readonly ISupplementService supplementService;
         private readonly ICategoryService categoryService;
         private readonly ISubcategoryService subcategoryService;
         private readonly IManufacturerService manufacturerService;
 
-        public SupplementsController(IManagerSupplementService managerSupplementService, ISupplementService supplementService, ICategoryService categoryService, ISubcategoryService subcategoryService, IManufacturerService manufacturerService)
+        public SupplementsController(IManagerSupplementService managerSupplementService, IManagerCategoryService managerCategoryService, IManagerSubcategoryService managerSubcategoryService, IManagerManufacturerService managerManufacturerService, ISupplementService supplementService, ICategoryService categoryService, ISubcategoryService subcategoryService, IManufacturerService manufacturerService)
         {
             this.managerSupplementService = managerSupplementService;
+            this.managerCategoryService = managerCategoryService;
+            this.managerSubcategoryService = managerSubcategoryService;
+            this.managerManufacturerService = managerManufacturerService;
             this.supplementService = supplementService;
             this.categoryService = categoryService;
             this.subcategoryService = subcategoryService;
@@ -65,9 +72,20 @@
             return View(model);
         }
 
-        public async Task<IActionResult> Create(int categoryId)
+        public async Task<IActionResult> Category()
         {
-            bool isCategoryExistingById = await this.categoryService.IsCategoryExistingById(categoryId, false);
+            SupplementCategoryServiceModel model = new SupplementCategoryServiceModel
+            {
+                Categories = await this.GetCategoriesSelectListItems()
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(SupplementCategoryServiceModel category)
+        {
+            bool isCategoryExistingById = await this.categoryService.IsCategoryExistingById(category.CategoryId, false);
 
             if (!isCategoryExistingById)
             {
@@ -78,13 +96,13 @@
 
             SupplementFormViewModel model = new SupplementFormViewModel();
 
-            await PrepareModelToReturn(categoryId, model);
+            await PrepareModelToReturn(category.CategoryId, model);
 
             return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(SupplementFormViewModel model)
+        public async Task<IActionResult> FinishCreate(SupplementFormViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -280,9 +298,21 @@
             model.Manufacturers = await this.GetManufacturersSelectListItems();
         }
 
+        private async Task<IEnumerable<SelectListItem>> GetCategoriesSelectListItems()
+        {
+            IEnumerable<CategoryBasicServiceModel> categories = await this.managerCategoryService.GetAllBasicListingAsync(false);
+
+            return categories.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.Name
+            })
+            .ToList();
+        }
+
         private async Task<IEnumerable<SelectListItem>> GetSubcategoriesSelectListItems(int categoryId)
         {
-            IEnumerable<SubcategoryBasicServiceModel> subcategories = await this.subcategoryService.GetAllBasicListingAsync(categoryId);
+            IEnumerable<SubcategoryBasicServiceModel> subcategories = await this.managerSubcategoryService.GetAllBasicListingAsync(categoryId, false);
 
             return subcategories.Select(c => new SelectListItem
             {
@@ -294,7 +324,7 @@
 
         private async Task<IEnumerable<SelectListItem>> GetManufacturersSelectListItems()
         {
-            IEnumerable<ManufacturerBasicServiceModel> manufacturers = await this.manufacturerService.GetAllBasicListingAsync();
+            IEnumerable<ManufacturerBasicServiceModel> manufacturers = await this.managerManufacturerService.GetAllBasicListingAsync(false);
 
             return manufacturers.Select(c => new SelectListItem
             {

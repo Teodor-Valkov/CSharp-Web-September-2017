@@ -1,10 +1,10 @@
 ﻿namespace FitStore.Services.Models.Supplements
 {
     using AutoMapper;
+    using Comments;
     using Common.Extensions;
     using Common.Mapping;
     using Data.Models;
-    using FitStore.Services.Models.Comments;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
@@ -24,17 +24,33 @@
         [Display(Name = SubcategoryEntity)]
         public string SubcategoryName { get; set; }
 
-        public IEnumerable<CommentAdvancedServiceModel> Comments { get; set; }
+        public IList<CommentAdvancedServiceModel> Comments { get; set; }
 
         public override void ConfigureMapping(Profile mapper)
         {
+            int page = default(int);
+            //bool shouldSeeDeletedComments = false;
+
             mapper
-                .CreateMap<Supplement, SupplementDetailsServiceModel>()
-                    .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Subcategory.Category.Name))
-                    .ForMember(dest => dest.SubcategoryName, opt => opt.MapFrom(src => src.Subcategory.Name))
-                    .ForMember(dest => dest.Picture, opt => opt.MapFrom(src => src.Picture.FromByteArrayToString()))
-                    .ForMember(dest => dest.ManufacturerName, opt => opt.MapFrom(src => src.Manufacturer.Name))
-                    .ForMember(dest => dest.Comments, opt => opt.MapFrom(src => src.Comments.OrderByDescending(c => c.PublishDate)));
+               .CreateMap<Supplement, SupplementDetailsServiceModel>()
+                   .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Subcategory.Category.Name))
+                   .ForMember(dest => dest.SubcategoryName, opt => opt.MapFrom(src => src.Subcategory.Name))
+                   .ForMember(dest => dest.Picture, opt => opt.MapFrom(src => src.Picture.FromByteArrayToString()))
+                   .ForMember(dest => dest.ManufacturerName, opt => opt.MapFrom(src => src.Manufacturer.Name))
+                   .ForMember(dest => dest.Comments, opt => opt
+                       .MapFrom(src => src.Comments.Where(c => c.IsDeleted == false).OrderByDescending(c => c.PublishDate).Skip((page - 1) * CommentPageSize).Take(CommentPageSize)));
+
+            //mapper
+            //    .CreateMap<Supplement, SupplementDetailsServiceModel>()
+            //        .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Subcategory.Category.Name))
+            //        .ForMember(dest => dest.SubcategoryName, opt => opt.MapFrom(src => src.Subcategory.Name))
+            //        .ForMember(dest => dest.Picture, opt => opt.MapFrom(src => src.Picture.FromByteArrayToString()))
+            //        .ForMember(dest => dest.ManufacturerName, opt => opt.MapFrom(src => src.Manufacturer.Name))
+            //        .ForMember(dest => dest.Comments, opt => opt
+            //            .MapFrom(src =>
+            //                shouldSeeDeletedComments == true
+            //                    ? src.Comments.OrderByDescending(c => c.PublishDate).Skip((page - 1) * CommentPageSize).Take(CommentPageSize)
+            //                    : src.Comments.Where(c => c.IsDeleted == false).OrderByDescending(c => c.PublishDate).Skip((page - 1) * CommentPageSize).Take(CommentPageSize)));
         }
     }
 }

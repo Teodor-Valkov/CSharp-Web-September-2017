@@ -82,18 +82,6 @@
             await this.database.SaveChangesAsync();
         }
 
-        public async Task RestoreAsync(int commentId)
-        {
-            Comment comment = await this.database
-                .Comments
-                .Where(c => c.Id == commentId)
-                .FirstOrDefaultAsync();
-
-            comment.IsDeleted = false;
-
-            await this.database.SaveChangesAsync();
-        }
-
         public Task<bool> IsUserAuthor(int commentId, string authorId)
         {
             return this.database

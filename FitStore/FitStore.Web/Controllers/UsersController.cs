@@ -46,8 +46,8 @@
                 Element = await this.userService.GetProfileByUsernameAsync(username, page),
                 Pagination = new PaginationViewModel
                 {
-                    TotalElements = await this.userService.TotalOrders(username),
-                    PageSize = UserProfilePageSize,
+                    TotalElements = await this.userService.TotalOrdersAsync(username),
+                    PageSize = OrderPageSize,
                     CurrentPage = page
                 }
             };

@@ -13,8 +13,6 @@
 
         Task DeleteAsync(int commentId);
 
-        Task RestoreAsync(int commentId);
-
         Task<bool> IsUserAuthor(int commentId, string authorId);
 
         Task<bool> IsCommentModified(int commentId, string content);

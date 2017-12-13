@@ -12,7 +12,8 @@
 
         public const string InvalidIdentityDetailsErroMessage = "Invalid identity details.";
         public const string ChangeRoleErrorMessage = "Error. {0}";
-        public const string ChangeRoleSuccessMessage = "User *{0}* has been added to role *{1}*.";
+        public const string AddToRoleSuccessMessage = "User {0} has been added to role {1}.";
+        public const string RemoveFromRoleSuccessMessage = "User {0} has been removed from role {1}.";
 
         public const string UserEditProfileErrorMessage = "Error. Your profile could not be changed. Please try again.";
         public const string UserEditProfileSuccessMessage = "Your profile was successfully changed.";
@@ -29,5 +30,7 @@
 
         public const string CancelOrderSuccessMessage = "Your order was successfully canceled.";
         public const string FinishOrderSuccessMessage = "Thank you for your order.";
+
+        public const string UserRestrictedErrorMessage = "You are temporarily restricted to perform this action.";
     }
 }

@@ -39,6 +39,15 @@
                .ToListAsync();
         }
 
+        public async Task<IEnumerable<SubcategoryBasicServiceModel>> GetAllBasicListingAsync(int categoryId, bool isDeleted)
+        {
+            return await this.database
+               .Subcategories
+               .Where(s => s.CategoryId == categoryId && s.IsDeleted == isDeleted)
+               .ProjectTo<SubcategoryBasicServiceModel>()
+               .ToListAsync();
+        }
+
         public async Task CreateAsync(string name, int categoryId)
         {
             Subcategory subcategory = new Subcategory
@@ -79,11 +88,24 @@
             Subcategory subcategory = await this.database
                 .Subcategories
                 .Include(s => s.Supplements)
+                    .ThenInclude(sup => sup.Reviews)
+                .Include(s => s.Supplements)
+                    .ThenInclude(sup => sup.Comments)
                 .Where(s => s.Id == subcategoryId)
                 .FirstOrDefaultAsync();
 
             foreach (Supplement supplement in subcategory.Supplements)
             {
+                foreach (Review review in supplement.Reviews)
+                {
+                    review.IsDeleted = true;
+                }
+
+                foreach (Comment comment in supplement.Comments)
+                {
+                    comment.IsDeleted = true;
+                }
+
                 supplement.IsDeleted = true;
             }
 
@@ -97,7 +119,11 @@
             Subcategory subcategory = await this.database
                 .Subcategories
                 .Include(s => s.Supplements)
-                .ThenInclude(s => s.Manufacturer)
+                    .ThenInclude(sup => sup.Manufacturer)
+                .Include(s => s.Supplements)
+                    .ThenInclude(sup => sup.Reviews)
+                .Include(s => s.Supplements)
+                    .ThenInclude(sup => sup.Comments)
                 .Where(s => s.Id == subcategoryId)
                 .FirstOrDefaultAsync();
 
@@ -105,6 +131,16 @@
             {
                 if (!supplement.Manufacturer.IsDeleted)
                 {
+                    foreach (Review review in supplement.Reviews)
+                    {
+                        review.IsDeleted = false;
+                    }
+
+                    foreach (Comment comment in supplement.Comments)
+                    {
+                        comment.IsDeleted = false;
+                    }
+
                     supplement.IsDeleted = false;
                 }
             }

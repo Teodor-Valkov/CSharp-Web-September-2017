@@ -6,7 +6,6 @@
     using Data.Models;
     using Microsoft.EntityFrameworkCore;
     using Models.Subcategories;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
 
@@ -17,15 +16,6 @@
         public SubcategoryService(FitStoreDbContext database)
         {
             this.database = database;
-        }
-
-        public async Task<IEnumerable<SubcategoryBasicServiceModel>> GetAllBasicListingAsync(int categoryId)
-        {
-            return await this.database
-               .Subcategories
-               .Where(s => s.CategoryId == categoryId)
-               .ProjectTo<SubcategoryBasicServiceModel>()
-               .ToListAsync();
         }
 
         public async Task<SubcategoryDetailsServiceModel> GetDetailsByIdAsync(int subcategoryId)

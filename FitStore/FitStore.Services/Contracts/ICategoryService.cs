@@ -8,8 +8,6 @@
     {
         Task<IEnumerable<CategoryAdvancedServiceModel>> GetAllAdvancedListingAsync();
 
-        Task<IEnumerable<CategoryBasicServiceModel>> GetAllBasicListingAsync();
-
         Task<CategoryDetailsServiceModel> GetDetailsByIdAsync(int categoryId);
 
         Task<bool> IsCategoryExistingById(int categoryId, bool isDeleted);

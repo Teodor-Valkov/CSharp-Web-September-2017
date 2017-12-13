@@ -17,7 +17,7 @@
 @if (User.Identity.IsAuthenticated && User.IsInRole(WebConstants.ManagerRole))
 {
     <div>
-        <a asp-area="Manager" asp-controller="Supplements" asp-action="Create" class="btn btn-success">Create Supplement</a>
+        <a asp-area="Manager" asp-controller="Supplements" asp-action="Category" class="btn btn-success">Create Supplement</a>
 
         <br />
         <br />
@@ -78,11 +78,22 @@ else
             @foreach (var supplement in Model.Elements)
             {
                 <tr class="text-center">
-                    <td>
-                        <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">
-                            <img id="supplements-index-image" src="@supplement.Picture" alt="supplement-picture">
-                        </a>
-                    </td>
+                    @if (User.IsInRole(WebConstants.ModeratorRole))
+                    {
+                        <td>
+                            <a asp-area="Moderator" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">
+                                <img id="supplements-index-image" src="@supplement.Picture" alt="supplement-picture">
+                            </a>
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                            <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">
+                                <img id="supplements-index-image" src="@supplement.Picture" alt="supplement-picture">
+                            </a>
+                        </td>
+                    }
                     <td>@supplement.Name</td>
                     <td>@supplement.Quantity</td>
                     <td>@supplement.Price</td>
@@ -95,11 +106,11 @@ else
                         }
                         else
                         {@Html.ActionLink("Delete", "Delete", "Supplements", new { area = "Manager", id = supplement.Id },
-                                            new
-                                            {
-                                                @class = "btn btn-danger",
-                                                onclick = $"return confirm('Are you sure you want to delete this supplement?');"
-                                            })
+                                                                            new
+                                                                            {
+                                                                                @class = "btn btn-danger",
+                                                                                onclick = $"return confirm('Are you sure you want to delete this supplement?');"
+                                                                            })
                     }
                     </td>
                 </tr>

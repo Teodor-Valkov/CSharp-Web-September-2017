@@ -5,8 +5,6 @@
 
     public class ShoppingCart
     {
-        //public IDictionary<OrderSupplements, int> Supplements { get; set; }
-
         public IList<SupplementInCartServiceModel> Supplements { get; set; } = new List<SupplementInCartServiceModel>();
 
         public decimal TotalPrice

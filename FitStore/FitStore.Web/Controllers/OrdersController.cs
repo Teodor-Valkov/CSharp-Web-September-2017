@@ -1,6 +1,7 @@
 ﻿namespace FitStore.Web.Controllers
 {
     using Data.Models;
+    using FitStore.Services.Models.Orders;
     using Infrastructure.Extensions;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
@@ -13,7 +14,7 @@
     using static Common.CommonConstants;
     using static Common.CommonMessages;
 
-    public class OrdersController : Controller
+    public class OrdersController : BaseController
     {
         private readonly UserManager<User> userManager;
         private readonly IOrderService orderService;
@@ -172,6 +173,23 @@
             TempData.AddSuccessMessage(FinishOrderSuccessMessage);
 
             return RedirectToAction(nameof(HomeController.Index), Home);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Review(int id)
+        {
+            bool isOrderExistingById = await this.orderService.IsOrderExistingById(id);
+
+            if (!isOrderExistingById)
+            {
+                return RedirectToAction(nameof(HomeController.Index), Home);
+            }
+
+            OrderDetailsServiceModel model = await this.orderService.GetDetailsByIdAsync(id);
+
+            ViewData["ReturnUrl"] = this.RedirectToOrderReview(id);
+
+            return View(model);
         }
 
         private IActionResult RedirectToLocal(string returnUrl)

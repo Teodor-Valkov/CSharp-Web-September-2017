@@ -31,7 +31,7 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    @if (User.Identity.IsAuthenticated && User.IsInRole(WebConstants.AdministratorRole))
+                    @if (User.IsInRole(WebConstants.AdministratorRole))
                     {
                         <li>
                             <ul class="nav navbar-nav">
@@ -47,7 +47,7 @@
                             </ul>
                         </li>
                     }
-                    @if (User.Identity.IsAuthenticated && User.IsInRole(WebConstants.ManagerRole))
+                    @if (User.IsInRole(WebConstants.ManagerRole))
                     {
                         <li>
                             <ul class="nav navbar-nav">
@@ -65,6 +65,32 @@
                                 </li>
                             </ul>
                         </li>
+                    }
+                    else
+                    {
+                        <li><a asp-area="" asp-controller="Manufacturers" asp-action="Index">Manufacturers</a></li>
+                    }
+                    @if (User.IsInRole(WebConstants.ModeratorRole))
+                    {
+                        <li>
+                            <ul class="nav navbar-nav">
+                                <li class="dropdown">
+                                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                        Moderator
+                                        <span class="caret"></span>
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><a asp-area="Moderator" asp-controller="Users" asp-action="Index">Users</a></li>
+                                        <li><a asp-area="Moderator" asp-controller="Reviews" asp-action="Index">Reviews</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+
+                    }
+                    else
+                    {
+                        <li><a asp-area="" asp-controller="Reviews" asp-action="Index">Reviews</a></li>
                     }
                 </ul>
                 @await Html.PartialAsync("_LoginPartial")

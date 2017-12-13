@@ -8,6 +8,8 @@
     {
         Task<IEnumerable<CategoryAdvancedServiceModel>> GetAllPagedListingAsync(bool isDeleted, string searchToken, int page);
 
+        Task<IEnumerable<CategoryBasicServiceModel>> GetAllBasicListingAsync(bool isDeleted);
+
         Task CreateAsync(string name);
 
         Task<CategoryBasicServiceModel> GetEditModelAsync(int categoryId);

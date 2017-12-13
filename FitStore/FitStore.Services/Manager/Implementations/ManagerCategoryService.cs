@@ -39,6 +39,15 @@
                .ToListAsync();
         }
 
+        public async Task<IEnumerable<CategoryBasicServiceModel>> GetAllBasicListingAsync(bool isDeleted)
+        {
+            return await this.database
+               .Categories
+               .Where(c => c.IsDeleted == isDeleted)
+               .ProjectTo<CategoryBasicServiceModel>()
+               .ToListAsync();
+        }
+
         public async Task CreateAsync(string name)
         {
             Category category = new Category
@@ -77,7 +86,11 @@
             Category category = await this.database
                 .Categories
                 .Include(c => c.Subcategories)
-                .ThenInclude(s => s.Supplements)
+                    .ThenInclude(sc => sc.Supplements)
+                    .ThenInclude(sup => sup.Reviews)
+                .Include(c => c.Subcategories)
+                    .ThenInclude(sc => sc.Supplements)
+                    .ThenInclude(sup => sup.Comments)
                 .Where(c => c.Id == categoryId)
                 .FirstOrDefaultAsync();
 
@@ -85,6 +98,16 @@
             {
                 foreach (Supplement supplement in subcategory.Supplements)
                 {
+                    foreach (Review review in supplement.Reviews)
+                    {
+                        review.IsDeleted = true;
+                    }
+
+                    foreach (Comment comment in supplement.Comments)
+                    {
+                        comment.IsDeleted = true;
+                    }
+
                     supplement.IsDeleted = true;
                 }
 
@@ -101,7 +124,14 @@
             Category category = await this.database
                 .Categories
                 .Include(c => c.Subcategories)
-                .ThenInclude(s => s.Supplements)
+                    .ThenInclude(sc => sc.Supplements)
+                    .ThenInclude(sup => sup.Manufacturer)
+                .Include(c => c.Subcategories)
+                    .ThenInclude(sc => sc.Supplements)
+                    .ThenInclude(sup => sup.Reviews)
+                .Include(c => c.Subcategories)
+                    .ThenInclude(sc => sc.Supplements)
+                    .ThenInclude(sup => sup.Comments)
                 .Where(c => c.Id == categoryId)
                 .FirstOrDefaultAsync();
 
@@ -109,7 +139,20 @@
             {
                 foreach (Supplement supplement in subcategory.Supplements)
                 {
-                    supplement.IsDeleted = false;
+                    if (!supplement.Manufacturer.IsDeleted)
+                    {
+                        supplement.IsDeleted = false;
+
+                        foreach (Review review in supplement.Reviews)
+                        {
+                            review.IsDeleted = false;
+                        }
+
+                        foreach (Comment comment in supplement.Comments)
+                        {
+                            comment.IsDeleted = false;
+                        }
+                    }
                 }
 
                 subcategory.IsDeleted = false;

@@ -8,7 +8,7 @@
     {
         Task<IEnumerable<SupplementAdvancedServiceModel>> GetAllAdvancedListingAsync();
 
-        Task<SupplementDetailsServiceModel> GetDetailsByIdAsync(int supplementId);
+        Task<SupplementDetailsServiceModel> GetDetailsByIdAsync(int supplementId, int page);
 
         Task<bool> IsSupplementExistingById(int supplementId, bool isDeleted);
 
@@ -17,5 +17,7 @@
         Task<bool> IsSupplementExistingByName(string name);
 
         Task<bool> IsSupplementExistingByIdAndName(int supplementId, string name);
+
+        Task<int> TotalCommentsAsync(int supplementId, bool shouldSeeDeletedComments);
     }
 }

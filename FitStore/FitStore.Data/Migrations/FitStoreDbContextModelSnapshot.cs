@@ -226,6 +226,8 @@ namespace FitStore.Data.Migrations
                     b.Property<string>("FullName")
                         .HasMaxLength(100);
 
+                    b.Property<bool>("IsRestricted");
+
                     b.Property<bool>("LockoutEnabled");
 
                     b.Property<DateTimeOffset?>("LockoutEnd");

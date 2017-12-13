@@ -2,25 +2,31 @@
 {
     public class CommonConstants
     {
+        public const int CategoryPageSize = 3;
+        public const int CommentPageSize = 3;
+        public const int ManufacturerPageSize = 3;
+        public const int OrderPageSize = 3;
+        public const int ReviewPageSize = 3;
+        public const int SubcategoryPageSize = 3;
+        public const int SupplementPageSize = 3;
         public const int UserPageSize = 5;
         public const int UserProfilePageSize = 3;
-        public const int CategoryPageSize = 3;
-        public const int SubcategoryPageSize = 3;
-        public const int ManufacturerPageSize = 3;
-        public const int SupplementPageSize = 3;
 
         public const string CategoryEntity = "Category";
-        public const string SubcategoryEntity = "Subcategory";
+        public const string CommentEntity = "Comment";
         public const string ManufacturerEntity = "Manufacturer";
+        public const string ReviewEntity = "Review";
+        public const string SubcategoryEntity = "Subcategory";
         public const string SupplementEntity = "Supplement";
         public const string UserEntity = "User";
-        public const string CommentEntity = "Comment";
 
         public const string Home = "Home";
         public const string Categories = "Categories";
-        public const string Subcategories = "Subcategories";
         public const string Manufacturers = "Manufacturers";
+        public const string Reviews = "Reviews";
+        public const string Subcategories = "Subcategories";
         public const string Supplements = "Supplements";
+        public const string Orders = "Orders";
 
         public const string UserSessionShoppingCartKeyName = "*#@User_Session_Shopping_Cart@#*";
         public const string UserFullNameName = "Full Name";

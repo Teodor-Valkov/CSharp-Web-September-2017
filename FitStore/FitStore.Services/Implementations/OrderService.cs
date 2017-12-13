@@ -10,6 +10,8 @@
     using System;
     using System.Linq;
     using System.Threading.Tasks;
+    using FitStore.Services.Models.Orders;
+    using AutoMapper.QueryableExtensions;
 
     public class OrderService : IOrderService
     {
@@ -18,6 +20,15 @@
         public OrderService(FitStoreDbContext database)
         {
             this.database = database;
+        }
+
+        public async Task<OrderDetailsServiceModel> GetDetailsByIdAsync(int orderId)
+        {
+            return await this.database
+                .Orders
+                .Where(o => o.Id == orderId)
+                .ProjectTo<OrderDetailsServiceModel>()
+                .FirstOrDefaultAsync();
         }
 
         public async Task<bool> AddSupplementToCartAsync(int supplementId, ShoppingCart shoppingCart)
@@ -110,6 +121,13 @@
             }
 
             return false;
+        }
+
+        public async Task<bool> IsOrderExistingById(int orderId)
+        {
+            return await this.database
+                .Orders
+                .AnyAsync(o => o.Id == orderId);
         }
 
         public async Task CancelOrderAsync(ShoppingCart shoppingCart)

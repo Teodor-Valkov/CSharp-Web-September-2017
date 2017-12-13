@@ -1,0 +1,57 @@
+﻿@model ReviewDetailsServiceModel
+
+@{
+    ViewData["Title"] = "Review Details";
+}
+
+<div class="row">
+    <div class="text-center">
+        <br />
+        <h2>@Model.SupplementName</h2>
+        <h3>Manufacturer: <a asp-area="" asp-controller="Manufacturers" asp-action="Details" asp-route-id="@Model.ManufacturerId">@Model.ManufacturerName</a></h3>
+        <br />
+        <br />
+        <div>
+            <img id="review-details-image" class="text-center" src="@Model.Picture" alt="supplement-picture">
+        </div>
+        <br />
+        <br />
+        <div>
+            <p>@Model.Content</p>
+            <p><em>Author: @Model.Author</em></p>
+        </div>
+        <div>
+            <a asp-area="" asp-controller="Reviews" asp-action="Index" class="btn btn-default">Back</a>
+            @if (this.User.IsInRole(WebConstants.ModeratorRole))
+            {
+                <a asp-area="" asp-controller="Reviews" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-sm">Edit</a>
+                if (Model.IsDeleted)
+                {
+                    <a asp-area="Moderator" asp-controller="Reviews" asp-action="Restore" asp-route-id="@Model.Id" class="btn btn-success btn-sm">Restore</a>
+                }
+                else
+                {
+                    @Html.ActionLink("Delete", "Delete", "Reviews", new { id = Model.Id },
+                                      new
+                                      {
+                                          @class = "btn btn-danger btn-sm",
+                                          onclick = $"return confirm('Are you sure you want to delete this review?');"
+                                      })
+                }
+            }
+            else if (this.User.Identity.Name == Model.Author)
+            {
+                <a asp-area="" asp-controller="Reviews" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-sm">Edit</a>
+                if (!Model.IsDeleted)
+                {
+                    @Html.ActionLink("Delete", "Delete", "Reviews", new { id = Model.Id },
+                                       new
+                                       {
+                                           @class = "btn btn-danger btn-sm",
+                                           onclick = $"return confirm('Are you sure you want to delete this review?');"
+                                       })
+                }
+            }
+        </div>
+    </div>
+</div>

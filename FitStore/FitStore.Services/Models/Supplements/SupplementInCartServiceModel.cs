@@ -4,9 +4,6 @@
     using Common.Extensions;
     using Common.Mapping;
     using Data.Models;
-    using System.ComponentModel.DataAnnotations;
-
-    using static Common.CommonConstants;
 
     public class SupplementInCartServiceModel : IMapFrom<Supplement>, IHaveCustomMapping
     {
@@ -20,7 +17,6 @@
 
         public string Picture { get; set; }
 
-        [Display(Name = ManufacturerEntity)]
         public string ManufacturerName { get; set; }
 
         public virtual void ConfigureMapping(Profile mapper)

@@ -1,0 +1,71 @@
+﻿@model PagingElementsViewModel<ReviewAdvancedServiceModel>
+
+@{
+    ViewData["Title"] = "All Reviews";
+}
+
+@if (!Model.Elements.Any())
+{
+    <h2 class="text-center">No Reviews Found.</h2>
+}
+else
+{
+    <br />
+    <h2>@ViewData["Title"]</h2>
+    <br />
+
+    <div class="row text-center">
+        <table class="table table-bordered table-responsive">
+            <thead>
+                <tr>
+                    <th class="text-center">Picture</th>
+                    <th class="text-center">Name</th>
+                    <th class="text-center">Rating</th>
+                    <th class="text-center">Author</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var review in Model.Elements)
+                {
+                    <tr class="text-center">
+                        <td>
+                            <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@review.SupplementId" asp-route-name="@review.SupplementName" asp-route-returnUrl="@ViewData["ReturnUrl"]">
+                                <img id="supplements-index-image" src="@review.Picture" alt="supplement-picture">
+                            </a>
+                        </td>
+                        <td>@review.SupplementName</td>
+                        <td>@review.Rating</td>
+                        <td>@review.Author</td>
+                        <td>
+                            <a asp-area="" asp-controller="Reviews" asp-action="Details" asp-route-id="@review.Id" class="btn btn-primary btn-sm">Details</a>
+                            @if (this.User.Identity.Name == review.Author)
+                            {
+                                <a asp-area="" asp-controller="Reviews" asp-action="Edit" asp-route-id="@review.Id" class="btn btn-warning btn-sm">Edit</a>
+
+                                @Html.ActionLink("Delete", "Delete", "Reviews", new { id = review.Id },
+                                                new
+                                                {
+                                                    @class = "btn btn-danger btn-sm",
+                                                    onclick = $"return confirm('Are you sure you want to delete this reviews?');"
+                                                })
+
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<div class="text-center">
+    @if (Model.Pagination.TotalPages > 1)
+    {
+        string actionLink = $"/reviews/index&";
+
+        Model.Pagination.ActionLink = actionLink;
+
+        @Html.Partial("_Pagination", Model.Pagination)
+    }
+</div>

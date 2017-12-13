@@ -22,23 +22,6 @@
             this.userManager = userManager;
         }
 
-        //public async Task<IEnumerable<UserSearchServiceModel>> GetAllSearchListingAsync(string searchToken)
-        //{
-        //    IQueryable<User> users = this.database.Users;
-
-        //    if (!string.IsNullOrWhiteSpace(searchToken))
-        //    {
-        //        users = users.Where(u =>
-        //            u.Name.ToLower().Contains(searchToken.ToLower()) ||
-        //            u.UserName.ToLower().Contains(searchToken.ToLower()));
-        //    }
-
-        //    return await users
-        //       .OrderBy(u => u.UserName)
-        //       .ProjectTo<UserSearchServiceModel>()
-        //       .ToListAsync();
-        //}
-
         public async Task<UserProfileServiceModel> GetProfileByUsernameAsync(string username, int page)
         {
             return await this.database
@@ -105,13 +88,20 @@
             return changePasswordResult.Succeeded;
         }
 
-        public async Task<int> TotalOrders(string username)
+        public async Task<bool> IsUserRestricted(string username)
+        {
+            User user = await this.userManager.FindByNameAsync(username);
+
+            return user.IsRestricted;
+        }
+
+        public async Task<int> TotalOrdersAsync(string username)
         {
             return await this.database
                 .Users
                 .Where(u => u.UserName == username)
-                .Select(u => u.Orders.Count)
-                .FirstOrDefaultAsync();
+                .SelectMany(u => u.Orders)
+                .CountAsync();
         }
     }
 }

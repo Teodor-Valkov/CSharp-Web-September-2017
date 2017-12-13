@@ -7,8 +7,6 @@
 
     public interface IUserService
     {
-        //Task<IEnumerable<UserSearchServiceModel>> GetAllSearchListingAsync(string searchToken);
-
         Task<UserProfileServiceModel> GetProfileByUsernameAsync(string username, int page);
 
         Task<UserEditProfileServiceModel> GetEditProfileByUsernameAsync(string username);
@@ -19,6 +17,8 @@
 
         Task<bool> ChangePasswordAsync(User user, string oldPassword, string newPassword);
 
-        Task<int> TotalOrders(string username);
+        Task<bool> IsUserRestricted(string username);
+
+        Task<int> TotalOrdersAsync(string username);
     }
 }

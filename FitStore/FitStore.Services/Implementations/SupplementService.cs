@@ -27,12 +27,12 @@
               .ToListAsync();
         }
 
-        public async Task<SupplementDetailsServiceModel> GetDetailsByIdAsync(int supplementId)
+        public async Task<SupplementDetailsServiceModel> GetDetailsByIdAsync(int supplementId, int page)
         {
             return await this.database
               .Supplements
               .Where(s => s.Id == supplementId)
-              .ProjectTo<SupplementDetailsServiceModel>()
+              .ProjectTo<SupplementDetailsServiceModel>(new { page })
               .FirstOrDefaultAsync();
         }
 
@@ -62,6 +62,25 @@
             return await this.database
                 .Supplements
                 .AnyAsync(s => s.Id != supplementId && s.Name.ToLower() == name.ToLower());
+        }
+
+        public async Task<int> TotalCommentsAsync(int supplementId, bool shouldSeeDeletedComments)
+        {
+            if (!shouldSeeDeletedComments)
+            {
+                return await this.database
+                    .Supplements
+                    .Where(s => s.Id == supplementId)
+                    .SelectMany(s => s.Comments)
+                    .Where(c => c.IsDeleted == false)
+                    .CountAsync();
+            }
+
+            return await this.database
+                .Supplements
+                .Where(s => s.Id == supplementId)
+                .SelectMany(s => s.Comments)
+                .CountAsync();
         }
     }
 }

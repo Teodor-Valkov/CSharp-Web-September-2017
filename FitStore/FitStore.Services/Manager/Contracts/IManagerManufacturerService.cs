@@ -8,6 +8,8 @@
     {
         Task<IEnumerable<ManufacturerAdvancedServiceModel>> GetAllPagedListingAsync(bool isDeleted, string searchToken, int page);
 
+        Task<IEnumerable<ManufacturerBasicServiceModel>> GetAllBasicListingAsync(bool isDeleted);
+
         Task CreateAsync(string name, string address);
 
         Task<ManufacturerBasicServiceModel> GetEditModelAsync(int manufacturerId);

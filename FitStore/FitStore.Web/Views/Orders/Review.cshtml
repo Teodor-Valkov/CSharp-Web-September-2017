@@ -1,0 +1,52 @@
+﻿@model OrderDetailsServiceModel
+
+@{
+    ViewData["Title"] = $"Order Review";
+}
+
+<div class="row">
+    <br />
+
+    <div class="col-12 text-center">
+        <h2>@ViewData["Title"]</h2>
+    </div>
+    <br />
+    <br />
+
+    <table class="table table-bordered table-responsive">
+        <thead>
+            <tr>
+                <th class="text-center">Picture</th>
+                <th class="text-center">Name</th>
+                <th class="text-center">Manufacturer</th>
+                <th class="text-center">Price</th>
+                <th class="text-center">Quantity</th>
+                <th class="text-center">Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var supplement in Model.Supplements)
+            {
+                <tr class="text-center">
+                    <td>
+                        <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">
+                            <img id="supplements-index-image" src="@supplement.Picture" alt="supplement-picture">
+                        </a>
+                    </td>
+                    <td>@supplement.Name</td>
+                    <td>@supplement.ManufacturerName</td>
+                    <td>@supplement.Price &euro;</td>
+                    <td>@supplement.Quantity</td>
+                    <td>@(@supplement.Price * @supplement.Quantity) &euro;</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <br />
+
+    <div class="text-center">
+        <h2>Order Date: @Model.PurchaseDate.ToShortDateString()</h2>
+        <h2>Total Price: @Model.TotalPrice &euro;</h2>
+    </div>
+</div>

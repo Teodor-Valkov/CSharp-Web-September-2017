@@ -37,5 +37,15 @@
         {
             return $"/{Manufacturers.ToLower()}/{nameof(ManufacturersController.Details).ToLower()}/{id}?name={name}";
         }
+
+        protected string RedirectToOrderReview(int id)
+        {
+            return $"/{Orders.ToLower()}/{nameof(OrdersController.Review).ToLower()}/{id}";
+        }
+
+        protected string RedirectToReviewIndex()
+        {
+            return $"/{Reviews.ToLower()}/{nameof(ReviewsController.Index).ToLower()}";
+        }
     }
 }

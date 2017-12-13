@@ -17,9 +17,18 @@
         @foreach (var supplement in Model.Supplements)
         {
             <div class="card col-md-4 text-center">
-                <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">
-                    <img class="card-img-top" id="subcategory-supplement-image" src="@supplement.Picture" alt="supplement-picture">
-                </a>
+                @if (User.IsInRole(WebConstants.ModeratorRole))
+                {
+                    <a asp-area="Moderator" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">
+                        <img class="card-img-top img-rounded" id="home-supplement-image" src="@supplement.Picture" alt="supplement-picture">
+                    </a>
+                }
+                else
+                {
+                    <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">
+                        <img class="card-img-top img-rounded" id="home-supplement-image" src="@supplement.Picture" alt="supplement-picture">
+                    </a>
+                }
                 <br />
                 <br />
                 <div class="card-block">
@@ -27,11 +36,31 @@
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item"><strong>Manufacturer:</strong> @supplement.ManufacturerName</li>
-                    <li class="list-group-item"><strong>Quantity:</strong> @supplement.Quantity</li>
+                    <li class="list-group-item">
+                        <strong>Quantity:</strong>
+                        @if (supplement.Quantity > 0)
+                        {
+                            @supplement.Quantity
+                        }
+                        else
+                        {
+                            <span class="text-danger">Out of Stock</span>
+                        }
+                    </li>
                     <li class="list-group-item"><strong>Price:</strong> @supplement.Price &euro;</li>
                     <li class="list-group-item">
-                        <a class="btn btn-primary btn-sm" asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">Details</a>
-                        <a class="btn btn-success btn-sm" asp-area="" asp-controller="Orders" asp-action="Add" asp-route-id="@supplement.Id">Buy</a>
+                        @if (User.IsInRole(WebConstants.ModeratorRole))
+                        {
+                            <a class="btn btn-primary btn-sm" asp-area="Moderator" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">Details</a>
+                        }
+                        else
+                        {
+                            <a class="btn btn-primary btn-sm" asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">Details</a>
+                        }
+                        @if (supplement.Quantity > 0)
+                        {
+                            <a class="btn btn-success btn-sm" asp-area="" asp-controller="Orders" asp-action="Add" asp-route-id="@supplement.Id">Buy</a>
+                        }
                         @if (User.Identity.IsAuthenticated && User.IsInRole(WebConstants.ManagerRole))
                         {
                             <a asp-area="Manager" asp-controller="Supplements" asp-action="Edit" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" class="btn btn-warning btn-sm">Edit</a>
@@ -43,11 +72,11 @@
                             else
                             {
                                 @Html.ActionLink("Delete", "Delete", "Supplements", new { area = "Manager", id = supplement.Id, name = supplement.Name },
-                                                          new
-                                                          {
-                                                              @class = "btn btn-danger btn-sm",
-                                                              onclick = $"return confirm('Are you sure you want to delete *{supplement.Name}*?');"
-                                                          })
+                                                                 new
+                                                                 {
+                                                                     @class = "btn btn-danger btn-sm",
+                                                                     onclick = $"return confirm('Are you sure you want to delete *{supplement.Name}*?');"
+                                                                 })
                             }
                         }
                     </li>

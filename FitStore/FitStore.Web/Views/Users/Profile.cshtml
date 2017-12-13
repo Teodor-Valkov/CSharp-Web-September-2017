@@ -8,6 +8,14 @@
     <div class="col-md-offset-2 col-md-8">
         <br />
         <h2 class="text-center">@ViewData["Title"]</h2>
+
+        @if (Model.Element.Username == User.Identity.Name)
+        {
+            <div class="text-center">
+                <a asp-action="EditProfile" asp-route-username="@User.Identity.Name" class="btn btn-default">Edit Profile</a>
+                <a asp-action="ChangePassword" asp-route-username="@User.Identity.Name" class="btn btn-default">Change Password</a>
+            </div>
+        }
         <hr />
 
         <table class="table table-bordered table-responsive">
@@ -32,13 +40,52 @@
                 <td>@Model.Element.BirthDate.ToShortDateString()</td>
             </tr>
         </table>
-
-        @if (Model.Element.Username == User.Identity.Name)
-            {
-            <div class="text-center">
-                <a asp-action="EditProfile" asp-route-username="@User.Identity.Name" class="btn btn-default">Edit Profile</a>
-                <a asp-action="ChangePassword" asp-route-username="@User.Identity.Name" class="btn btn-default">Change Password</a>
-            </div>
-        }
     </div>
+</div>
+
+@if (Model.Element.Orders.Any())
+{
+
+    <h3 class="text-center">Your Orders:</h3>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-offset-2 col-md-8">
+            <table class="table table-bordered table-responsive">
+                <thead>
+                    <tr>
+                        <th class="text-center">Order Date</th>
+                        <th class="text-center">Supplements Ordered</th>
+                        <th class="text-center">Total Price</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+
+                @foreach (var order in Model.Element.Orders)
+                {
+                    <tbody>
+                        <tr class="text-center">
+                            <td>@order.PurchaseDate.ToShortDateString()</td>
+                            <td>@order.Supplements</td>
+                            <td>@order.TotalPrice &euro;</td>
+                            <td>
+                                <a asp-area="" asp-controller="Orders" asp-action="Review" asp-route-id="@order.Id" class="btn btn-primary btn-sm">Details</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                }
+            </table>
+        </div>
+    </div>
+}
+
+<div class="text-center">
+    @if (Model.Pagination.TotalPages > 1)
+    {
+        string actionLink = $"/users/profile?username={Model.Element.Username}&";
+
+        Model.Pagination.ActionLink = actionLink;
+
+        @Html.Partial("_Pagination", Model.Pagination)
+    }
 </div>
