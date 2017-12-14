@@ -15,7 +15,7 @@
         {
             mapper
                 .CreateMap<Subcategory, SubcategoryAdvancedServiceModel>()
-                    .ForMember(dest => dest.Supplements, opt => opt.MapFrom(src => src.Supplements.Count(s => s.IsDeleted == false)));
+                    .ForMember(dest => dest.Supplements, opt => opt.MapFrom(src => src.Supplements.Count()));
         }
     }
 }

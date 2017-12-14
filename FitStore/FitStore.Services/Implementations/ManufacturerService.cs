@@ -27,18 +27,18 @@
                 .Manufacturers
                 .Where(m => m.IsDeleted == false)
                 .OrderBy(m => m.Name)
-                .Skip((page - 1) * ManufacturerPageSize)
-                .Take(ManufacturerPageSize)
+                .Skip((page - 1) * SupplementPageSize)
+                .Take(SupplementPageSize)
                 .ProjectTo<ManufacturerAdvancedServiceModel>()
                 .ToListAsync();
         }
 
-        public async Task<ManufacturerDetailsServiceModel> GetDetailsByIdAsync(int manufacturerId)
+        public async Task<ManufacturerDetailsServiceModel> GetDetailsByIdAsync(int manufacturerId, int page)
         {
             return await this.database
               .Manufacturers
               .Where(m => m.Id == manufacturerId)
-              .ProjectTo<ManufacturerDetailsServiceModel>()
+              .ProjectTo<ManufacturerDetailsServiceModel>(new { page })
               .FirstOrDefaultAsync();
         }
 
@@ -76,6 +76,14 @@
                 .Manufacturers
                 .Where(m => m.IsDeleted == false)
                 .CountAsync();
+        }
+
+        public async Task<int> TotalSupplementsCountAsync(int manufacturerId)
+        {
+            return await this.database
+                .Manufacturers
+                .Where(m => m.Id == manufacturerId)
+                .SumAsync(m => m.Supplements.Count(sup => sup.IsDeleted == false));
         }
     }
 }

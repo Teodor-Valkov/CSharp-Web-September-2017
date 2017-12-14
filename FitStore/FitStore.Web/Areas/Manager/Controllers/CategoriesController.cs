@@ -39,7 +39,7 @@
                 Pagination = new PaginationViewModel
                 {
                     TotalElements = await this.managerCategoryService.TotalCountAsync(isDeleted, searchToken),
-                    PageSize = CategoryPageSize,
+                    PageSize = SupplementPageSize,
                     CurrentPage = page
                 }
             };

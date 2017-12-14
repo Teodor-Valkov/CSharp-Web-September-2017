@@ -18,12 +18,12 @@
             this.database = database;
         }
 
-        public async Task<SubcategoryDetailsServiceModel> GetDetailsByIdAsync(int subcategoryId)
+        public async Task<SubcategoryDetailsServiceModel> GetDetailsByIdAsync(int subcategoryId, int page)
         {
             return await this.database
               .Subcategories
               .Where(s => s.Id == subcategoryId)
-              .ProjectTo<SubcategoryDetailsServiceModel>()
+              .ProjectTo<SubcategoryDetailsServiceModel>(new { page })
               .FirstOrDefaultAsync();
         }
 
@@ -63,6 +63,14 @@
             return await this.database
                 .Subcategories
                 .AnyAsync(s => s.Id != subcategoryId && s.Name.ToLower() == name.ToLower());
+        }
+
+        public async Task<int> TotalSupplementsCountAsync(int subcategoryId)
+        {
+            return await this.database
+                .Subcategories
+                .Where(s => s.Id == subcategoryId)
+                .SumAsync(s => s.Supplements.Count(sup => sup.IsDeleted == false));
         }
     }
 }

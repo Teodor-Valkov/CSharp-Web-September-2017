@@ -19,8 +19,8 @@
         {
             mapper
                 .CreateMap<Category, CategoryAdvancedServiceModel>()
-                    .ForMember(dest => dest.Subcategories, opt => opt.MapFrom(src => src.Subcategories.Where(sc => sc.IsDeleted == false)))
-                    .ForMember(dest => dest.Supplements, opt => opt.MapFrom(src => src.Subcategories.Sum(sc => sc.Supplements.Count(sup => sup.IsDeleted == false))));
+                    .ForMember(dest => dest.Subcategories, opt => opt.MapFrom(src => src.Subcategories))
+                    .ForMember(dest => dest.Supplements, opt => opt.MapFrom(src => src.Subcategories.Sum(sc => sc.Supplements.Count)));
         }
     }
 }

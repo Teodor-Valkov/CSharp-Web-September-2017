@@ -5,7 +5,7 @@
 
     public interface ISubcategoryService
     {
-        Task<SubcategoryDetailsServiceModel> GetDetailsByIdAsync(int categoryId);
+        Task<SubcategoryDetailsServiceModel> GetDetailsByIdAsync(int categoryId, int page);
 
         Task<int> GetCategoryIdBySubcategoryId(int subcategoryId);
 
@@ -16,5 +16,7 @@
         Task<bool> IsSubcategoryExistingByName(string name);
 
         Task<bool> IsSubcategoryExistingByIdAndName(int subcategoryId, string name);
+
+        Task<int> TotalSupplementsCountAsync(int subcategoryId);
     }
 }

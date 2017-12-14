@@ -1,4 +1,4 @@
-﻿@model HomeIndexViewModel
+﻿@model PagingElementViewModel<HomeIndexViewModel>
 
 @{
     ViewData["Title"] = "Home Page";
@@ -50,7 +50,9 @@
     <div class="row">
         <div class="col-md-2">
             <br />
-            @foreach (var category in Model.Categories)
+            <br />
+
+            @foreach (var category in Model.Element.Categories)
             {
                 <ul class="nav nav-pills nav-stacked">
                     <li id="home-category-link"><a asp-area="" asp-controller="Categories" asp-action="Details" asp-route-id="@category.Id" asp-route-name="@category.Name">@category.Name</a></li>
@@ -65,20 +67,33 @@
         <div class="col-md-offset-1 col-md-9">
             <br />
             <br />
-            @foreach (var supplement in Model.Supplements)
+            @foreach (var supplement in Model.Element.Supplements)
             {
                 <div class="card col-md-4 text-center">
                     @if (User.IsInRole(WebConstants.ModeratorRole))
                     {
                         <a asp-area="Moderator" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">
-                            <img class="card-img-top img-rounded" id="home-supplement-image" src="@supplement.Picture" alt="supplement-picture">
+                            @if (supplement.Picture == string.Empty)
+                            {
+                                <img class="card-img-top img-rounded" id="home-supplement-image" src="~/images/image-not-found.jpg" alt="supplement-picture" />
+                            }
+                            else
+                            {
+                                <img class="card-img-top img-rounded" id="home-supplement-image" src="@supplement.Picture" alt="supplement-picture" />
+                            }
                         </a>
-
                     }
                     else
                     {
                         <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">
-                            <img class="card-img-top img-rounded" id="home-supplement-image" src="@supplement.Picture" alt="supplement-picture">
+                            @if (supplement.Picture == string.Empty)
+                            {
+                                <img class="card-img-top img-rounded" id="home-supplement-image" src="~/images/image-not-found.jpg" alt="supplement-picture" />
+                            }
+                            else
+                            {
+                                <img class="card-img-top img-rounded" id="home-supplement-image" src="@supplement.Picture" alt="supplement-picture" />
+                            }
                         </a>
                     }
                     <br />
@@ -87,7 +102,7 @@
                         <h4 class="card-title text-center">@supplement.Name</h4>
                     </div>
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item"><strong>Manufacturer:</strong> @supplement.ManufacturerName</li>
+                        <li class="list-group-item"><strong>Manufacturer:</strong> <a asp-area="" asp-controller="Manufacturers" asp-action="Details" asp-route-id="@supplement.ManufacturerId" asp-route-name="@supplement.ManufacturerName">@supplement.ManufacturerName</a> </li>
                         <li class="list-group-item">
                             <strong>Quantity:</strong>
                             @if (supplement.Quantity > 0)
@@ -124,11 +139,11 @@
                                 else
                                 {
                                     @Html.ActionLink("Delete", "Delete", "Supplements", new { area = "Manager", id = supplement.Id, name = supplement.Name },
-                                                                        new
-                                                                        {
-                                                                            @class = "btn btn-danger btn-sm",
-                                                                            onclick = $"return confirm('Are you sure you want to delete *{supplement.Name}*?');"
-                                                                        })
+                                                                                 new
+                                                                                 {
+                                                                                     @class = "btn btn-danger btn-sm",
+                                                                                     onclick = $"return confirm('Are you sure you want to delete *{supplement.Name}*?');"
+                                                                                 })
                                 }
                             }
                         </li>
@@ -137,4 +152,15 @@
             }
         </div>
     </div>
+</div>
+
+<div class="text-center">
+    @if (Model.Pagination.TotalPages > 1)
+    {
+        string actionLink = $"/home/index?";
+
+        Model.Pagination.ActionLink = actionLink;
+
+        @Html.Partial("_Pagination", Model.Pagination)
+    }
 </div>

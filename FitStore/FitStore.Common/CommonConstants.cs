@@ -2,15 +2,12 @@
 {
     public class CommonConstants
     {
-        public const int CategoryPageSize = 3;
         public const int CommentPageSize = 3;
-        public const int ManufacturerPageSize = 3;
         public const int OrderPageSize = 3;
         public const int ReviewPageSize = 3;
-        public const int SubcategoryPageSize = 3;
+        public const int HomePageSize = 6;
         public const int SupplementPageSize = 3;
         public const int UserPageSize = 5;
-        public const int UserProfilePageSize = 3;
 
         public const string CategoryEntity = "Category";
         public const string CommentEntity = "Comment";

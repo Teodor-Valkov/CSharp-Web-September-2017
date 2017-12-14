@@ -9,6 +9,8 @@
     using System.Threading.Tasks;
     using System.Collections.Generic;
 
+    using static Common.CommonConstants;
+
     public class SupplementService : ISupplementService
     {
         private readonly FitStoreDbContext database;
@@ -18,11 +20,14 @@
             this.database = database;
         }
 
-        public async Task<IEnumerable<SupplementAdvancedServiceModel>> GetAllAdvancedListingAsync()
+        public async Task<IEnumerable<SupplementAdvancedServiceModel>> GetAllAdvancedListingAsync(int page)
         {
             return await this.database
               .Supplements
               .Where(s => s.IsDeleted == false)
+              .OrderBy(s => s.Name)
+              .Skip((page - 1) * HomePageSize)
+              .Take(HomePageSize)
               .ProjectTo<SupplementAdvancedServiceModel>()
               .ToListAsync();
         }
@@ -80,6 +85,14 @@
                 .Supplements
                 .Where(s => s.Id == supplementId)
                 .SelectMany(s => s.Comments)
+                .CountAsync();
+        }
+
+        public Task<int> TotalCountAsync()
+        {
+            return this.database
+                .Supplements
+                .Where(s => s.IsDeleted == false)
                 .CountAsync();
         }
     }

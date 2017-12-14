@@ -33,8 +33,8 @@
             return await categories
                .Where(c => c.IsDeleted == isDeleted)
                .OrderBy(c => c.Name)
-               .Skip((page - 1) * CategoryPageSize)
-               .Take(CategoryPageSize)
+               .Skip((page - 1) * SupplementPageSize)
+               .Take(SupplementPageSize)
                .ProjectTo<CategoryAdvancedServiceModel>()
                .ToListAsync();
         }

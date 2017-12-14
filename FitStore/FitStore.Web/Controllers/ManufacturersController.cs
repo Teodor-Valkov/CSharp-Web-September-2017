@@ -32,7 +32,7 @@
                 Pagination = new PaginationViewModel
                 {
                     TotalElements = await this.manufacturerService.TotalCountAsync(),
-                    PageSize = ManufacturerPageSize,
+                    PageSize = SupplementPageSize,
                     CurrentPage = page
                 }
             };
@@ -45,7 +45,7 @@
             return View(model);
         }
 
-        public async Task<IActionResult> Details(int id, string name)
+        public async Task<IActionResult> Details(int id, string name, int page = 1)
         {
             bool isManufacturerExisting = await this.manufacturerService.IsManufacturerExistingById(id, false);
 
@@ -56,7 +56,26 @@
                 return RedirectToAction(nameof(HomeController.Index), Home);
             }
 
-            ManufacturerDetailsServiceModel model = await this.manufacturerService.GetDetailsByIdAsync(id);
+            if (page < 1)
+            {
+                return RedirectToAction(nameof(Details), new { id, name });
+            }
+
+            PagingElementViewModel<ManufacturerDetailsServiceModel> model = new PagingElementViewModel<ManufacturerDetailsServiceModel>
+            {
+                Element = await this.manufacturerService.GetDetailsByIdAsync(id, page),
+                Pagination = new PaginationViewModel
+                {
+                    TotalElements = await this.manufacturerService.TotalSupplementsCountAsync(id),
+                    PageSize = SupplementPageSize,
+                    CurrentPage = page
+                }
+            };
+
+            if (page > model.Pagination.TotalPages && model.Pagination.TotalPages != 0)
+            {
+                return RedirectToAction(nameof(Details), new { id, name, page = model.Pagination.TotalPages });
+            }
 
             ViewData["ReturnUrl"] = this.RedirectToManufacturerDetails(id, name);
 

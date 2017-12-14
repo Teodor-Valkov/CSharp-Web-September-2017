@@ -28,12 +28,12 @@
                .ToListAsync();
         }
 
-        public async Task<CategoryDetailsServiceModel> GetDetailsByIdAsync(int categoryId)
+        public async Task<CategoryDetailsServiceModel> GetDetailsByIdAsync(int categoryId, int page)
         {
             return await this.database
               .Categories
               .Where(c => c.Id == categoryId)
-              .ProjectTo<CategoryDetailsServiceModel>()
+              .ProjectTo<CategoryDetailsServiceModel>(new { page })
               .FirstOrDefaultAsync();
         }
 
@@ -63,6 +63,14 @@
             return await this.database
                 .Categories
                 .AnyAsync(c => c.Id != categoryId && c.Name.ToLower() == name.ToLower());
+        }
+
+        public async Task<int> TotalSupplementsCountAsync(int categoryId)
+        {
+            return await this.database
+                .Categories
+                .Where(c => c.Id == categoryId)
+                .SumAsync(c => c.Subcategories.Sum(sc => sc.Supplements.Count(sup => sup.IsDeleted == false)));
         }
     }
 }

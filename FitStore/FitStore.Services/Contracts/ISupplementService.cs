@@ -6,7 +6,7 @@
 
     public interface ISupplementService
     {
-        Task<IEnumerable<SupplementAdvancedServiceModel>> GetAllAdvancedListingAsync();
+        Task<IEnumerable<SupplementAdvancedServiceModel>> GetAllAdvancedListingAsync(int page);
 
         Task<SupplementDetailsServiceModel> GetDetailsByIdAsync(int supplementId, int page);
 
@@ -19,5 +19,7 @@
         Task<bool> IsSupplementExistingByIdAndName(int supplementId, string name);
 
         Task<int> TotalCommentsAsync(int supplementId, bool shouldSeeDeletedComments);
+
+        Task<int> TotalCountAsync();
     }
 }

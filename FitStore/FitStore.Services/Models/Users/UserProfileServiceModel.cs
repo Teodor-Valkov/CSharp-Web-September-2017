@@ -38,7 +38,11 @@
             mapper
               .CreateMap<User, UserProfileServiceModel>()
                 .ForMember(dest => dest.Orders, opt => opt
-                    .MapFrom(src => src.Orders.Where(o => o.User.UserName == username).OrderByDescending(o => o.PurchaseDate).Skip((page - 1) * OrderPageSize).Take(OrderPageSize)));
+                    .MapFrom(src => src.Orders
+                        .Where(o => o.User.UserName == username)
+                        .OrderByDescending(o => o.PurchaseDate)
+                        .Skip((page - 1) * OrderPageSize)
+                        .Take(OrderPageSize)));
         }
     }
 }

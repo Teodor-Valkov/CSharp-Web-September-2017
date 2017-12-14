@@ -1,7 +1,7 @@
-﻿@model CategoryDetailsServiceModel
+﻿@model PagingElementViewModel<CategoryDetailsServiceModel>
 
 @{
-    ViewData["Title"] = $"Category: {Model.Name}";
+    ViewData["Title"] = $"Category Details";
 }
 
 <div class="row">
@@ -9,16 +9,16 @@
         <br />
 
         <div>
-            <h2>@ViewData["Title"]</h2>
-            <h4>Subcategories: @Model.Subcategories.Count()</h4>
-            <h4>Supplements: @Model.Supplements.Count()</h4>
+            <h2>Category: @Model.Element.Name</h2>
+            <h4>Subcategories: @Model.Element.Subcategories.Count()</h4>
+            <h4>Supplements: @Model.Pagination.TotalElements</h4>
         </div>
 
         <br />
         <br />
 
         <div class="text-center">
-            @foreach (var subcategory in Model.Subcategories)
+            @foreach (var subcategory in Model.Element.Subcategories)
             {
                 <a asp-area="" asp-controller="Subcategories" asp-action="Details" asp-route-id="@subcategory.Id" asp-route-name="@subcategory.Name" id="subcategory-links" class="btn btn-default">@subcategory.Name (@subcategory.Supplements)</a>
             }
@@ -26,73 +26,20 @@
         <br />
         <br />
 
-        @foreach (var supplement in Model.Supplements)
+        @foreach (var supplement in Model.Element.Supplements)
         {
-            <div class="card col-md-4 text-center">
-                @if (User.IsInRole(WebConstants.ModeratorRole))
-                {
-                    <a asp-area="Moderator" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">
-                        <img class="card-img-top img-rounded" id="home-supplement-image" src="@supplement.Picture" alt="supplement-picture">
-                    </a>
-
-                }
-                else
-                {
-                    <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">
-                        <img class="card-img-top img-rounded" id="home-supplement-image" src="@supplement.Picture" alt="supplement-picture">
-                    </a>
-                }
-                <div class="card-block">
-                    <h4 class="card-title">@supplement.Name</h4>
-                </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item"><strong>Manufacturer:</strong> @supplement.ManufacturerName</li>
-                    <li class="list-group-item">
-                        <strong>Quantity:</strong>
-                        @if (supplement.Quantity > 0)
-                        {
-                            @supplement.Quantity
-                        }
-                        else
-                        {
-                            <span class="text-danger">Out of Stock</span>
-                        }
-                    </li>
-                    <li class="list-group-item"><strong>Price:</strong> @supplement.Price &euro;</li>
-                    <li class="list-group-item">
-                        @if (User.IsInRole(WebConstants.ModeratorRole))
-                        {
-                            <a class="btn btn-primary btn-sm" asp-area="Moderator" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">Details</a>
-                        }
-                        else
-                        {
-                            <a class="btn btn-primary btn-sm" asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">Details</a>
-                        }
-                        @if (supplement.Quantity > 0)
-                        {
-                            <a class="btn btn-success btn-sm" asp-area="" asp-controller="Orders" asp-action="Add" asp-route-id="@supplement.Id">Buy</a>
-                        }
-                        @if (User.Identity.IsAuthenticated && User.IsInRole(WebConstants.ManagerRole))
-                        {
-                            <a asp-area="Manager" asp-controller="Supplements" asp-action="Edit" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" class="btn btn-warning btn-sm">Edit</a>
-                            if (supplement.IsDeleted)
-                            {
-                                <a asp-area="Manager" asp-controller="Supplements" asp-action="Delete" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" class="btn btn-success btn-sm">Restore</a>
-
-                            }
-                            else
-                            {
-                                @Html.ActionLink("Delete", "Delete", "Supplements", new { area = "Manager", id = supplement.Id, name = supplement.Name },
-                                                                                                                                                                  new
-                                                                                                                                                                  {
-                                                                                                                                                                      @class = "btn btn-danger btn-sm",
-                                                                                                                                                                      onclick = $"return confirm('Are you sure you want to delete *{supplement.Name}*?');"
-                                                                                                                                                                  })
-                            }
-                        }
-                    </li>
-                </ul>
-            </div>
+            await Html.RenderPartialAsync("_SupplementDetails", supplement);
         }
     </div>
+</div>
+
+<div class="text-center">
+    @if (Model.Pagination.TotalPages > 1)
+    {
+        string actionLink = $"/categories/details/{Model.Element.Id}?name={Model.Element.Name}&";
+
+        Model.Pagination.ActionLink = actionLink;
+
+        @Html.Partial("_Pagination", Model.Pagination)
+    }
 </div>

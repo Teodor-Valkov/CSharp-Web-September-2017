@@ -82,11 +82,17 @@
                 .WithMany(c => c.Subcategories)
                 .HasForeignKey(s => s.CategoryId);
 
-            builder.Entity<Supplement>()
-                .HasIndex(s => s.IsDeleted);
-
             builder.Entity<Category>()
                 .HasIndex(c => c.IsDeleted);
+
+            //builder.Entity<Subcategory>()
+            //    .HasIndex(s => s.IsDeleted);
+
+            //builder.Entity<Manufacturer>()
+            //    .HasIndex(m => m.IsDeleted);
+
+            builder.Entity<Supplement>()
+                .HasIndex(s => s.IsDeleted);
 
             builder.Entity<Comment>()
                 .HasIndex(c => c.IsDeleted);
