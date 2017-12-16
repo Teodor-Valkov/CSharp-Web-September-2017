@@ -10,14 +10,14 @@
 
         Task<bool> AddSupplementToCartAsync(int supplementId, ShoppingCart shoppingCart);
 
-        Task<bool> RemoveSupplementFromCartAsync(int supplementId, ShoppingCart shoppingCart);
+        bool RemoveSupplementFromCartAsync(int supplementId, ShoppingCart shoppingCart);
 
-        Task<bool> RemoveAllSupplementsFromCartAsync(int supplementId, ShoppingCart shoppingCart);
+        bool RemoveAllSupplementsFromCartAsync(int supplementId, ShoppingCart shoppingCart);
 
         Task<bool> IsOrderExistingById(int orderId);
 
-        Task CancelOrderAsync(ShoppingCart shoppingCart);
+        Task<bool> IsLastAvailableSupplementAlreadyAdded(int supplementId, ShoppingCart shoppingCart);
 
-        Task FinishOrderAsync(string userId, ShoppingCart shoppingCart);
+        Task<bool> FinishOrderAsync(string userId, ShoppingCart shoppingCart);
     }
 }

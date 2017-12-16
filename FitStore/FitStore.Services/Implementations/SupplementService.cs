@@ -10,6 +10,7 @@
     using System.Collections.Generic;
 
     using static Common.CommonConstants;
+    using FitStore.Data.Models;
 
     public class SupplementService : ISupplementService
     {
@@ -20,11 +21,16 @@
             this.database = database;
         }
 
-        public async Task<IEnumerable<SupplementAdvancedServiceModel>> GetAllAdvancedListingAsync(int page)
+        public async Task<IEnumerable<SupplementAdvancedServiceModel>> GetAllAdvancedListingAsync(string searchToken, int page)
         {
-            return await this.database
-              .Supplements
-              .Where(s => s.IsDeleted == false)
+            IQueryable<Supplement> supplements = this.database.Supplements.Where(s => s.IsDeleted == false);
+
+            if (!string.IsNullOrWhiteSpace(searchToken))
+            {
+                supplements = supplements.Where(s => s.Name.ToLower().Contains(searchToken.ToLower()));
+            }
+
+            return await supplements
               .OrderBy(s => s.Name)
               .Skip((page - 1) * HomePageSize)
               .Take(HomePageSize)
@@ -88,11 +94,19 @@
                 .CountAsync();
         }
 
-        public Task<int> TotalCountAsync()
+        public Task<int> TotalCountAsync(string searchToken)
         {
+            if (string.IsNullOrWhiteSpace(searchToken))
+            {
+                return this.database
+                    .Supplements
+                    .Where(s => s.IsDeleted == false)
+                    .CountAsync();
+            }
+
             return this.database
                 .Supplements
-                .Where(s => s.IsDeleted == false)
+                .Where(s => s.IsDeleted == false && s.Name.ToLower().Contains(searchToken.ToLower()))
                 .CountAsync();
         }
     }

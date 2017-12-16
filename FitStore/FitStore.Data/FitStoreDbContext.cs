@@ -85,11 +85,11 @@
             builder.Entity<Category>()
                 .HasIndex(c => c.IsDeleted);
 
-            //builder.Entity<Subcategory>()
-            //    .HasIndex(s => s.IsDeleted);
+            builder.Entity<Subcategory>()
+                .HasIndex(s => s.IsDeleted);
 
-            //builder.Entity<Manufacturer>()
-            //    .HasIndex(m => m.IsDeleted);
+            builder.Entity<Manufacturer>()
+                .HasIndex(m => m.IsDeleted);
 
             builder.Entity<Supplement>()
                 .HasIndex(s => s.IsDeleted);

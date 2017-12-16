@@ -27,10 +27,14 @@
         public const string SupplementRemovedFromCartSuccessMessage = "Supplement was successfully removed from your cart.";
 
         public const string SupplementUnavailableErrorMessage = "This supplement is currently out of stock.";
+        public const string SupplementLastOneJustAddedErrorMessage = "You already added the last available supplement in your cart.";
 
         public const string CancelOrderSuccessMessage = "Your order was successfully canceled.";
         public const string FinishOrderSuccessMessage = "Thank you for your order.";
+        public const string FinishOrderErrorMessage = "Oops! Someone was faster than you... Try to add less supplement quantities in your cart.";
 
         public const string UserRestrictedErrorMessage = "You are temporarily restricted to perform this action.";
+
+        public const string SupplementPictureErrorMessage = "Only pictures in Jpeg format are allowed";
     }
 }

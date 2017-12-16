@@ -30,7 +30,7 @@
                 <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">Fit Store</a>
             </div>
             <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
+                <ul class="nav navbar-nav col-md-9">
                     @if (User.IsInRole(WebConstants.AdministratorRole))
                     {
                         <li>
@@ -91,6 +91,18 @@
                     {
                         <li><a asp-area="" asp-controller="Reviews" asp-action="Index">Reviews</a></li>
                     }
+                    <li class="col-md-6 pull-right" id="search">
+                        <div>
+                            <form method="get" asp-area="" asp-controller="Home" asp-action="Index">
+                                <div class="input-group">
+                                    <input class="form-control" name="searchToken" placeholder="Supplement..." value="@ViewData["SearchToken"]" />
+                                    <span class="input-group-btn">
+                                        <input class="btn btn-primary" type="submit" value="Search" />
+                                    </span>
+                                </div>
+                            </form>
+                        </div>
+                    </li>
                 </ul>
                 @await Html.PartialAsync("_LoginPartial")
             </div>

@@ -21,6 +21,7 @@
 
         public bool IsDeleted { get; set; }
 
+        [Required]
         public string AuthorId { get; set; }
 
         public User Author { get; set; }

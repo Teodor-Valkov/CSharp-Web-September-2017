@@ -21,7 +21,7 @@
             this.supplementService = supplementService;
         }
 
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(string searchToken, int page = 1)
         {
             if (page < 1)
             {
@@ -33,11 +33,12 @@
                 Element = new HomeIndexViewModel
                 {
                     Categories = await this.categoryService.GetAllAdvancedListingAsync(),
-                    Supplements = await this.supplementService.GetAllAdvancedListingAsync(page)
+                    Supplements = await this.supplementService.GetAllAdvancedListingAsync(searchToken, page)
                 },
+                SearchToken = searchToken,
                 Pagination = new PaginationViewModel
                 {
-                    TotalElements = await this.supplementService.TotalCountAsync(),
+                    TotalElements = await this.supplementService.TotalCountAsync(searchToken),
                     PageSize = HomePageSize,
                     CurrentPage = page
                 }
@@ -48,6 +49,7 @@
                 return RedirectToAction(nameof(Index), new { page = model.Pagination.TotalPages });
             }
 
+            ViewData["SearchToken"] = searchToken;
             ViewData["ReturnUrl"] = this.RedirectToHomeIndex();
 
             return View(model);

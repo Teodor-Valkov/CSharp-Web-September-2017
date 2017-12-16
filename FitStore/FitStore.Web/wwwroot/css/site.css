@@ -48,21 +48,25 @@ a.disabled {
 }
 
 div img#supplements-index-image {
-    width: 25px;
+    width: 50px;
     height: 50px;
 }
 
+div img#supplement-details-image {
+    width: 250px;
+    height: 250px;
+}
+
 div img#home-supplement-image,
-div img#supplement-details-image,
 div img#category-supplement-image,
 div img#subcategory-supplement-image,
 div img#manufacturer-supplement-image {
-    width: 100px;
+    width: 150px;
     height: 150px;
 }
 
 div img#review-details-image {
-    width: 200px;
+    width: 300px;
     height: 300px;
 }
 
@@ -73,3 +77,11 @@ div li#home-category-link a:hover {
 div li#home-subcategory-link a:hover {
     background-color: aliceblue;
 }
+
+li#search {
+    margin-right: 80px;
+}
+
+    li#search div {
+        margin-top: 8px;
+    }

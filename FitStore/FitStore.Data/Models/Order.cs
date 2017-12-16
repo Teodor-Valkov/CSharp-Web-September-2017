@@ -13,6 +13,7 @@
 
         public DateTime PurchaseDate { get; set; }
 
+        [Required]
         public string UserId { get; set; }
 
         public User User { get; set; }

@@ -1,13 +1,13 @@
 ﻿namespace FitStore.Web.Controllers
 {
     using Data.Models;
-    using FitStore.Services.Models.Orders;
     using Infrastructure.Extensions;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Services.Contracts;
     using Services.Models;
+    using Services.Models.Orders;
     using System.Linq;
     using System.Threading.Tasks;
 
@@ -40,20 +40,29 @@
                 return RedirectToAction(nameof(HomeController.Index), Home);
             }
 
-            ShoppingCart shoppingCart = HttpContext.Session.GetShoppingCart(UserSessionShoppingCartKeyName);
+            ShoppingCart shoppingCart = HttpContext.Session.GetShoppingCart<ShoppingCart>(UserSessionShoppingCartKey);
+
+            bool alreadyAddedLastAvailableSupplement = await this.orderService.IsLastAvailableSupplementAlreadyAdded(id, shoppingCart);
+
+            if (alreadyAddedLastAvailableSupplement)
+            {
+                TempData.AddErrorMessage(SupplementLastOneJustAddedErrorMessage);
+
+                return this.RedirectToLocal(returnUrl);
+            }
 
             bool addSupplementToCartResult = await this.orderService.AddSupplementToCartAsync(id, shoppingCart);
 
-            if (addSupplementToCartResult && returnUrl == null)
+            if (addSupplementToCartResult)
             {
                 TempData.AddSuccessMessage(SupplementAddedToCartSuccessMessage);
+
+                HttpContext.Session.SetShoppingCart(UserSessionShoppingCartKey, shoppingCart);
             }
-            else if (!addSupplementToCartResult)
+            else
             {
                 TempData.AddErrorMessage(SupplementUnavailableErrorMessage);
             }
-
-            HttpContext.Session.SetShoppingCart(UserSessionShoppingCartKeyName, shoppingCart);
 
             return this.RedirectToLocal(returnUrl);
         }
@@ -69,17 +78,19 @@
                 return RedirectToAction(nameof(Details));
             }
 
-            ShoppingCart shoppingCart = HttpContext.Session.GetShoppingCart(UserSessionShoppingCartKeyName);
+            ShoppingCart shoppingCart = HttpContext.Session.GetShoppingCart<ShoppingCart>(UserSessionShoppingCartKey);
 
-            bool removeSupplementFromCartResult = await this.orderService.RemoveSupplementFromCartAsync(id, shoppingCart);
+            bool removeSupplementFromCartResult = this.orderService.RemoveSupplementFromCartAsync(id, shoppingCart);
 
             if (removeSupplementFromCartResult)
             {
-                HttpContext.Session.SetShoppingCart(UserSessionShoppingCartKeyName, shoppingCart);
+                TempData.AddSuccessMessage(SupplementRemovedFromCartSuccessMessage);
+
+                HttpContext.Session.SetShoppingCart(UserSessionShoppingCartKey, shoppingCart);
             }
             else
             {
-                TempData.AddErrorMessage(string.Format(EntityNotFound, SupplementEntity));
+                TempData.AddErrorMessage(SupplementRemovedFromCartErrorMessage);
             }
 
             return RedirectToAction(nameof(Details));
@@ -96,15 +107,15 @@
                 return RedirectToAction(nameof(Details));
             }
 
-            ShoppingCart shoppingCart = HttpContext.Session.GetShoppingCart(UserSessionShoppingCartKeyName);
+            ShoppingCart shoppingCart = HttpContext.Session.GetShoppingCart<ShoppingCart>(UserSessionShoppingCartKey);
 
-            bool removeSupplementFromCartResult = await this.orderService.RemoveAllSupplementsFromCartAsync(id, shoppingCart);
+            bool removeSupplementFromCartResult = this.orderService.RemoveAllSupplementsFromCartAsync(id, shoppingCart);
 
             if (removeSupplementFromCartResult)
             {
                 TempData.AddSuccessMessage(SupplementRemovedFromCartSuccessMessage);
 
-                HttpContext.Session.SetShoppingCart(UserSessionShoppingCartKeyName, shoppingCart);
+                HttpContext.Session.SetShoppingCart(UserSessionShoppingCartKey, shoppingCart);
             }
             else
             {
@@ -116,7 +127,7 @@
 
         public IActionResult Details()
         {
-            ShoppingCart shoppingCart = HttpContext.Session.GetShoppingCart(UserSessionShoppingCartKeyName);
+            ShoppingCart shoppingCart = HttpContext.Session.GetShoppingCart<ShoppingCart>(UserSessionShoppingCartKey);
 
             return this.View(shoppingCart);
         }
@@ -124,7 +135,7 @@
         [Authorize]
         public IActionResult Checkout()
         {
-            ShoppingCart shoppingCart = HttpContext.Session.GetShoppingCart(UserSessionShoppingCartKeyName);
+            ShoppingCart shoppingCart = HttpContext.Session.GetShoppingCart<ShoppingCart>(UserSessionShoppingCartKey);
 
             if (!shoppingCart.Supplements.Any())
             {
@@ -135,18 +146,16 @@
         }
 
         [Authorize]
-        public async Task<IActionResult> Cancel()
+        public IActionResult Cancel()
         {
-            ShoppingCart shoppingCart = HttpContext.Session.GetShoppingCart(UserSessionShoppingCartKeyName);
+            ShoppingCart shoppingCart = HttpContext.Session.GetShoppingCart<ShoppingCart>(UserSessionShoppingCartKey);
 
             if (!shoppingCart.Supplements.Any())
             {
                 return RedirectToAction(nameof(HomeController.Index), Home);
             }
 
-            await this.orderService.CancelOrderAsync(shoppingCart);
-
-            HttpContext.Session.Clear();
+            HttpContext.Session.Remove(UserSessionShoppingCartKey);
 
             TempData.AddSuccessMessage(CancelOrderSuccessMessage);
 
@@ -159,18 +168,25 @@
         {
             string userId = this.userManager.GetUserId(User);
 
-            ShoppingCart shoppingCart = HttpContext.Session.GetShoppingCart(UserSessionShoppingCartKeyName);
+            ShoppingCart shoppingCart = HttpContext.Session.GetShoppingCart<ShoppingCart>(UserSessionShoppingCartKey);
 
             if (!shoppingCart.Supplements.Any())
             {
                 return RedirectToAction(nameof(HomeController.Index), Home);
             }
 
-            await this.orderService.FinishOrderAsync(userId, shoppingCart);
+            bool OrderResult = await this.orderService.FinishOrderAsync(userId, shoppingCart);
 
-            HttpContext.Session.Clear();
+            if (OrderResult)
+            {
+                TempData.AddSuccessMessage(FinishOrderSuccessMessage);
+            }
+            else
+            {
+                TempData.AddErrorMessage(FinishOrderErrorMessage);
+            }
 
-            TempData.AddSuccessMessage(FinishOrderSuccessMessage);
+            HttpContext.Session.Remove(UserSessionShoppingCartKey);
 
             return RedirectToAction(nameof(HomeController.Index), Home);
         }

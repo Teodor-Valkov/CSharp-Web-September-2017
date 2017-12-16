@@ -1,5 +1,6 @@
 ﻿namespace FitStore.Web.Areas.Manager.Models.Supplements
 {
+    using FitStore.Web.Infrastructure.Validation.ValidationAttributes;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc.Rendering;
     using System;
@@ -27,10 +28,8 @@
         [Range(0, double.MaxValue)]
         public decimal Price { get; set; }
 
-        [Display(Name = SupplementBestBeforeDateName)]
-        public int CategoryId { get; set; }
-
         [Required]
+        [Picture]
         [DataType(DataType.Upload)]
         public IFormFile Picture { get; set; }
 

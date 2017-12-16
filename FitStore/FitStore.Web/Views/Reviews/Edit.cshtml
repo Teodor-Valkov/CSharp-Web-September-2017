@@ -13,19 +13,9 @@
         </div>
 
         <form method="post">
-            <div class="form-text text-danger" asp-validation-summary="ModelOnly"></div>
-            <div class="row">
-                <div class="form-group col-md-3">
-                    <label asp-for="Rating"></label>
-                    <select name="Rating" asp-items="@Model.Ratings" class="form-control"></select>
-                    <span class="form-text text-danger" asp-validation-for="Rating"></span>
-                </div>
-            </div>
-            <div class="form-group">
-                <label asp-for="Content"></label>
-                <textarea class="form-control" asp-for="Content" rows="10"></textarea>
-                <span class="form-text text-danger" asp-validation-for="Content"></span>
-            </div>
+
+            @await Html.PartialAsync("_ReviewForm", Model)
+
             <div class="text-center">
                 <a asp-area="" asp-controller="Reviews" asp-action="Index" class="btn btn-default">Back</a>
                 <input class="btn btn-success" type="submit" value="Edit" />

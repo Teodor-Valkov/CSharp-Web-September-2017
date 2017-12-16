@@ -1,26 +1,18 @@
 ﻿namespace FitStore.Common.Extensions
 {
+    using System.IO;
     using System.Text.RegularExpressions;
 
     public static class StringExtensions
     {
-        private const int MaxLength = 250;
-
         public static string ToFriendlyUrl(this string text)
         {
             return Regex.Replace(text, @"[^A-Za-z0-9_\.~]+", "-");
         }
 
-        public static string ToResume(this string text)
+        public static byte[] ToByteArray(this string imagePath)
         {
-            if (string.IsNullOrEmpty(text) || text.Length < MaxLength)
-            {
-                return text;
-            }
-
-            int symbols = text.IndexOf('.', MaxLength);
-
-            return text.Substring(0, symbols) + " ";
+            return File.ReadAllBytes(imagePath);
         }
     }
 }

@@ -57,29 +57,17 @@
                 shoppingCart.Supplements.Add(supplementInCart);
             }
 
-            supplement.Quantity -= 1;
-
-            await this.database.SaveChangesAsync();
-
             return true;
         }
 
-        public async Task<bool> RemoveSupplementFromCartAsync(int supplementId, ShoppingCart shoppingCart)
+        public bool RemoveSupplementFromCartAsync(int supplementId, ShoppingCart shoppingCart)
         {
             if (shoppingCart.Supplements.Any(s => s.Id == supplementId))
             {
-                Supplement supplement = await this.database
-                    .Supplements
-                    .Include(s => s.Manufacturer)
-                    .Where(s => s.Id == supplementId)
-                    .FirstOrDefaultAsync();
-
                 SupplementInCartServiceModel supplemenInCart = shoppingCart
                     .Supplements
                     .Where(s => s.Id == supplementId)
                     .FirstOrDefault();
-
-                supplement.Quantity += 1;
 
                 supplemenInCart.Quantity -= 1;
 
@@ -88,34 +76,22 @@
                     shoppingCart.Supplements.Remove(supplemenInCart);
                 }
 
-                await this.database.SaveChangesAsync();
-
                 return true;
             }
 
             return false;
         }
 
-        public async Task<bool> RemoveAllSupplementsFromCartAsync(int supplementId, ShoppingCart shoppingCart)
+        public bool RemoveAllSupplementsFromCartAsync(int supplementId, ShoppingCart shoppingCart)
         {
             if (shoppingCart.Supplements.Any(s => s.Id == supplementId))
             {
-                Supplement supplement = await this.database
-                    .Supplements
-                    .Include(s => s.Manufacturer)
-                    .Where(s => s.Id == supplementId)
-                    .FirstOrDefaultAsync();
-
                 SupplementInCartServiceModel supplemenInCart = shoppingCart
                     .Supplements
                     .Where(s => s.Id == supplementId)
                     .FirstOrDefault();
 
-                supplement.Quantity += supplemenInCart.Quantity;
-
                 shoppingCart.Supplements.Remove(supplemenInCart);
-
-                await this.database.SaveChangesAsync();
 
                 return true;
             }
@@ -130,23 +106,43 @@
                 .AnyAsync(o => o.Id == orderId);
         }
 
-        public async Task CancelOrderAsync(ShoppingCart shoppingCart)
+        public async Task<bool> IsLastAvailableSupplementAlreadyAdded(int supplementId, ShoppingCart shoppingCart)
+        {
+            Supplement supplement = await this.database
+                .Supplements
+                .Where(s => s.Id == supplementId)
+                .FirstOrDefaultAsync();
+
+            SupplementInCartServiceModel supplementInCart = shoppingCart
+                .Supplements
+                .Where(s => s.Id == supplementId)
+                .FirstOrDefault();
+
+            if (supplementInCart == null)
+            {
+                return false;
+            }
+
+            return supplement.Quantity == supplementInCart.Quantity;
+        }
+
+        public async Task<bool> FinishOrderAsync(string userId, ShoppingCart shoppingCart)
         {
             foreach (SupplementInCartServiceModel supplementInCart in shoppingCart.Supplements)
             {
                 Supplement supplement = await this.database
-                .Supplements
-                .Where(s => s.Id == supplementInCart.Id)
-                .FirstOrDefaultAsync();
+                    .Supplements
+                    .Where(s => s.Id == supplementInCart.Id)
+                    .FirstOrDefaultAsync();
 
-                supplement.Quantity += supplementInCart.Quantity;
+                if (supplement.Quantity < supplementInCart.Quantity)
+                {
+                    return false;
+                }
+
+                supplement.Quantity -= supplementInCart.Quantity;
             }
 
-            await this.database.SaveChangesAsync();
-        }
-
-        public async Task FinishOrderAsync(string userId, ShoppingCart shoppingCart)
-        {
             Order order = new Order
             {
                 UserId = userId,
@@ -170,6 +166,8 @@
             }
 
             await this.database.SaveChangesAsync();
+
+            return true;
         }
     }
 }

@@ -1,0 +1,13 @@
+﻿@model ManufacturerFormViewModel
+
+<div class="form-text text-danger" asp-validation-summary="ModelOnly"></div>
+<div class="form-group">
+    <label asp-for="Name"></label>
+    <input class="form-control" asp-for="Name" />
+    <span class="form-text text-danger" asp-validation-for="Name"></span>
+</div>
+<div class="form-group">
+    <label asp-for="Address"></label>
+    <input class="form-control" asp-for="Address" />
+    <span class="form-text text-danger" asp-validation-for="Address"></span>
+</div>

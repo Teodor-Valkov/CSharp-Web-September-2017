@@ -74,7 +74,7 @@
 
             TempData.AddSuccessMessage(string.Format(EntityRestored, ReviewEntity));
 
-            return RedirectToAction(nameof(ReviewsController.Index), Reviews);
+            return RedirectToAction(nameof(Index));
         }
     }
 }

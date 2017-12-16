@@ -17,7 +17,7 @@
 @if (User.Identity.IsAuthenticated && User.IsInRole(WebConstants.ManagerRole))
 {
     <div>
-        <a asp-area="Manager" asp-controller="Supplements" asp-action="Category" class="btn btn-success">Create Supplement</a>
+        <a asp-area="Manager" asp-controller="Supplements" asp-action="ChooseCategory" class="btn btn-success">Create Supplement</a>
 
         <br />
         <br />
@@ -106,11 +106,11 @@ else
                         }
                         else
                         {@Html.ActionLink("Delete", "Delete", "Supplements", new { area = "Manager", id = supplement.Id },
-                                                                            new
-                                                                            {
-                                                                                @class = "btn btn-danger",
-                                                                                onclick = $"return confirm('Are you sure you want to delete this supplement?');"
-                                                                            })
+                                                                                    new
+                                                                                    {
+                                                                                        @class = "btn btn-danger",
+                                                                                        onclick = $"return confirm('Are you sure you want to delete this supplement?');"
+                                                                                    })
                     }
                     </td>
                 </tr>

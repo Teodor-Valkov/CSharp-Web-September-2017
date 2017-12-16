@@ -60,12 +60,10 @@
                 googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
             });
 
-            services.AddDistributedMemoryCache();
-
             services.AddSession(options =>
             {
-                options.IdleTimeout = TimeSpan.FromSeconds(300);
-                options.Cookie.Name = UserSessionShoppingCartKeyName;
+                options.IdleTimeout = TimeSpan.FromSeconds(600);
+                options.Cookie.Name = UserSessionShoppingCartKey;
                 options.Cookie.HttpOnly = true;
             });
 
@@ -90,9 +88,9 @@
 
             app.UseStaticFiles();
 
-            app.UseSession();
-
             app.UseAuthentication();
+
+            app.UseSession();
 
             app.UseMvc(routes =>
             {

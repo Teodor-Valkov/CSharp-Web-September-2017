@@ -25,7 +25,7 @@
         public const string Supplements = "Supplements";
         public const string Orders = "Orders";
 
-        public const string UserSessionShoppingCartKeyName = "*#@User_Session_Shopping_Cart@#*";
+        public const string UserSessionShoppingCartKey = "*#@User_Session_Shopping_Cart@#*";
         public const string UserFullNameName = "Full Name";
         public const string UserBirthDateName = "Birth Date";
         public const string UserRegistrationDateName = "Registration Date";

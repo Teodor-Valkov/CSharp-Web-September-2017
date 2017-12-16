@@ -259,14 +259,11 @@
 
             IList<string> sessionKeys = new List<string>(HttpContext.Session.Keys);
 
-            if (sessionKeys.Contains(UserSessionShoppingCartKeyName))
+            if (sessionKeys.Contains(UserSessionShoppingCartKey))
             {
-                ShoppingCart shoppingCart = HttpContext.Session.GetShoppingCart(UserSessionShoppingCartKeyName);
+                ShoppingCart shoppingCart = HttpContext.Session.GetShoppingCart<ShoppingCart>(UserSessionShoppingCartKey);
 
-                await this._orderService.CancelOrderAsync(shoppingCart);
-
-                HttpContext.Session.Remove(UserSessionShoppingCartKeyName);
-                //HttpContext.Session.Clear();
+                HttpContext.Session.Remove(UserSessionShoppingCartKey);
             }
 
             return RedirectToAction(nameof(HomeController.Index), "Home");

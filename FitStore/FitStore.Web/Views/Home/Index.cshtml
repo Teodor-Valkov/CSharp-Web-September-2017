@@ -1,50 +1,8 @@
 ﻿@model PagingElementViewModel<HomeIndexViewModel>
 
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
 }
-
-@*<div class="col-md-12">
-        <form action="Search">
-            <div class="col-md-8">
-                <input asp-for="SearchToken" placeholder="Search" class="form-control" />
-            </div>
-            <div class="col-md-1">
-                <input asp-for="SearchInUsers" />
-                <label asp-for="SearchInUsers"></label>
-            </div>
-            <div class="col-md-1">
-                <input asp-for="SearchInCourses" />
-                <label asp-for="SearchInCourses"></label>
-            </div>
-            <div class="col-md-1">
-                <input asp-for="SearchInArticles" />
-                <label asp-for="SearchInArticles"></label>
-            </div>
-            <div class="col-md-1">
-                <input type="submit" class="btn btn-default" value="Search" />
-            </div>
-        </form>
-    </div>*@
-
-@*<div class="home-text">
-        <div>
-            <h1>Welcome to the Fit Store!</h1>
-        </div>
-
-        <div>
-            <h3>
-                <a asp-area="" asp-controller="Supplements" asp-action="Index">Believe in us, Believe in yourself!</a>
-            </h3>
-        </div>
-
-        <br />
-        <br />
-
-        <div>
-            <img src="~/images/2.jpg" alt="fit-store-photo" width="1000" height="600" />
-        </div>
-    </div>*@
 
 <div class="container-fluid">
     <div class="row">
@@ -69,86 +27,7 @@
             <br />
             @foreach (var supplement in Model.Element.Supplements)
             {
-                <div class="card col-md-4 text-center">
-                    @if (User.IsInRole(WebConstants.ModeratorRole))
-                    {
-                        <a asp-area="Moderator" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">
-                            @if (supplement.Picture == string.Empty)
-                            {
-                                <img class="card-img-top img-rounded" id="home-supplement-image" src="~/images/image-not-found.jpg" alt="supplement-picture" />
-                            }
-                            else
-                            {
-                                <img class="card-img-top img-rounded" id="home-supplement-image" src="@supplement.Picture" alt="supplement-picture" />
-                            }
-                        </a>
-                    }
-                    else
-                    {
-                        <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">
-                            @if (supplement.Picture == string.Empty)
-                            {
-                                <img class="card-img-top img-rounded" id="home-supplement-image" src="~/images/image-not-found.jpg" alt="supplement-picture" />
-                            }
-                            else
-                            {
-                                <img class="card-img-top img-rounded" id="home-supplement-image" src="@supplement.Picture" alt="supplement-picture" />
-                            }
-                        </a>
-                    }
-                    <br />
-                    <br />
-                    <div class="card-block">
-                        <h4 class="card-title text-center">@supplement.Name</h4>
-                    </div>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item"><strong>Manufacturer:</strong> <a asp-area="" asp-controller="Manufacturers" asp-action="Details" asp-route-id="@supplement.ManufacturerId" asp-route-name="@supplement.ManufacturerName">@supplement.ManufacturerName</a> </li>
-                        <li class="list-group-item">
-                            <strong>Quantity:</strong>
-                            @if (supplement.Quantity > 0)
-                            {
-                                @supplement.Quantity
-                            }
-                            else
-                            {
-                                <span class="text-danger">Out of Stock</span>
-                            }
-                        </li>
-                        <li class="list-group-item"><strong>Price:</strong> @supplement.Price &euro;</li>
-                        <li class="list-group-item">
-                            @if (User.IsInRole(WebConstants.ModeratorRole))
-                            {
-                                <a class="btn btn-primary btn-sm" asp-area="Moderator" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">Details</a>
-                            }
-                            else
-                            {
-                                <a class="btn btn-primary btn-sm" asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">Details</a>
-                            }
-                            @if (supplement.Quantity > 0)
-                            {
-                                <a class="btn btn-success btn-sm" asp-area="" asp-controller="Orders" asp-action="Add" asp-route-id="@supplement.Id">Buy</a>
-                            }
-                            @if (User.Identity.IsAuthenticated && User.IsInRole(WebConstants.ManagerRole))
-                            {
-                                <a asp-area="Manager" asp-controller="Supplements" asp-action="Edit" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" class="btn btn-warning btn-sm">Edit</a>
-                                if (supplement.IsDeleted)
-                                {
-                                    <a asp-area="Manager" asp-controller="Supplements" asp-action="Delete" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" class="btn btn-success btn-sm">Restore</a>
-
-                                }
-                                else
-                                {
-                                    @Html.ActionLink("Delete", "Delete", "Supplements", new { area = "Manager", id = supplement.Id, name = supplement.Name },
-                                                                                 new
-                                                                                 {
-                                                                                     @class = "btn btn-danger btn-sm",
-                                                                                     onclick = $"return confirm('Are you sure you want to delete *{supplement.Name}*?');"
-                                                                                 })
-                                }
-                            }
-                        </li>
-                    </ul>
-                </div>
+                await Html.RenderPartialAsync("_HomeSupplement", supplement);
             }
         </div>
     </div>
@@ -157,7 +36,9 @@
 <div class="text-center">
     @if (Model.Pagination.TotalPages > 1)
     {
-        string actionLink = $"/home/index?";
+        string actionLink = string.IsNullOrWhiteSpace(Model.SearchToken)
+           ? $"/home/index?"
+           : $"/home/index?SearchToken={Model.SearchToken}&";
 
         Model.Pagination.ActionLink = actionLink;
 

@@ -72,7 +72,7 @@
             return View(model);
         }
 
-        public async Task<IActionResult> Category()
+        public async Task<IActionResult> ChooseCategory()
         {
             SupplementCategoryServiceModel model = new SupplementCategoryServiceModel
             {
@@ -83,7 +83,7 @@
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(SupplementCategoryServiceModel category)
+        public async Task<IActionResult> ChooseCategory(SupplementCategoryServiceModel category)
         {
             bool isCategoryExistingById = await this.categoryService.IsCategoryExistingById(category.CategoryId, false);
 
@@ -94,9 +94,16 @@
                 return RedirectToAction(nameof(Index));
             }
 
+            return RedirectToAction(nameof(Create), category.CategoryId);
+        }
+
+        public async Task<IActionResult> Create(int categoryId)
+        {
             SupplementFormViewModel model = new SupplementFormViewModel();
 
-            await PrepareModelToReturn(category.CategoryId, model);
+            await PrepareModelToReturn(categoryId, model);
+
+            TempData["CategoryId"] = categoryId;
 
             return View(model);
         }
@@ -104,22 +111,24 @@
         [HttpPost]
         public async Task<IActionResult> FinishCreate(SupplementFormViewModel model)
         {
+            int categoryId = int.Parse(TempData["CategoryId"].ToString());
+
             if (!ModelState.IsValid)
             {
-                await PrepareModelToReturn(model.CategoryId, model);
+                await PrepareModelToReturn(categoryId, model);
 
-                return View(model);
+                return View(nameof(Create), model);
             }
 
             bool isSupplementExistingByName = await this.supplementService.IsSupplementExistingByName(model.Name);
 
-            if (!isSupplementExistingByName)
+            if (isSupplementExistingByName)
             {
                 TempData.AddErrorMessage(string.Format(EntityExists, SupplementEntity));
 
-                await PrepareModelToReturn(model.CategoryId, model);
+                await PrepareModelToReturn(categoryId, model);
 
-                return View(model);
+                return View(nameof(Create), model);
             }
 
             bool isSubcategoryExistingById = await this.subcategoryService.IsSubcategoryExistingById(model.SubcategoryId, false);
@@ -128,7 +137,7 @@
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, SubcategoryEntity));
 
-                await PrepareModelToReturn(model.CategoryId, model);
+                await PrepareModelToReturn(categoryId, model);
 
                 return View(model);
             }
@@ -139,7 +148,7 @@
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, ManufacturerEntity));
 
-                await PrepareModelToReturn(model.CategoryId, model);
+                await PrepareModelToReturn(categoryId, model);
 
                 return View(model);
             }
@@ -173,12 +182,16 @@
                 Quantity = supplement.Quantity,
                 Price = supplement.Price,
                 BestBeforeDate = supplement.BestBeforeDate,
+
                 SubcategoryId = supplement.SubcategoryId,
                 ManufacturerId = supplement.ManufacturerId,
-                CategoryId = await this.subcategoryService.GetCategoryIdBySubcategoryId(supplement.SubcategoryId)
             };
 
-            await PrepareModelToReturn(model.CategoryId, model);
+            int categoryId = await this.subcategoryService.GetCategoryIdBySubcategoryId(supplement.SubcategoryId);
+
+            await PrepareModelToReturn(categoryId, model);
+
+            TempData["CategoryId"] = categoryId;
 
             return View(model);
         }
@@ -186,9 +199,11 @@
         [HttpPost]
         public async Task<IActionResult> Edit(int id, SupplementFormViewModel model)
         {
+            int categoryId = int.Parse(TempData["CategoryId"].ToString());
+
             if (!ModelState.IsValid)
             {
-                await PrepareModelToReturn(model.CategoryId, model);
+                await PrepareModelToReturn(categoryId, model);
 
                 return View(model);
             }
@@ -210,7 +225,7 @@
             {
                 TempData.AddWarningMessage(EntityNotModified);
 
-                await PrepareModelToReturn(model.CategoryId, model);
+                await PrepareModelToReturn(categoryId, model);
 
                 return View(model);
             }
@@ -221,7 +236,7 @@
             {
                 TempData.AddErrorMessage(string.Format(EntityExists, SupplementEntity));
 
-                await PrepareModelToReturn(model.CategoryId, model);
+                await PrepareModelToReturn(categoryId, model);
 
                 return View(model);
             }
@@ -232,7 +247,7 @@
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, SubcategoryEntity));
 
-                await PrepareModelToReturn(model.CategoryId, model);
+                await PrepareModelToReturn(categoryId, model);
 
                 return View(model);
             }
@@ -243,7 +258,7 @@
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, ManufacturerEntity));
 
-                await PrepareModelToReturn(model.CategoryId, model);
+                await PrepareModelToReturn(categoryId, model);
 
                 return View(model);
             }

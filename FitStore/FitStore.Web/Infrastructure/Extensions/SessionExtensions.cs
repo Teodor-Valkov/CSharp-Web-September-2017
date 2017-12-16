@@ -2,36 +2,39 @@
 {
     using Microsoft.AspNetCore.Http;
     using Newtonsoft.Json;
-    using Services.Models;
+    using System;
+
+    using static Common.CommonConstants;
 
     public static class SessionExtensions
     {
-        public static void SetShoppingCart(this ISession session, string shoppingCartKey, ShoppingCart shoppingCart)
-        {
-            session.SetString(shoppingCartKey, JsonConvert.SerializeObject(shoppingCart));
-        }
-
-        public static ShoppingCart GetShoppingCart(this ISession session, string shoppingCartKey)
-        {
-            string shoppingCartAsString = session.GetString(shoppingCartKey);
-
-            return shoppingCartAsString == null
-                ? new ShoppingCart()
-                : JsonConvert.DeserializeObject<ShoppingCart>(shoppingCartAsString);
-        }
-
-        //public static void Set<T>(this ISession session, string key, T value)
+        //public static string GetShoppingCartId(this ISession session)
         //{
-        //    session.SetString(key, JsonConvert.SerializeObject(value));
+        //    string shoppingCartId = session.GetString(UserSessionShoppingCartKey);
+
+        //    if (shoppingCartId == null)
+        //    {
+        //        shoppingCartId = Guid.NewGuid().ToString();
+        //        session.SetString(UserSessionShoppingCartKey, shoppingCartId);
+        //    }
+
+        //    return shoppingCartId;
         //}
 
-        //public static T Get<T>(this ISession session, string key)
-        //{
-        //    string value = session.GetString(key);
+        public static T GetShoppingCart<T>(this ISession session, string key)
+            where T : class
+        {
+            string value = session.GetString(key);
 
-        //    return value == null
-        //        ? default(T)
-        //        : JsonConvert.DeserializeObject<T>(value);
-        //}
+            return value == null
+                ? Activator.CreateInstance<T>()
+                : JsonConvert.DeserializeObject<T>(value);
+        }
+
+        public static void SetShoppingCart<T>(this ISession session, string key, T value)
+            where T : class
+        {
+            session.SetString(key, JsonConvert.SerializeObject(value));
+        }
     }
 }

@@ -43,7 +43,7 @@
         {
             return await this.database
                .Categories
-               .Where(c => c.IsDeleted == isDeleted)
+               .Where(c => c.IsDeleted == isDeleted && c.Subcategories.Any())
                .ProjectTo<CategoryBasicServiceModel>()
                .ToListAsync();
         }
