@@ -18,8 +18,6 @@
 
         Task DeleteAsync(int reviewId);
 
-        Task RestoreAsync(int reviewId);
-
         Task<bool> IsUserAuthor(int reviewId, string authorId);
 
         Task<bool> IsReviewModified(int reviewId, string content, int rating);

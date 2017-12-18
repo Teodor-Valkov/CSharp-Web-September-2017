@@ -18,7 +18,7 @@
 
         Task DeleteAsync(int subcategoryId);
 
-        Task RestoreAsync(int subcategoryId);
+        Task<string> RestoreAsync(int subcategoryId);
 
         Task<bool> IsSubcategoryModified(int subcategoryId, string name, int categoryId);
 

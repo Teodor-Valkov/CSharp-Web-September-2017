@@ -141,8 +141,6 @@
                 {
                     if (!supplement.Manufacturer.IsDeleted)
                     {
-                        supplement.IsDeleted = false;
-
                         foreach (Review review in supplement.Reviews)
                         {
                             review.IsDeleted = false;
@@ -152,6 +150,8 @@
                         {
                             comment.IsDeleted = false;
                         }
+
+                        supplement.IsDeleted = false;
                     }
                 }
 

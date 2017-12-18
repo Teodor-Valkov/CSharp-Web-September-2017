@@ -7,5 +7,7 @@
     public interface IModeratorReviewService
     {
         Task<IEnumerable<ReviewAdvancedServiceModel>> GetAllListingAsync(int page);
+
+        Task<string> RestoreAsync(int reviewId);
     }
 }

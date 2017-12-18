@@ -1,11 +1,11 @@
 ﻿@model PagingElementsViewModel<SupplementAdvancedServiceModel>
 @{
-    string isDeletedValue = "false";
+    string isDeletedWhenSearching = "false";
     string type = "Active";
 
     if (Model.IsDeleted)
     {
-        isDeletedValue = "true";
+        isDeletedWhenSearching = "true";
         type = "Deleted";
     }
 
@@ -37,25 +37,10 @@
             </form>
         }
     </div>
-    <br />
 }
 
-<br />
+@await Html.PartialAsync("_SearchForm", new SearchViewModel { SearchToken = Model.SearchToken, IsDeleted = isDeletedWhenSearching })
 
-<div class="row">
-    <div class="col-md-4">
-        <form>
-            <label asp-for="SearchToken"></label>
-            <div class="input-group">
-                <input class="form-control" asp-for="@Model.SearchToken" />
-                <span class="input-group-btn">
-                    <input type="hidden" name="isDeleted" value="@isDeletedValue" />
-                    <input class="btn btn-primary" type="submit" value="Search" />
-                </span>
-            </div>
-        </form>
-    </div>
-</div>
 <br />
 
 @if (!Model.Elements.Any())
@@ -80,38 +65,58 @@ else
                 <tr class="text-center">
                     @if (User.IsInRole(WebConstants.ModeratorRole))
                     {
-                        <td>
-                            <a asp-area="Moderator" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">
+                        if (!supplement.IsDeleted)
+                        {
+                            <td>
+                                <a asp-area="Moderator" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">
+                                    <img id="supplements-index-image" src="@supplement.Picture" alt="supplement-picture">
+                                </a>
+                            </td>
+                        }
+                        else
+                        {
+                            <td>
                                 <img id="supplements-index-image" src="@supplement.Picture" alt="supplement-picture">
-                            </a>
-                        </td>
+                            </td>
+                        }
                     }
                     else
                     {
-                        <td>
-                            <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">
+                        if (!supplement.IsDeleted)
+                        {
+                            <td>
+                                <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">
+                                    <img id="supplements-index-image" src="@supplement.Picture" alt="supplement-picture">
+                                </a>
+                            </td>
+                        }
+                        else
+                        {
+                            <td>
                                 <img id="supplements-index-image" src="@supplement.Picture" alt="supplement-picture">
-                            </a>
-                        </td>
+                            </td>
+                        }
                     }
+
                     <td>@supplement.Name</td>
                     <td>@supplement.Quantity</td>
                     <td>@supplement.Price</td>
                     <td>
-                        <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" class="btn btn-primary" asp-route-returnUrl="@ViewData["ReturnUrl"]">Details</a>
-                        <a asp-area="Manager" asp-controller="Supplements" asp-action="Edit" asp-route-id="@supplement.Id" class="btn btn-warning">Edit</a>
                         @if (Model.IsDeleted)
                         {
                             <a asp-area="Manager" asp-controller="Supplements" asp-action="Restore" asp-route-id="@supplement.Id" class="btn btn-success">Restore</a>
                         }
                         else
-                        {@Html.ActionLink("Delete", "Delete", "Supplements", new { area = "Manager", id = supplement.Id },
-                                                                                    new
-                                                                                    {
-                                                                                        @class = "btn btn-danger",
-                                                                                        onclick = $"return confirm('Are you sure you want to delete this supplement?');"
-                                                                                    })
-                    }
+                        {
+                            <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" class="btn btn-primary" asp-route-returnUrl="@ViewData["ReturnUrl"]">Details</a>
+                            <a asp-area="Manager" asp-controller="Supplements" asp-action="Edit" asp-route-id="@supplement.Id" class="btn btn-warning">Edit</a>
+                            @Html.ActionLink("Delete", "Delete", "Supplements", new { area = "Manager", id = supplement.Id },
+                                                                                                                                                                                                                                                                                                             new
+                                                                                                                                                                                                                                                                                                             {
+                                                                                                                                                                                                                                                                                                                 @class = "btn btn-danger",
+                                                                                                                                                                                                                                                                                                                 onclick = $"return confirm('Are you sure you want to delete this supplement?');"
+                                                                                                                                                                                                                                                                                                             })
+                        }
                     </td>
                 </tr>
             }

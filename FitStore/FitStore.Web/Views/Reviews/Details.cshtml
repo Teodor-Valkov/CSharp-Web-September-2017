@@ -21,7 +21,7 @@
             <p><em>Author: @Model.Author</em></p>
         </div>
         <div>
-            <a asp-area="" asp-controller="Reviews" asp-action="Index" class="btn btn-default">Back</a>
+            <a asp-area="" asp-controller="Reviews" asp-action="Index" class="btn btn-default btn-sm">Back</a>
             @if (this.User.IsInRole(WebConstants.ModeratorRole))
             {
                 <a asp-area="" asp-controller="Reviews" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-sm">Edit</a>

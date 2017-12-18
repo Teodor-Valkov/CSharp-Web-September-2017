@@ -83,7 +83,7 @@
 
         public async Task<IActionResult> Edit(int id)
         {
-            bool isCategoryExistingById = await this.categoryService.IsCategoryExistingById(id);
+            bool isCategoryExistingById = await this.categoryService.IsCategoryExistingById(id, false);
 
             if (!isCategoryExistingById)
             {
@@ -107,7 +107,7 @@
                 return View(model);
             }
 
-            bool isCategoryExistingById = await this.categoryService.IsCategoryExistingById(id);
+            bool isCategoryExistingById = await this.categoryService.IsCategoryExistingById(id, false);
 
             if (!isCategoryExistingById)
             {

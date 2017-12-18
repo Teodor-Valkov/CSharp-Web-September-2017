@@ -17,7 +17,7 @@
 
         Task DeleteAsync(int supplementId);
 
-        Task RestoreAsync(int supplementId);
+        Task<string> RestoreAsync(int supplementId);
 
         Task<bool> IsSupplementModified(int supplemetId, string name, string description, int quantity, decimal price, byte[] picture, DateTime bestBeforeDate, int subcategoryId, int manufacturerId);
 

@@ -32,7 +32,7 @@ else
                         @if (!review.IsDeleted)
                         {
                             <td>
-                                <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@review.SupplementId" asp-route-name="@review.SupplementName" asp-route-returnUrl="@ViewData["ReturnUrl"]">
+                                <a asp-area="Moderator" asp-controller="Supplements" asp-action="Details" asp-route-id="@review.SupplementId" asp-route-name="@review.SupplementName" asp-route-returnUrl="@ViewData["ReturnUrl"]">
                                     <img id="supplements-index-image" src="@review.Picture" alt="supplement-picture">
                                 </a>
                             </td>
@@ -43,19 +43,17 @@ else
                                 <a asp-area="" asp-controller="Reviews" asp-action="Details" asp-route-id="@review.Id" class="btn btn-primary btn-sm">Details</a>
                                 <a asp-area="" asp-controller="Reviews" asp-action="Edit" asp-route-id="@review.Id" class="btn btn-warning btn-sm">Edit</a>
                                 @Html.ActionLink("Delete", "Delete", "Reviews", new { area = string.Empty, id = review.Id },
-                                                            new
-                                                            {
-                                                                @class = "btn btn-danger btn-sm",
-                                                                onclick = $"return confirm('Are you sure you want to delete this reviews?');"
-                                                            })
+                                                                                                         new
+                                                                                                         {
+                                                                                                             @class = "btn btn-danger btn-sm",
+                                                                                                             onclick = $"return confirm('Are you sure you want to delete this reviews?');"
+                                                                                                         })
                             </td>
                         }
                         else if (review.IsDeleted)
                         {
                             <td>
-                                <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@review.SupplementId" asp-route-name="@review.SupplementName" asp-route-returnUrl="@ViewData["ReturnUrl"]">
-                                    <img id="supplements-index-image" src="@review.Picture" alt="supplement-picture">
-                                </a>
+                                <img id="supplements-index-image" src="@review.Picture" alt="supplement-picture">
                             </td>
                             <td>@review.SupplementName</td>
                             <td>@review.Rating</td>
@@ -74,7 +72,7 @@ else
 <div class="text-center">
     @if (Model.Pagination.TotalPages > 1)
     {
-        string actionLink = $"/reviews/index&";
+        string actionLink = $"/moderator/reviews/index?";
 
         Model.Pagination.ActionLink = actionLink;
 

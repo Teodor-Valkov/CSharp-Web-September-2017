@@ -5,7 +5,6 @@
     using Services.Contracts;
     using Services.Moderator.Contracts;
     using System.Threading.Tasks;
-    using Web.Controllers;
 
     using static Common.CommonConstants;
     using static Common.CommonMessages;
@@ -37,12 +36,19 @@
 
             if (!isUserModerator)
             {
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
-            await this.moderatorCommentService.RestoreAsync(id);
+            bool restoreResult = await this.moderatorCommentService.RestoreAsync(id);
 
-            TempData.AddSuccessMessage(string.Format(EntityRestored, CommentEntity));
+            if (restoreResult)
+            {
+                TempData.AddSuccessMessage(string.Format(EntityRestored, CommentEntity));
+            }
+            else
+            {
+                TempData.AddErrorMessage(string.Format(EntityNotRestored, CommentEntity));
+            }
 
             return RedirectToAction(nameof(SupplementsController.Details), Supplements, new { area = ModeratorArea, id = supplementId });
         }

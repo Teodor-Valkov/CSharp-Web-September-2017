@@ -7,7 +7,6 @@
     using Services.Models.Reviews;
     using Services.Moderator.Contracts;
     using System.Threading.Tasks;
-    using Web.Controllers;
 
     using static Common.CommonConstants;
     using static Common.CommonMessages;
@@ -59,20 +58,26 @@
             if (!isReviewExistingById)
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, ReviewEntity));
-
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             bool isUserModerator = User.IsInRole(ModeratorRole);
 
             if (!isUserModerator)
             {
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
-            await this.reviewService.RestoreAsync(id);
+            string restoreResult = await this.moderatorReviewService.RestoreAsync(id);
 
-            TempData.AddSuccessMessage(string.Format(EntityRestored, ReviewEntity));
+            if (restoreResult == string.Empty)
+            {
+                TempData.AddSuccessMessage(string.Format(EntityRestored, ReviewEntity));
+            }
+            else
+            {
+                TempData.AddErrorMessage(string.Format(EntityNotRestored, ReviewEntity) + restoreResult);
+            }
 
             return RedirectToAction(nameof(Index));
         }

@@ -35,7 +35,7 @@ else
                             </a>
                         </td>
                         <td>@review.SupplementName</td>
-                        <td>@review.Rating</td>
+                        <td>@review.Rating/10</td>
                         <td>@review.Author</td>
                         <td>
                             <a asp-area="" asp-controller="Reviews" asp-action="Details" asp-route-id="@review.Id" class="btn btn-primary btn-sm">Details</a>
@@ -62,7 +62,7 @@ else
 <div class="text-center">
     @if (Model.Pagination.TotalPages > 1)
     {
-        string actionLink = $"/reviews/index&";
+        string actionLink = $"/reviews/index?";
 
         Model.Pagination.ActionLink = actionLink;
 

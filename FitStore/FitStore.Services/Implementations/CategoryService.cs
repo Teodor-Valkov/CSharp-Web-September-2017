@@ -44,13 +44,6 @@
                 .AnyAsync(c => c.Id == categoryId && c.IsDeleted == isDeleted);
         }
 
-        public async Task<bool> IsCategoryExistingById(int categoryId)
-        {
-            return await this.database
-                .Categories
-                .AnyAsync(c => c.Id == categoryId);
-        }
-
         public async Task<bool> IsCategoryExistingByName(string name)
         {
             return await this.database

@@ -1,0 +1,16 @@
+﻿@model SearchViewModel
+
+<div class="row">
+    <div class="col-md-4">
+        <form>
+            <label for="searchToken"></label>
+            <div class="input-group">
+                <input class="form-control" asp-for="@Model.SearchToken" />
+                <input type="hidden" asp-for="@Model.IsDeleted" />
+                <span class="input-group-btn">
+                    <input class="btn btn-primary" type="submit" value="Search" />
+                </span>
+            </div>
+        </form>
+    </div>
+</div>

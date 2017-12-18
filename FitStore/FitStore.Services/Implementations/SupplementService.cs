@@ -54,13 +54,6 @@
                 .AnyAsync(s => s.Id == supplementId && s.IsDeleted == isDeleted);
         }
 
-        public async Task<bool> IsSupplementExistingById(int supplementId)
-        {
-            return await this.database
-                .Supplements
-                .AnyAsync(s => s.Id == supplementId);
-        }
-
         public async Task<bool> IsSupplementExistingByName(string name)
         {
             return await this.database

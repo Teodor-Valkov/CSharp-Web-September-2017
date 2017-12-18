@@ -1,6 +1,6 @@
 ﻿@model SupplementAdvancedServiceModel
 
-<div class="card col-md-4 text-center">
+<div class="card col-md-4 col-sm-6 text-center">
     @if (User.IsInRole(WebConstants.ModeratorRole))
     {
         <a asp-area="Moderator" asp-controller="Supplements" asp-action="Details" asp-route-id="@Model.Id" asp-route-name="@Model.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">
@@ -16,7 +16,7 @@
     }
     else
     {
-        <a asp-area="" asp-controller="Supplemens" asp-action="Details" asp-route-id="@Model.Id" asp-route-name="@Model.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">
+        <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@Model.Id" asp-route-name="@Model.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">
             @if (Model.Picture == string.Empty)
             {
                 <img class="card-img-top img-rounded" id="home-supplement-image" src="~/images/image-not-found.jpg" alt="supplement-picture" />
@@ -70,11 +70,11 @@
                 else
                 {
                     @Html.ActionLink("Delete", "Delete", "Supplements", new { area = "Manager", id = Model.Id, name = Model.Name },
-                                                                                                                                                                new
-                                                                                                                                                                {
-                                                                                                                                                                    @class = "btn btn-danger btn-sm",
-                                                                                                                                                                    onclick = $"return confirm('Are you sure you want to delete *{Model.Name}*?');"
-                                                                                                                                                                })
+                                                                                                                                                                     new
+                                                                                                                                                                     {
+                                                                                                                                                                         @class = "btn btn-danger btn-sm",
+                                                                                                                                                                         onclick = $"return confirm('Are you sure you want to delete *{Model.Name}*?');"
+                                                                                                                                                                     })
                 }
             }
         </li>

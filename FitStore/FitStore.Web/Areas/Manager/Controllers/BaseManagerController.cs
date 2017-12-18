@@ -7,7 +7,7 @@
     using static WebConstants;
 
     [Area(ManagerArea)]
-    [Authorize(Roles = AdministratorRole)]
+    [Authorize(Roles = ManagerRole)]
     public class BaseManagerController : Controller
     {
         protected RedirectToActionResult RedirectToCategoriesIndex(bool isDeleted)

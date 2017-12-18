@@ -12,6 +12,7 @@
     using System.Threading.Tasks;
 
     using static Common.CommonConstants;
+    using static Common.CommonMessages;
 
     public class ManagerSupplementService : IManagerSupplementService
     {
@@ -111,14 +112,31 @@
             await this.database.SaveChangesAsync();
         }
 
-        public async Task RestoreAsync(int supplementId)
+        public async Task<string> RestoreAsync(int supplementId)
         {
             Supplement supplement = await this.database
                     .Supplements
+                    .Include(s => s.Manufacturer)
+                    .Include(s => s.Subcategory)
+                    .ThenInclude(sub => sub.Category)
                     .Include(s => s.Reviews)
                     .Include(s => s.Comments)
                     .Where(s => s.Id == supplementId)
                     .FirstOrDefaultAsync();
+
+            Manufacturer manufacturer = supplement.Manufacturer;
+            Subcategory subcategory = supplement.Subcategory;
+            Category category = supplement.Subcategory.Category;
+
+            if (manufacturer.IsDeleted)
+            {
+                return string.Format(EntityNotExists, ManufacturerEntity);
+            }
+
+            if (category.IsDeleted || subcategory.IsDeleted)
+            {
+                return string.Format(EntityNotExists, $"{CategoryEntity}/{SubcategoryEntity}");
+            }
 
             foreach (Review review in supplement.Reviews)
             {
@@ -133,6 +151,8 @@
             supplement.IsDeleted = false;
 
             await this.database.SaveChangesAsync();
+
+            return string.Empty;
         }
 
         public async Task<bool> IsSupplementModified(int supplementId, string name, string description, int quantity, decimal price, byte[] picture, DateTime bestBeforeDate, int subcategoryId, int manufacturerId)

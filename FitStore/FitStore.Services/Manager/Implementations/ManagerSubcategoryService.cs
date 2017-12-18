@@ -11,6 +11,7 @@
     using System.Threading.Tasks;
 
     using static Common.CommonConstants;
+    using static Common.CommonMessages;
 
     public class ManagerSubcategoryService : IManagerSubcategoryService
     {
@@ -114,10 +115,11 @@
             await this.database.SaveChangesAsync();
         }
 
-        public async Task RestoreAsync(int subcategoryId)
+        public async Task<string> RestoreAsync(int subcategoryId)
         {
             Subcategory subcategory = await this.database
                 .Subcategories
+                .Include(s => s.Category)
                 .Include(s => s.Supplements)
                     .ThenInclude(sup => sup.Manufacturer)
                 .Include(s => s.Supplements)
@@ -126,6 +128,13 @@
                     .ThenInclude(sup => sup.Comments)
                 .Where(s => s.Id == subcategoryId)
                 .FirstOrDefaultAsync();
+
+            Category category = subcategory.Category;
+
+            if (category.IsDeleted)
+            {
+                return string.Format(EntityNotExists, CategoryEntity);
+            }
 
             foreach (Supplement supplement in subcategory.Supplements)
             {
@@ -148,6 +157,8 @@
             subcategory.IsDeleted = false;
 
             await this.database.SaveChangesAsync();
+
+            return null;
         }
 
         public async Task<bool> IsSubcategoryModified(int subcategoryId, string name, int categoryId)

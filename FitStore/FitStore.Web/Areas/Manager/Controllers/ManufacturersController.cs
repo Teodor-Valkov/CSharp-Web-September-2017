@@ -83,7 +83,7 @@
 
         public async Task<IActionResult> Edit(int id)
         {
-            bool isManufacturerExistingById = await this.manufacturerService.IsManufacturerExistingById(id);
+            bool isManufacturerExistingById = await this.manufacturerService.IsManufacturerExistingById(id, false);
 
             if (!isManufacturerExistingById)
             {
@@ -107,7 +107,7 @@
                 return View(model);
             }
 
-            bool isManufacturerExistingById = await this.manufacturerService.IsManufacturerExistingById(id);
+            bool isManufacturerExistingById = await this.manufacturerService.IsManufacturerExistingById(id, false);
 
             if (!isManufacturerExistingById)
             {

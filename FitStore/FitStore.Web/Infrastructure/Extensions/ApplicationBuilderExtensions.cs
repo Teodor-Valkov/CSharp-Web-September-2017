@@ -7,6 +7,7 @@
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
 
@@ -15,6 +16,8 @@
 
     public static class ApplicationBuilderExtensions
     {
+        private static DateTime purchaseDate = DateTime.Now;
+
         public static IApplicationBuilder UseDatabaseMigration(this IApplicationBuilder app)
         {
             using (IServiceScope serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
@@ -30,6 +33,9 @@
                 SeedSubcategories(database);
                 SeedManufacturers(database);
                 SeedSuplements(database);
+                SeedReviews(userManager, database);
+                SeedComments(userManager, database);
+                SeedOrders(userManager, database);
             }
 
             return app;
@@ -159,7 +165,7 @@
                             FullName = $"{userUsername} {userUsername} {i}",
                             Email = string.Format(userEmail, i),
                             BirthDate = DateTime.UtcNow.AddYears(-i * 5).AddMonths(-i * 10).AddDays(-i * 15),
-                            RegistrationDate = DateTime.UtcNow,
+                            RegistrationDate = DateTime.UtcNow.AddYears(-i).AddMonths(-i).AddDays(-i),
                             Address = $"{string.Format(userAddress, i)}",
                             PhoneNumber = $"{string.Format(userPhoneNumber, i)}"
                         };
@@ -377,6 +383,137 @@
             })
             .GetAwaiter()
             .GetResult();
+        }
+
+        private static void SeedComments(UserManager<User> userManager, FitStoreDbContext database)
+        {
+            Task.Run(async () =>
+            {
+                if (!await database.Comments.AnyAsync())
+                {
+                    User firstUser = await userManager.FindByNameAsync("User_1");
+                    User secondUser = await userManager.FindByNameAsync("User_2");
+
+                    IEnumerable<Supplement> supplements = database.Supplements;
+                    bool firstUserComment = true;
+
+                    foreach (Supplement supplement in supplements)
+                    {
+                        foreach (Comment commentInSupplement in comentsInSupplement)
+                        {
+                            Comment comment = new Comment
+                            {
+                                PublishDate = commentInSupplement.PublishDate,
+                                Content = commentInSupplement.Content,
+                                SupplementId = supplement.Id
+                            };
+
+                            comment.AuthorId = firstUserComment
+                                ? firstUser.Id
+                                : secondUser.Id;
+
+                            firstUserComment = !firstUserComment;
+
+                            supplement.Comments.Add(comment);
+                        }
+                    }
+
+                    await database.SaveChangesAsync();
+                }
+            })
+          .GetAwaiter()
+          .GetResult();
+        }
+
+        private static void SeedReviews(UserManager<User> userManager, FitStoreDbContext database)
+        {
+            Task.Run(async () =>
+            {
+                if (!await database.Reviews.AnyAsync())
+                {
+                    User firstUser = await userManager.FindByNameAsync("User_1");
+
+                    foreach (Review review in reviewsFirstPart)
+                    {
+                        review.AuthorId = firstUser.Id;
+                    }
+
+                    await database.AddRangeAsync(reviewsFirstPart);
+
+                    User secondUser = await userManager.FindByNameAsync("User_2");
+
+                    foreach (Review review in reviewsSecondPart)
+                    {
+                        review.Author = secondUser;
+                    }
+
+                    await database.AddRangeAsync(reviewsSecondPart);
+
+                    await database.SaveChangesAsync();
+                }
+            })
+          .GetAwaiter()
+          .GetResult();
+        }
+
+        private static void SeedOrders(UserManager<User> userManager, FitStoreDbContext database)
+        {
+            Task.Run(async () =>
+            {
+                if (!await database.Orders.AnyAsync())
+                {
+                    User firstUser = await userManager.FindByNameAsync("User_1");
+                    User secondUser = await userManager.FindByNameAsync("User_2");
+
+                    await SeedOrdersOfUser(database, supplementsInOrderFirstPart, firstUser);
+                    await SeedOrdersOfUser(database, supplementsInOrderSecondPart, firstUser);
+                    await SeedOrdersOfUser(database, supplementsInOrderThirdPart, firstUser);
+                    await SeedOrdersOfUser(database, supplementsInOrderFourthPart, firstUser);
+                    await SeedOrdersOfUser(database, supplementsInOrderFifthPart, firstUser);
+                    await SeedOrdersOfUser(database, supplementsInOrderSixPart, firstUser);
+
+                    await SeedOrdersOfUser(database, supplementsInOrderFirstPart, secondUser);
+                    await SeedOrdersOfUser(database, supplementsInOrderSecondPart, secondUser);
+                    await SeedOrdersOfUser(database, supplementsInOrderThirdPart, secondUser);
+                    await SeedOrdersOfUser(database, supplementsInOrderFourthPart, secondUser);
+                    await SeedOrdersOfUser(database, supplementsInOrderFifthPart, secondUser);
+                    await SeedOrdersOfUser(database, supplementsInOrderSixPart, secondUser);
+
+                    await database.SaveChangesAsync();
+                }
+            })
+          .GetAwaiter()
+          .GetResult();
+        }
+
+        private static async Task SeedOrdersOfUser(FitStoreDbContext database, IEnumerable<OrderSupplements> supplementsInOrder, User user)
+        {
+            for (int i = 1; i <= supplementsInOrder.Count(); i++)
+            {
+                Order order = new Order
+                {
+                    UserId = user.Id,
+                    PurchaseDate = purchaseDate.AddDays(-i * 15)
+                };
+
+                await database.Orders.AddAsync(order);
+                await database.SaveChangesAsync();
+
+                foreach (OrderSupplements supplementInOrder in supplementsInOrder)
+                {
+                    OrderSupplements supplement = new OrderSupplements
+                    {
+                        OrderId = order.Id,
+                        SupplementId = supplementInOrder.SupplementId,
+                        Quantity = supplementInOrder.Quantity,
+                        Price = supplementInOrder.Price
+                    };
+
+                    order.Supplements.Add(supplement);
+                }
+
+                order.TotalPrice = order.Supplements.Sum(s => s.Quantity * s.Price);
+            }
         }
     }
 }

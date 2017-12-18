@@ -44,13 +44,6 @@
                 .AnyAsync(s => s.Id == subcategoryId && s.IsDeleted == isDeleted);
         }
 
-        public async Task<bool> IsSubcategoryExistingById(int subcategoryId)
-        {
-            return await this.database
-                .Subcategories
-                .AnyAsync(s => s.Id == subcategoryId);
-        }
-
         public async Task<bool> IsSubcategoryExistingByName(string name)
         {
             return await this.database

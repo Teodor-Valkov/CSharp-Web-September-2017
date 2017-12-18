@@ -49,13 +49,6 @@
                 .AnyAsync(m => m.Id == manufacturerId && m.IsDeleted == isDeleted);
         }
 
-        public async Task<bool> IsManufacturerExistingById(int manufacturerId)
-        {
-            return await this.database
-                .Manufacturers
-                .AnyAsync(m => m.Id == manufacturerId);
-        }
-
         public async Task<bool> IsManufacturerExistingByName(string name)
         {
             return await this.database

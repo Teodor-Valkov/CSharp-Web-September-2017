@@ -99,7 +99,7 @@
 
         public async Task<IActionResult> Edit(int id)
         {
-            bool isSubcategoryExistingById = await this.subcategoryService.IsSubcategoryExistingById(id);
+            bool isSubcategoryExistingById = await this.subcategoryService.IsSubcategoryExistingById(id, false);
 
             if (!isSubcategoryExistingById)
             {
@@ -130,7 +130,7 @@
                 return View(model);
             }
 
-            bool isSubcategoryExistingById = await this.subcategoryService.IsSubcategoryExistingById(id);
+            bool isSubcategoryExistingById = await this.subcategoryService.IsSubcategoryExistingById(id, false);
 
             if (!isSubcategoryExistingById)
             {
@@ -197,9 +197,16 @@
                 return this.RedirectToSubcategoriesIndex(true);
             }
 
-            await this.managerSubcategoryService.RestoreAsync(id);
+            string restoreResult = await this.managerSubcategoryService.RestoreAsync(id);
 
-            TempData.AddSuccessMessage(string.Format(EntityRestored, SubcategoryEntity));
+            if (restoreResult == string.Empty)
+            {
+                TempData.AddSuccessMessage(string.Format(EntityRestored, SubcategoryEntity));
+            }
+            else
+            {
+                TempData.AddErrorMessage(string.Format(EntityNotRestored, SubcategoryEntity) + restoreResult);
+            }
 
             return this.RedirectToSubcategoriesIndex(true);
         }

@@ -108,18 +108,6 @@
             await this.database.SaveChangesAsync();
         }
 
-        public async Task RestoreAsync(int reviewId)
-        {
-            Review review = await this.database
-              .Reviews
-              .Where(r => r.Id == reviewId)
-              .FirstOrDefaultAsync();
-
-            review.IsDeleted = false;
-
-            await this.database.SaveChangesAsync();
-        }
-
         public Task<bool> IsUserAuthor(int reviewId, string authorId)
         {
             return this.database

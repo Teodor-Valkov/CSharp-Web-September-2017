@@ -4,11 +4,13 @@
     {
         public const string EntityNotFound = "{0} not found.";
         public const string EntityExists = "{0} with that name already exists.";
+        public const string EntityNotExists = " {0} does not exist.";
         public const string EntityCreated = "{0} was created successfully.";
         public const string EntityModified = "{0} was edited successfully.";
         public const string EntityNotModified = "No changes to apply.";
         public const string EntityDeleted = "{0} was deleted successfully.";
         public const string EntityRestored = "{0} was restored successfully.";
+        public const string EntityNotRestored = "{0} cannot be restored.";
 
         public const string InvalidIdentityDetailsErroMessage = "Invalid identity details.";
         public const string ChangeRoleErrorMessage = "Error. {0}";

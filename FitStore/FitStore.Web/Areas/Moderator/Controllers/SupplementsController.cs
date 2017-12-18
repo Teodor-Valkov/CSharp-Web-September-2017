@@ -7,7 +7,6 @@
     using Services.Moderator.Contracts;
     using Services.Moderator.Models.Supplements;
     using System.Threading.Tasks;
-    using Web.Controllers;
 
     using static Common.CommonConstants;
     using static Common.CommonMessages;
@@ -33,7 +32,7 @@
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, SupplementEntity));
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             if (page < 1)

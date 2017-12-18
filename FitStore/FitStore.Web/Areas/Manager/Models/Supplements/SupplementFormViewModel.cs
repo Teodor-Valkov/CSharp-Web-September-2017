@@ -34,6 +34,7 @@
         public IFormFile Picture { get; set; }
 
         [DataType(DataType.Date)]
+        [Display(Name = SupplementBestBeforeDateName)]
         public DateTime BestBeforeDate { get; set; }
 
         [Display(Name = SubcategoryEntity)]

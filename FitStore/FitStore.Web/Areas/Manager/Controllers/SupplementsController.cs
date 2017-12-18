@@ -164,7 +164,7 @@
 
         public async Task<IActionResult> Edit(int id)
         {
-            bool isSuplementExistingById = await this.supplementService.IsSupplementExistingById(id);
+            bool isSuplementExistingById = await this.supplementService.IsSupplementExistingById(id, false);
 
             if (!isSuplementExistingById)
             {
@@ -208,7 +208,7 @@
                 return View(model);
             }
 
-            bool isSuplementExistingById = await this.supplementService.IsSupplementExistingById(id);
+            bool isSuplementExistingById = await this.supplementService.IsSupplementExistingById(id, false);
 
             if (!isSuplementExistingById)
             {
@@ -299,9 +299,16 @@
                 return this.RedirectToSupplementsIndex(true);
             }
 
-            await this.managerSupplementService.RestoreAsync(id);
+            string restoreResult = await this.managerSupplementService.RestoreAsync(id);
 
-            TempData.AddSuccessMessage(string.Format(EntityRestored, SupplementEntity));
+            if (restoreResult == string.Empty)
+            {
+                TempData.AddSuccessMessage(string.Format(EntityRestored, SupplementEntity));
+            }
+            else
+            {
+                TempData.AddErrorMessage(string.Format(EntityNotRestored, SupplementEntity) + restoreResult);
+            }
 
             return this.RedirectToSupplementsIndex(true);
         }
