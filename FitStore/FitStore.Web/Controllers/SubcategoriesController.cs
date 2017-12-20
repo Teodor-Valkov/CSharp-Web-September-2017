@@ -27,7 +27,7 @@
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, SubcategoryEntity));
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             if (page < 1)
@@ -46,12 +46,12 @@
                 }
             };
 
-            if (page > model.Pagination.TotalPages && model.Pagination.TotalPages != 0)
+            if (page > 1 && page > model.Pagination.TotalPages)
             {
-                return RedirectToAction(nameof(Details), new { id, name, page = model.Pagination.TotalPages });
+                return RedirectToAction(nameof(Details), new { id, name });
             }
 
-            ViewData["ReturnUrl"] = this.RedirectToSubcategoryDetails(id, name);
+            ViewData["ReturnUrl"] = this.ReturnToSubcategoryDetails(id, name);
 
             return View(model);
         }

@@ -1,5 +1,6 @@
 ﻿namespace FitStore.Web.Areas.Moderator.Controllers
 {
+    using FitStore.Web.Controllers;
     using Infrastructure.Extensions;
     using Microsoft.AspNetCore.Mvc;
     using Models.Pagination;
@@ -24,8 +25,6 @@
 
         public async Task<IActionResult> Details(int id, string name, string returnUrl, int page = 1)
         {
-            ViewData["ReturnUrl"] = returnUrl;
-
             bool isSupplementExisting = await this.supplementService.IsSupplementExistingById(id, false);
 
             if (!isSupplementExisting)
@@ -37,7 +36,7 @@
 
             if (page < 1)
             {
-                return RedirectToAction(nameof(Details), new { id });
+                return RedirectToAction(nameof(Details), new { id, name });
             }
 
             PagingElementViewModel<SupplementDetailsWithDeletedCommentsServiceModel> model = new PagingElementViewModel<SupplementDetailsWithDeletedCommentsServiceModel>
@@ -51,10 +50,17 @@
                 }
             };
 
-            if (page > model.Pagination.TotalPages && model.Pagination.TotalPages != 0)
+            if (page > 1 && page > model.Pagination.TotalPages)
             {
-                return RedirectToAction(nameof(Details), new { id, page = model.Pagination.TotalPages });
+                return RedirectToAction(nameof(Details), new { id, name });
             }
+
+            if (!Url.IsLocalUrl(returnUrl))
+            {
+                returnUrl = this.ReturnToHomeIndex();
+            }
+
+            ViewData["ReturnUrl"] = returnUrl;
 
             return View(model);
         }

@@ -12,7 +12,7 @@
 
     public class CategoryDetailsServiceModel : CategoryBasicServiceModel, IMapFrom<Category>, IHaveCustomMapping
     {
-        public IEnumerable<SubcategoryCountServiceModel> Subcategories { get; set; }
+        public IEnumerable<SubcategoryAdvancedServiceModel> Subcategories { get; set; }
 
         public IEnumerable<SupplementAdvancedServiceModel> Supplements { get; set; }
 

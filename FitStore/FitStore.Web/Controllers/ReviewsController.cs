@@ -53,12 +53,10 @@
                 }
             };
 
-            if (page > model.Pagination.TotalPages && model.Pagination.TotalPages != 0)
+            if (page > 1 && page > model.Pagination.TotalPages)
             {
-                return RedirectToAction(nameof(Index), new { page = model.Pagination.TotalPages });
+                return RedirectToAction(nameof(Index));
             }
-
-            ViewData["ReturnUrl"] = this.RedirectToHomeIndex();
 
             return View(model);
         }
@@ -72,7 +70,7 @@
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, ReviewEntity));
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             ReviewDetailsServiceModel model = await this.reviewService.GeDetailsByIdAsync(id);
@@ -88,7 +86,7 @@
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, SupplementEntity));
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             string username = User.Identity.Name;
@@ -99,7 +97,7 @@
             {
                 TempData.AddErrorMessage(UserRestrictedErrorMessage);
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             ReviewFormViewModel model = new ReviewFormViewModel()
@@ -119,6 +117,8 @@
             {
                 model.Ratings = this.GetRatingsSelectListItems();
 
+                ViewData["SupplementId"] = id;
+
                 return View(model);
             }
 
@@ -128,7 +128,7 @@
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, SupplementEntity));
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             string username = User.Identity.Name;
@@ -139,7 +139,7 @@
             {
                 TempData.AddErrorMessage(UserRestrictedErrorMessage);
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             string userId = this.userManager.GetUserId(User);
@@ -148,7 +148,7 @@
 
             TempData.AddSuccessMessage(string.Format(EntityCreated, ReviewEntity));
 
-            return this.RedirectToAction(nameof(ReviewsController.Index), Reviews);
+            return this.RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Edit(int id)
@@ -159,7 +159,7 @@
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, ReviewEntity));
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             string username = User.Identity.Name;
@@ -170,7 +170,7 @@
             {
                 TempData.AddErrorMessage(UserRestrictedErrorMessage);
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             string userId = this.userManager.GetUserId(User);
@@ -180,7 +180,7 @@
 
             if (!isUserAuthor && !isUserModerator)
             {
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             ReviewBasicServiceModel review = await this.reviewService.GetEditModelAsync(id);
@@ -211,7 +211,7 @@
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, ReviewEntity));
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             string username = User.Identity.Name;
@@ -222,7 +222,7 @@
             {
                 TempData.AddErrorMessage(UserRestrictedErrorMessage);
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             string userId = this.userManager.GetUserId(User);
@@ -232,7 +232,7 @@
 
             if (!isUserAuthor && !isUserModerator)
             {
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             bool isReviewModified = await this.reviewService.IsReviewModified(id, model.Content, model.Rating);
@@ -250,7 +250,7 @@
 
             TempData.AddSuccessMessage(string.Format(EntityModified, ReviewEntity));
 
-            return this.RedirectToAction(nameof(ReviewsController.Index), Reviews);
+            return this.RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Delete(int id)
@@ -261,7 +261,7 @@
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, ReviewEntity));
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             string username = User.Identity.Name;
@@ -272,7 +272,7 @@
             {
                 TempData.AddErrorMessage(UserRestrictedErrorMessage);
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             string userId = this.userManager.GetUserId(User);
@@ -282,7 +282,7 @@
 
             if (!isUserAuthor && !isUserModerator)
             {
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             await this.reviewService.DeleteAsync(id);
@@ -294,7 +294,7 @@
                 return RedirectToAction(nameof(ReviewsController.Index), Reviews, new { area = ModeratorArea });
             }
 
-            return RedirectToAction(nameof(ReviewsController.Index), Reviews);
+            return RedirectToAction(nameof(Index));
         }
 
         private IEnumerable<SelectListItem> GetRatingsSelectListItems()

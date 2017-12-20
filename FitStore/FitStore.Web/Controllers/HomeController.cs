@@ -44,13 +44,12 @@
                 }
             };
 
-            if (page > model.Pagination.TotalPages && model.Pagination.TotalPages != 0)
+            if (page > 1 && page > model.Pagination.TotalPages)
             {
-                return RedirectToAction(nameof(Index), new { page = model.Pagination.TotalPages });
+                return RedirectToAction(nameof(Index));
             }
 
             ViewData["SearchToken"] = searchToken;
-            ViewData["ReturnUrl"] = this.RedirectToHomeIndex();
 
             return View(model);
         }

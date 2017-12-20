@@ -6,23 +6,25 @@
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-2">
+        <div class="col-md-3">
             <br />
             <br />
 
             @foreach (var category in Model.Element.Categories)
             {
-                <ul class="nav nav-pills nav-stacked">
-                    <li id="home-category-link"><a asp-area="" asp-controller="Categories" asp-action="Details" asp-route-id="@category.Id" asp-route-name="@category.Name">@category.Name</a></li>
-                    @foreach (var subcategory in category.Subcategories)
-                    {
-                        <li id="home-subcategory-link"><a asp-area="" asp-controller="Subcategories" asp-action="Details" asp-route-id="@subcategory.Id" asp-route-name="@subcategory.Name" class="col-md-offset-2">@subcategory.Name</a></li>
-                    }
-                </ul>
+                <div class="col-md-10">
+                    <ul class="nav nav-pills nav-stacked">
+                        <li id="home-category-link"><a asp-area="" asp-controller="Categories" asp-action="Details" asp-route-id="@category.Id" asp-route-name="@category.Name">@category.Name (@category.Supplements)</a></li>
+                        @foreach (var subcategory in category.Subcategories)
+                        {
+                            <li id="home-subcategory-link"><a asp-area="" asp-controller="Subcategories" asp-action="Details" asp-route-id="@subcategory.Id" asp-route-name="@subcategory.Name" class="col-md-offset-2">@subcategory.Name (@subcategory.Supplements)</a></li>
+                        }
+                    </ul>
+                </div>
             }
         </div>
 
-        <div class="col-md-offset-1 col-md-9">
+        <div class="col-md-9">
             <br />
             <br />
             @foreach (var supplement in Model.Element.Supplements)

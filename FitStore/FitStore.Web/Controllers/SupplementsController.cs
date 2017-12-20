@@ -1,8 +1,8 @@
 ﻿namespace FitStore.Web.Controllers
 {
-    using FitStore.Web.Models.Pagination;
     using Infrastructure.Extensions;
     using Microsoft.AspNetCore.Mvc;
+    using Models.Pagination;
     using Services.Contracts;
     using Services.Models.Supplements;
     using System.Threading.Tasks;
@@ -10,7 +10,7 @@
     using static Common.CommonConstants;
     using static Common.CommonMessages;
 
-    public class SupplementsController : Controller
+    public class SupplementsController : BaseController
     {
         private readonly ISupplementService supplementService;
 
@@ -21,20 +21,18 @@
 
         public async Task<IActionResult> Details(int id, string name, string returnUrl, int page = 1)
         {
-            ViewData["ReturnUrl"] = returnUrl;
-
             bool isSupplementExisting = await this.supplementService.IsSupplementExistingById(id, false);
 
             if (!isSupplementExisting)
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, SupplementEntity));
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             if (page < 1)
             {
-                return RedirectToAction(nameof(Details), new { id });
+                return RedirectToAction(nameof(Details), new { id, name });
             }
 
             PagingElementViewModel<SupplementDetailsServiceModel> model = new PagingElementViewModel<SupplementDetailsServiceModel>
@@ -48,10 +46,17 @@
                 }
             };
 
-            if (page > model.Pagination.TotalPages && model.Pagination.TotalPages != 0)
+            if (page > 1 && page > model.Pagination.TotalPages)
             {
-                return RedirectToAction(nameof(Details), new { id, page = model.Pagination.TotalPages });
+                return RedirectToAction(nameof(Details), new { id, name });
             }
+
+            if (!Url.IsLocalUrl(returnUrl))
+            {
+                returnUrl = this.ReturnToHomeIndex();
+            }
+
+            ViewData["ReturnUrl"] = returnUrl;
 
             return View(model);
         }

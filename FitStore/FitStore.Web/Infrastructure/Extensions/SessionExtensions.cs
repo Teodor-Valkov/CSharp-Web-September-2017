@@ -4,23 +4,8 @@
     using Newtonsoft.Json;
     using System;
 
-    using static Common.CommonConstants;
-
     public static class SessionExtensions
     {
-        //public static string GetShoppingCartId(this ISession session)
-        //{
-        //    string shoppingCartId = session.GetString(UserSessionShoppingCartKey);
-
-        //    if (shoppingCartId == null)
-        //    {
-        //        shoppingCartId = Guid.NewGuid().ToString();
-        //        session.SetString(UserSessionShoppingCartKey, shoppingCartId);
-        //    }
-
-        //    return shoppingCartId;
-        //}
-
         public static T GetShoppingCart<T>(this ISession session, string key)
             where T : class
         {

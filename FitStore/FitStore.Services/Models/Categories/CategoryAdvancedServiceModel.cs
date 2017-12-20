@@ -9,7 +9,7 @@
 
     public class CategoryAdvancedServiceModel : CategoryBasicServiceModel, IMapFrom<Category>, IHaveCustomMapping
     {
-        public IEnumerable<SubcategoryBasicServiceModel> Subcategories { get; set; }
+        public IEnumerable<SubcategoryAdvancedServiceModel> Subcategories { get; set; }
 
         public int Supplements { get; set; }
 
@@ -20,7 +20,7 @@
             mapper
                 .CreateMap<Category, CategoryAdvancedServiceModel>()
                     .ForMember(dest => dest.Subcategories, opt => opt.MapFrom(src => src.Subcategories))
-                    .ForMember(dest => dest.Supplements, opt => opt.MapFrom(src => src.Subcategories.Sum(sc => sc.Supplements.Count)));
+                    .ForMember(dest => dest.Supplements, opt => opt.MapFrom(src => src.Subcategories.Sum(sc => sc.Supplements.Count(s => s.IsDeleted == false))));
         }
     }
 }

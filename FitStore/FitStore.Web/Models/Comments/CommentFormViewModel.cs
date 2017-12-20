@@ -10,7 +10,5 @@
         [MinLength(CommentContentMinLength)]
         [MaxLength(CommentContentMaxLength)]
         public string Content { get; set; }
-
-        public int SupplementId { get; set; }
     }
 }

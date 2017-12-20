@@ -16,8 +16,6 @@
 
     public static class ApplicationBuilderExtensions
     {
-        private static DateTime purchaseDate = DateTime.Now;
-
         public static IApplicationBuilder UseDatabaseMigration(this IApplicationBuilder app)
         {
             using (IServiceScope serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
@@ -488,32 +486,33 @@
 
         private static async Task SeedOrdersOfUser(FitStoreDbContext database, IEnumerable<OrderSupplements> supplementsInOrder, User user)
         {
-            for (int i = 1; i <= supplementsInOrder.Count(); i++)
+            DateTime previousOrderPurchaseDate = database.Orders.LastOrDefault() == null
+                ? DateTime.UtcNow
+                : database.Orders.Last().PurchaseDate;
+
+            Order order = new Order
             {
-                Order order = new Order
+                UserId = user.Id,
+                PurchaseDate = previousOrderPurchaseDate.AddDays(-45)
+            };
+
+            await database.Orders.AddAsync(order);
+            await database.SaveChangesAsync();
+
+            foreach (OrderSupplements supplementInOrder in supplementsInOrder)
+            {
+                OrderSupplements supplement = new OrderSupplements
                 {
-                    UserId = user.Id,
-                    PurchaseDate = purchaseDate.AddDays(-i * 15)
+                    OrderId = order.Id,
+                    SupplementId = supplementInOrder.SupplementId,
+                    Quantity = supplementInOrder.Quantity,
+                    Price = supplementInOrder.Price
                 };
 
-                await database.Orders.AddAsync(order);
-                await database.SaveChangesAsync();
-
-                foreach (OrderSupplements supplementInOrder in supplementsInOrder)
-                {
-                    OrderSupplements supplement = new OrderSupplements
-                    {
-                        OrderId = order.Id,
-                        SupplementId = supplementInOrder.SupplementId,
-                        Quantity = supplementInOrder.Quantity,
-                        Price = supplementInOrder.Price
-                    };
-
-                    order.Supplements.Add(supplement);
-                }
-
-                order.TotalPrice = order.Supplements.Sum(s => s.Quantity * s.Price);
+                order.Supplements.Add(supplement);
             }
+
+            order.TotalPrice = order.Supplements.Sum(s => s.Quantity * s.Price);
         }
     }
 }

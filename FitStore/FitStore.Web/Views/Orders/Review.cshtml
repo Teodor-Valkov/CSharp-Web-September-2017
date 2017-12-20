@@ -29,7 +29,7 @@
             {
                 <tr class="text-center">
                     <td>
-                        <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">
+                        <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl=@Context.Request.Path>
                             <img id="supplements-index-image" src="@supplement.Picture" alt="supplement-picture">
                         </a>
                     </td>
@@ -48,5 +48,6 @@
     <div class="text-center">
         <h2>Order Date: @Model.PurchaseDate.ToShortDateString()</h2>
         <h2>Total Price: @Model.TotalPrice &euro;</h2>
+        <a asp-area="" asp-controller="Users" asp-action="Profile" asp-route-username="@User.Identity.Name" class="btn btn-default">Back</a>
     </div>
 </div>

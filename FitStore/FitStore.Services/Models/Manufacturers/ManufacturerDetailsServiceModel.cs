@@ -22,7 +22,7 @@
                     .ForMember(dest => dest.Supplements, opt => opt
                         .MapFrom(src => src.Supplements
                             .Where(s => s.IsDeleted == false)
-                            .OrderBy(sup => sup.Name)
+                            .OrderBy(s => s.Name)
                             .Skip((page - 1) * SupplementPageSize)
                             .Take(SupplementPageSize)));
         }

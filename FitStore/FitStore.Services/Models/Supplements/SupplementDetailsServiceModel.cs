@@ -29,7 +29,6 @@
         public override void ConfigureMapping(Profile mapper)
         {
             int page = default(int);
-            //bool shouldSeeDeletedComments = false;
 
             mapper
                .CreateMap<Supplement, SupplementDetailsServiceModel>()
@@ -38,19 +37,11 @@
                    .ForMember(dest => dest.Picture, opt => opt.MapFrom(src => src.Picture.FromByteArrayToString()))
                    .ForMember(dest => dest.ManufacturerName, opt => opt.MapFrom(src => src.Manufacturer.Name))
                    .ForMember(dest => dest.Comments, opt => opt
-                       .MapFrom(src => src.Comments.Where(c => c.IsDeleted == false).OrderByDescending(c => c.PublishDate).Skip((page - 1) * CommentPageSize).Take(CommentPageSize)));
-
-            //mapper
-            //    .CreateMap<Supplement, SupplementDetailsServiceModel>()
-            //        .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Subcategory.Category.Name))
-            //        .ForMember(dest => dest.SubcategoryName, opt => opt.MapFrom(src => src.Subcategory.Name))
-            //        .ForMember(dest => dest.Picture, opt => opt.MapFrom(src => src.Picture.FromByteArrayToString()))
-            //        .ForMember(dest => dest.ManufacturerName, opt => opt.MapFrom(src => src.Manufacturer.Name))
-            //        .ForMember(dest => dest.Comments, opt => opt
-            //            .MapFrom(src =>
-            //                shouldSeeDeletedComments == true
-            //                    ? src.Comments.OrderByDescending(c => c.PublishDate).Skip((page - 1) * CommentPageSize).Take(CommentPageSize)
-            //                    : src.Comments.Where(c => c.IsDeleted == false).OrderByDescending(c => c.PublishDate).Skip((page - 1) * CommentPageSize).Take(CommentPageSize)));
+                       .MapFrom(src => src.Comments
+                            .Where(c => c.IsDeleted == false)
+                            .OrderByDescending(c => c.PublishDate)
+                            .Skip((page - 1) * CommentPageSize)
+                            .Take(CommentPageSize)));
         }
     }
 }

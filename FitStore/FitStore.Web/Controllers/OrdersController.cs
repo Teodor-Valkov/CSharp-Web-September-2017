@@ -29,7 +29,10 @@
 
         public async Task<IActionResult> Add(int id, string returnUrl)
         {
-            ViewData["ReturnUrl"] = returnUrl;
+            if (!Url.IsLocalUrl(returnUrl))
+            {
+                returnUrl = this.ReturnToHomeIndex();
+            }
 
             bool isSupplementExisting = await this.supplementService.IsSupplementExistingById(id, false);
 
@@ -37,7 +40,7 @@
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, SupplementEntity));
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             ShoppingCart shoppingCart = HttpContext.Session.GetShoppingCart<ShoppingCart>(UserSessionShoppingCartKey);
@@ -48,7 +51,7 @@
             {
                 TempData.AddErrorMessage(SupplementLastOneJustAddedErrorMessage);
 
-                return this.RedirectToLocal(returnUrl);
+                return this.Redirect(returnUrl);
             }
 
             bool addSupplementToCartResult = await this.orderService.AddSupplementToCartAsync(id, shoppingCart);
@@ -64,7 +67,7 @@
                 TempData.AddErrorMessage(SupplementUnavailableErrorMessage);
             }
 
-            return this.RedirectToLocal(returnUrl);
+            return this.Redirect(returnUrl);
         }
 
         public async Task<IActionResult> Remove(int id)
@@ -109,9 +112,9 @@
 
             ShoppingCart shoppingCart = HttpContext.Session.GetShoppingCart<ShoppingCart>(UserSessionShoppingCartKey);
 
-            bool removeSupplementFromCartResult = this.orderService.RemoveAllSupplementsFromCartAsync(id, shoppingCart);
+            bool removeAllSupplementsFromCartResult = this.orderService.RemoveAllSupplementsFromCartAsync(id, shoppingCart);
 
-            if (removeSupplementFromCartResult)
+            if (removeAllSupplementsFromCartResult)
             {
                 TempData.AddSuccessMessage(SupplementRemovedFromCartSuccessMessage);
 
@@ -139,7 +142,7 @@
 
             if (!shoppingCart.Supplements.Any())
             {
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             return View(shoppingCart);
@@ -152,7 +155,7 @@
 
             if (!shoppingCart.Supplements.Any())
             {
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             HttpContext.Session.Remove(UserSessionShoppingCartKey);
@@ -172,7 +175,7 @@
 
             if (!shoppingCart.Supplements.Any())
             {
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             bool OrderResult = await this.orderService.FinishOrderAsync(userId, shoppingCart);
@@ -188,7 +191,7 @@
 
             HttpContext.Session.Remove(UserSessionShoppingCartKey);
 
-            return RedirectToAction(nameof(HomeController.Index), Home);
+            return this.RedirectToHomeIndex();
         }
 
         [Authorize]
@@ -198,12 +201,10 @@
 
             if (!isOrderExistingById)
             {
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             OrderDetailsServiceModel model = await this.orderService.GetDetailsByIdAsync(id);
-
-            ViewData["ReturnUrl"] = this.RedirectToOrderReview(id);
 
             return View(model);
         }

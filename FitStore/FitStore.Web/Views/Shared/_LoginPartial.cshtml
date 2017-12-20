@@ -6,7 +6,7 @@
 
 @{
     string username = UserManager.GetUserName(User);
-    int supplementsInCart = Context.Session.GetShoppingCart<ShoppingCart>(CommonConstants.UserSessionShoppingCartKey).Supplements.Count;
+    int supplementsInCart = Context.Session.GetShoppingCart<ShoppingCart>(CommonConstants.UserSessionShoppingCartKey).Supplements.Sum(s => s.Quantity);
 }
 
 @if (SignInManager.IsSignedIn(User))

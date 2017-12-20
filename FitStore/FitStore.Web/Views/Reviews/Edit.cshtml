@@ -2,6 +2,10 @@
 
 @{
     ViewData["Title"] = "Edit Review";
+
+    string area = User.IsInRole(WebConstants.ModeratorRole)
+        ? "Moderator"
+        : string.Empty;
 }
 
 <div class="row">
@@ -17,7 +21,7 @@
             @await Html.PartialAsync("_ReviewForm", Model)
 
             <div class="text-center">
-                <a asp-area="" asp-controller="Reviews" asp-action="Index" class="btn btn-default">Back</a>
+                <a asp-area="@area" asp-controller="Reviews" asp-action="Index" class="btn btn-default">Back</a>
                 <input class="btn btn-success" type="submit" value="Edit" />
             </div>
         </form>

@@ -41,12 +41,10 @@
                 }
             };
 
-            if (page > model.Pagination.TotalPages && model.Pagination.TotalPages != 0)
+            if (page > 1 && page > model.Pagination.TotalPages)
             {
-                return RedirectToAction(nameof(Index), new { page = model.Pagination.TotalPages });
+                return RedirectToAction(nameof(Index));
             }
-
-            ViewData["ReturnUrl"] = this.RedirectToModeratorReviewIndex();
 
             return View(model);
         }
@@ -58,6 +56,7 @@
             if (!isReviewExistingById)
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, ReviewEntity));
+
                 return this.RedirectToHomeIndex();
             }
 

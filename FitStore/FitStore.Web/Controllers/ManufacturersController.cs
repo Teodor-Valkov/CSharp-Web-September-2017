@@ -32,14 +32,14 @@
                 Pagination = new PaginationViewModel
                 {
                     TotalElements = await this.manufacturerService.TotalCountAsync(),
-                    PageSize = SupplementPageSize,
+                    PageSize = ManufacturerPageSize,
                     CurrentPage = page
                 }
             };
 
-            if (page > model.Pagination.TotalPages && model.Pagination.TotalPages != 0)
+            if (page > 1 && page > model.Pagination.TotalPages)
             {
-                return RedirectToAction(nameof(Index), new { page = model.Pagination.TotalPages });
+                return RedirectToAction(nameof(Index));
             }
 
             return View(model);
@@ -53,7 +53,7 @@
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, ManufacturerEntity));
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             if (page < 1)
@@ -72,12 +72,12 @@
                 }
             };
 
-            if (page > model.Pagination.TotalPages && model.Pagination.TotalPages != 0)
+            if (page > 1 && page > model.Pagination.TotalPages)
             {
-                return RedirectToAction(nameof(Details), new { id, name, page = model.Pagination.TotalPages });
+                return RedirectToAction(nameof(Details), new { id, name });
             }
 
-            ViewData["ReturnUrl"] = this.RedirectToManufacturerDetails(id, name);
+            ViewData["ReturnUrl"] = this.ReturnToManufacturerDetails(id, name);
 
             return View(model);
         }

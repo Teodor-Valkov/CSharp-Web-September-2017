@@ -17,7 +17,6 @@
         public const string AddToRoleSuccessMessage = "User {0} has been added to role {1}.";
         public const string RemoveFromRoleSuccessMessage = "User {0} has been removed from role {1}.";
 
-        public const string UserEditProfileErrorMessage = "Error. Your profile could not be changed. Please try again.";
         public const string UserEditProfileSuccessMessage = "Your profile was successfully changed.";
 
         public const string UserChangePasswordExternalLoginErrorMessage = "You do not have a password. You are using an external login provider.";
@@ -37,6 +36,7 @@
 
         public const string UserRestrictedErrorMessage = "You are temporarily restricted to perform this action.";
 
-        public const string SupplementPictureErrorMessage = "Only pictures in Jpeg format are allowed";
+        public const string SupplementPictureErrorMessage = "Only pictures in Jpeg format are allowed.";
+        public const string SupplementBestBeforeDateErrorMessage = "Best before date should be in the future.";
     }
 }

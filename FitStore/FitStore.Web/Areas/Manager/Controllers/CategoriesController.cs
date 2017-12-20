@@ -28,7 +28,7 @@
         {
             if (page < 1)
             {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { searchToken, isDeleted });
             }
 
             PagingElementsViewModel<CategoryAdvancedServiceModel> model = new PagingElementsViewModel<CategoryAdvancedServiceModel>
@@ -44,9 +44,9 @@
                 }
             };
 
-            if (page > model.Pagination.TotalPages && model.Pagination.TotalPages != 0)
+            if (page > 1 && page > model.Pagination.TotalPages)
             {
-                return RedirectToAction(nameof(Index), new { page = model.Pagination.TotalPages });
+                return RedirectToAction(nameof(Index), new { searchToken, isDeleted });
             }
 
             return View(model);

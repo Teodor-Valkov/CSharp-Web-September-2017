@@ -14,7 +14,7 @@
     using static Common.CommonMessages;
 
     [Authorize]
-    public class UsersController : Controller
+    public class UsersController : BaseController
     {
         private readonly UserManager<User> userManager;
         private readonly IUserService userService;
@@ -25,7 +25,7 @@
             this.userService = userService;
         }
 
-        public async Task<ActionResult> Profile(string username, int page = 1)
+        public async Task<IActionResult> Profile(string username, int page = 1)
         {
             User user = await this.userManager.FindByNameAsync(username);
 
@@ -33,7 +33,7 @@
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, username));
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             if (page < 1)
@@ -52,9 +52,9 @@
                 }
             };
 
-            if (page > model.Pagination.TotalPages && model.Pagination.TotalPages != 0)
+            if (page > 1 && page > model.Pagination.TotalPages)
             {
-                return RedirectToAction(nameof(Profile), new { username, page = model.Pagination.TotalPages });
+                return RedirectToAction(nameof(Profile), new { username });
             }
 
             return View(model);
@@ -68,10 +68,10 @@
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, username));
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
-            UserEditProfileServiceModel model = await this.userService.GetEditProfileByUsernameAsync(user.UserName);
+            UserEditProfileServiceModel model = await this.userService.GetEditProfileByUsernameAsync(username);
 
             return View(model);
         }
@@ -90,14 +90,14 @@
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, username));
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             bool editProfileResult = await this.userService.EditProfileAsync(user, model.FullName, model.Email, model.Address, model.PhoneNumber, model.BirthDate);
 
             if (!editProfileResult)
             {
-                TempData.AddErrorMessage(UserEditProfileErrorMessage);
+                TempData.AddWarningMessage(EntityNotModified);
 
                 return View(model);
             }
@@ -115,7 +115,7 @@
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, username));
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             bool userHasPassword = await this.userManager.HasPasswordAsync(user);
@@ -146,14 +146,23 @@
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, username));
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
+            }
+
+            bool userHasPassword = await this.userManager.HasPasswordAsync(user);
+
+            if (!userHasPassword)
+            {
+                TempData.AddErrorMessage(UserChangePasswordExternalLoginErrorMessage);
+
+                return RedirectToAction(nameof(Profile), new { username });
             }
 
             bool changePasswordResult = await this.userService.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
 
             if (!changePasswordResult)
             {
-                TempData.AddErrorMessage(UserChangePasswordErrorMessage);
+                TempData.AddWarningMessage(EntityNotModified);
 
                 return View(model);
             }

@@ -33,6 +33,7 @@
         [DataType(DataType.Upload)]
         public IFormFile Picture { get; set; }
 
+        [BestBeforeDate]
         [DataType(DataType.Date)]
         [Display(Name = SupplementBestBeforeDateName)]
         public DateTime BestBeforeDate { get; set; }

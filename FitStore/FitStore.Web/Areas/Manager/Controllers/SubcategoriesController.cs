@@ -21,21 +21,19 @@
         private readonly IManagerSubcategoryService managerSubcategoryService;
         private readonly IManagerCategoryService managerCategoryService;
         private readonly ISubcategoryService subcategoryService;
-        private readonly ICategoryService categoryService;
 
-        public SubcategoriesController(IManagerSubcategoryService managerSubcategoryService, IManagerCategoryService managerCategoryService, ISubcategoryService subcategoryService, ICategoryService categoryService)
+        public SubcategoriesController(IManagerSubcategoryService managerSubcategoryService, IManagerCategoryService managerCategoryService, ISubcategoryService subcategoryService)
         {
             this.managerSubcategoryService = managerSubcategoryService;
             this.managerCategoryService = managerCategoryService;
             this.subcategoryService = subcategoryService;
-            this.categoryService = categoryService;
         }
 
         public async Task<IActionResult> Index(string searchToken, bool isDeleted, int page = 1)
         {
             if (page < 1)
             {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { searchToken, isDeleted });
             }
 
             PagingElementsViewModel<SubcategoryAdvancedServiceModel> model = new PagingElementsViewModel<SubcategoryAdvancedServiceModel>
@@ -51,9 +49,9 @@
                 }
             };
 
-            if (page > model.Pagination.TotalPages && model.Pagination.TotalPages != 0)
+            if (page > 1 && page > model.Pagination.TotalPages)
             {
-                return RedirectToAction(nameof(Index), new { page = model.Pagination.TotalPages });
+                return RedirectToAction(nameof(Index), new { searchToken, isDeleted });
             }
 
             return View(model);
@@ -113,7 +111,7 @@
             SubcategoryFormViewModel model = new SubcategoryFormViewModel
             {
                 Name = subcategory.Name,
-                CategoryId = await this.subcategoryService.GetCategoryIdBySubcategoryId(subcategory.Id),
+                CategoryId = await this.subcategoryService.GetCategoryIdBySubcategoryId(id),
                 Categories = await this.GetCategoriesSelectListItems()
             };
 

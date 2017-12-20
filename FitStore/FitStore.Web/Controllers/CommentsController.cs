@@ -16,7 +16,7 @@
     using static WebConstants;
 
     [Authorize]
-    public class CommentsController : Controller
+    public class CommentsController : BaseController
     {
         private readonly UserManager<User> userManager;
         private readonly ICommentService commentService;
@@ -39,7 +39,7 @@
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, SupplementEntity));
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             string username = User.Identity.Name;
@@ -50,13 +50,12 @@
             {
                 TempData.AddErrorMessage(UserRestrictedErrorMessage);
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
-            CommentFormViewModel model = new CommentFormViewModel
-            {
-                SupplementId = id
-            };
+            CommentFormViewModel model = new CommentFormViewModel();
+
+            ViewData["SupplementId"] = id;
 
             return View(model);
         }
@@ -66,6 +65,8 @@
         {
             if (!ModelState.IsValid)
             {
+                ViewData["SupplementId"] = id;
+
                 return View(model);
             }
 
@@ -75,7 +76,7 @@
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, SupplementEntity));
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             string username = User.Identity.Name;
@@ -86,7 +87,7 @@
             {
                 TempData.AddErrorMessage(UserRestrictedErrorMessage);
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             string userId = this.userManager.GetUserId(User);
@@ -106,7 +107,16 @@
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, CommentEntity));
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
+            }
+
+            bool isSupplementExistingById = await this.supplementService.IsSupplementExistingById(supplementId, false);
+
+            if (!isSupplementExistingById)
+            {
+                TempData.AddErrorMessage(string.Format(EntityNotFound, SupplementEntity));
+
+                return this.RedirectToHomeIndex();
             }
 
             string username = User.Identity.Name;
@@ -117,7 +127,7 @@
             {
                 TempData.AddErrorMessage(UserRestrictedErrorMessage);
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             string userId = this.userManager.GetUserId(User);
@@ -127,7 +137,7 @@
 
             if (!isUserAuthor && !isUserModerator)
             {
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             CommentBasicServiceModel comment = await this.commentService.GetEditModelAsync(id);
@@ -151,7 +161,16 @@
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, CommentEntity));
 
-                return this.RedirectToAction(nameof(SupplementsController.Details), Supplements, new { id = supplementId });
+                return this.RedirectToHomeIndex();
+            }
+
+            bool isSupplementExistingById = await this.supplementService.IsSupplementExistingById(supplementId, false);
+
+            if (!isSupplementExistingById)
+            {
+                TempData.AddErrorMessage(string.Format(EntityNotFound, SupplementEntity));
+
+                return this.RedirectToHomeIndex();
             }
 
             string username = User.Identity.Name;
@@ -162,7 +181,7 @@
             {
                 TempData.AddErrorMessage(UserRestrictedErrorMessage);
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             string userId = this.userManager.GetUserId(User);
@@ -172,7 +191,7 @@
 
             if (!isUserAuthor && !isUserModerator)
             {
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             bool isCommentModified = await this.commentService.IsCommentModified(id, model.Content);
@@ -199,7 +218,16 @@
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, CommentEntity));
 
-                return this.RedirectToAction(nameof(SupplementsController.Details), Supplements, new { area = ModeratorArea, id = supplementId });
+                return this.RedirectToHomeIndex();
+            }
+
+            bool isSupplementExistingById = await this.supplementService.IsSupplementExistingById(supplementId, false);
+
+            if (!isSupplementExistingById)
+            {
+                TempData.AddErrorMessage(string.Format(EntityNotFound, SupplementEntity));
+
+                return this.RedirectToHomeIndex();
             }
 
             string username = User.Identity.Name;
@@ -210,7 +238,7 @@
             {
                 TempData.AddErrorMessage(UserRestrictedErrorMessage);
 
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             string userId = this.userManager.GetUserId(User);
@@ -220,12 +248,17 @@
 
             if (!isUserAuthor && !isUserModerator)
             {
-                return RedirectToAction(nameof(HomeController.Index), Home);
+                return this.RedirectToHomeIndex();
             }
 
             await this.commentService.DeleteAsync(id);
 
             TempData.AddSuccessMessage(string.Format(EntityDeleted, CommentEntity));
+
+            if (isUserModerator)
+            {
+                return RedirectToAction(nameof(SupplementsController.Details), Supplements, new { area = ModeratorArea, id = supplementId });
+            }
 
             return this.RedirectToAction(nameof(SupplementsController.Details), Supplements, new { id = supplementId });
         }

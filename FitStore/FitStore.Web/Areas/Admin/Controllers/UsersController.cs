@@ -39,7 +39,7 @@
         {
             if (page < 1)
             {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { searchToken });
             }
 
             PagingElementsViewModel<AdminUserBasicServiceModel> model = new PagingElementsViewModel<AdminUserBasicServiceModel>
@@ -54,9 +54,9 @@
                 }
             };
 
-            if (page > model.Pagination.TotalPages && model.Pagination.TotalPages != 0)
+            if (page > 1 && page > model.Pagination.TotalPages)
             {
-                return RedirectToAction(nameof(Index), new { page = model.Pagination.TotalPages });
+                return RedirectToAction(nameof(Index), new { searchToken });
             }
 
             return View(model);
@@ -107,16 +107,15 @@
         public async Task<IActionResult> AddToRole(UserWithRoleFormViewModel model)
         {
             bool isRoleExisting = await this.roleManager.RoleExistsAsync(model.Role);
-            bool isUserExisting = await this.userManager.FindByNameAsync(model.Username) != null;
 
-            if (!ModelState.IsValid || !isRoleExisting || !isUserExisting)
+            User user = await this.userManager.FindByNameAsync(model.Username);
+
+            if (!ModelState.IsValid || !isRoleExisting || user == null)
             {
                 TempData.AddErrorMessage(InvalidIdentityDetailsErroMessage);
 
                 return RedirectToAction(nameof(Details), new { model.Username });
             }
-
-            User user = await this.userManager.FindByNameAsync(model.Username);
 
             IdentityResult addToRoleResult = await this.userManager.AddToRoleAsync(user, model.Role);
 
@@ -140,16 +139,15 @@
         public async Task<IActionResult> RemoveFromRole(UserWithRoleFormViewModel model)
         {
             bool isRoleExisting = await this.roleManager.RoleExistsAsync(model.Role);
-            bool isUserExisting = await this.userManager.FindByNameAsync(model.Username) != null;
 
-            if (!ModelState.IsValid || !isRoleExisting || !isUserExisting)
+            User user = await this.userManager.FindByNameAsync(model.Username);
+
+            if (!ModelState.IsValid || !isRoleExisting || user == null)
             {
                 TempData.AddErrorMessage(InvalidIdentityDetailsErroMessage);
 
                 return RedirectToAction(nameof(Details), new { model.Username });
             }
-
-            User user = await this.userManager.FindByNameAsync(model.Username);
 
             IdentityResult removeFromRoleResult = await this.userManager.RemoveFromRoleAsync(user, model.Role);
 

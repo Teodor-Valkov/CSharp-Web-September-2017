@@ -2,6 +2,9 @@
 
 @{
     ViewData["Title"] = "Review Details";
+    string area = User.IsInRole(WebConstants.ModeratorRole)
+        ? "Moderator"
+        : string.Empty;
 }
 
 <div class="row">
@@ -12,7 +15,16 @@
         <br />
         <br />
         <div>
-            <img id="review-details-image" class="text-center" src="@Model.Picture" alt="supplement-picture">
+            <a asp-area="@area" asp-controller="Supplements" asp-action="Details" asp-route-id="@Model.SupplementId" asp-route-name="@Model.SupplementName" asp-route-returnUrl=@Context.Request.Path>
+                @if (Model.Picture == string.Empty)
+                {
+                    <img id="review-details-image" src="~/images/image-not-found.jpg" alt="supplement-picture">
+                }
+                else
+                {
+                    <img id="review-details-image" src="@Model.Picture" alt="supplement-picture">
+                }
+            </a>
         </div>
         <br />
         <br />
@@ -21,37 +33,7 @@
             <p><em>Author: @Model.Author</em></p>
         </div>
         <div>
-            <a asp-area="" asp-controller="Reviews" asp-action="Index" class="btn btn-default btn-sm">Back</a>
-            @if (this.User.IsInRole(WebConstants.ModeratorRole))
-            {
-                <a asp-area="" asp-controller="Reviews" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-sm">Edit</a>
-                if (Model.IsDeleted)
-                {
-                    <a asp-area="Moderator" asp-controller="Reviews" asp-action="Restore" asp-route-id="@Model.Id" class="btn btn-success btn-sm">Restore</a>
-                }
-                else
-                {
-                    @Html.ActionLink("Delete", "Delete", "Reviews", new { id = Model.Id },
-                                      new
-                                      {
-                                          @class = "btn btn-danger btn-sm",
-                                          onclick = $"return confirm('Are you sure you want to delete this review?');"
-                                      })
-                }
-            }
-            else if (this.User.Identity.Name == Model.Author)
-            {
-                <a asp-area="" asp-controller="Reviews" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-sm">Edit</a>
-                if (!Model.IsDeleted)
-                {
-                    @Html.ActionLink("Delete", "Delete", "Reviews", new { id = Model.Id },
-                                       new
-                                       {
-                                           @class = "btn btn-danger btn-sm",
-                                           onclick = $"return confirm('Are you sure you want to delete this review?');"
-                                       })
-                }
-            }
+            <a asp-area="@area" asp-controller="Reviews" asp-action="Index" class="btn btn-default btn-sm">Back</a>
         </div>
     </div>
 </div>

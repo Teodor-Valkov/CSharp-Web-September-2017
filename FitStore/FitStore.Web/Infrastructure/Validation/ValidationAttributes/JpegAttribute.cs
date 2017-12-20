@@ -1,8 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace FitStore.Web.Infrastructure.Validation.ValidationAttributes
+﻿namespace FitStore.Web.Infrastructure.Validation.ValidationAttributes
 {
     using Microsoft.AspNetCore.Http;
+    using System.ComponentModel.DataAnnotations;
 
     using static Common.CommonMessages;
 

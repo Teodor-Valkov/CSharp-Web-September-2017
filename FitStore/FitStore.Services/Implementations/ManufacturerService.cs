@@ -3,7 +3,6 @@
     using AutoMapper.QueryableExtensions;
     using Contracts;
     using Data;
-    using Data.Models;
     using Microsoft.EntityFrameworkCore;
     using Models.Manufacturers;
     using System.Collections.Generic;
@@ -27,8 +26,8 @@
                 .Manufacturers
                 .Where(m => m.IsDeleted == false)
                 .OrderBy(m => m.Name)
-                .Skip((page - 1) * SupplementPageSize)
-                .Take(SupplementPageSize)
+                .Skip((page - 1) * ManufacturerPageSize)
+                .Take(ManufacturerPageSize)
                 .ProjectTo<ManufacturerAdvancedServiceModel>()
                 .ToListAsync();
         }
@@ -76,7 +75,7 @@
             return await this.database
                 .Manufacturers
                 .Where(m => m.Id == manufacturerId)
-                .SumAsync(m => m.Supplements.Count(sup => sup.IsDeleted == false));
+                .SumAsync(m => m.Supplements.Count(s => s.IsDeleted == false));
         }
     }
 }

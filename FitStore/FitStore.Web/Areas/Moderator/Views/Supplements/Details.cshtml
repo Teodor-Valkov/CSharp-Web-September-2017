@@ -54,19 +54,9 @@
             {
                 <a class="btn btn-success" asp-area="" asp-controller="Orders" asp-action="Add" asp-route-id="@Model.Element.Id">Buy</a>
             }
-            <a asp-area="Manager" asp-controller="Supplements" asp-action="Edit" asp-route-id="@Model.Element.Id" asp-route-name="@Model.Element.Name" class="btn btn-warning">Edit</a>
-            @if (Model.Element.IsDeleted)
-            {
-                <a asp-area="Manager" asp-controller="Supplements" asp-action="Restore" asp-route-id="@Model.Element.Id" asp-route-name="@Model.Element.Name" class="btn btn-success">Restore</a>
-            }
             else
             {
-                @Html.ActionLink("Delete", "Delete", "Supplements", new { area = "Manager", id = Model.Element.Id, name = Model.Element.Name },
-                                                                                                      new
-                                                                                                      {
-                                                                                                          @class = "btn btn-danger",
-                                                                                                          onclick = $"return confirm('Are you sure you want to delete this supplement?');"
-                                                                                                      })
+                <a class="btn btn-danger disabled">Buy</a>
             }
         </div>
         <br />
@@ -90,22 +80,22 @@
                 <div class="text-right"><em>Publish Date: @comment.PublishDate.ToShortDateString()</em></div>
                 <br />
                 <div class="text-right">
-                    @if (this.User.Identity.Name == comment.Author || this.User.IsInRole(WebConstants.ModeratorRole))
+                    @if (User.Identity.Name == comment.Author || User.IsInRole(WebConstants.ModeratorRole))
                     {
                         <a asp-area="" asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.Id" class="btn btn-warning btn-sm">Edit</a>
 
-                        @Html.ActionLink("Delete", "Delete", "Comments", new { id = comment.Id, supplementId = Model.Element.Id },
-                                                                                                           new
-                                                                                                           {
-                                                                                                               @class = "btn btn-danger btn-sm",
-                                                                                                               onclick = $"return confirm('Are you sure you want to delete this comment?');"
+                        @Html.ActionLink("Delete", "Delete", "Comments", new { area = string.Empty, id = comment.Id, supplementId = Model.Element.Id },
+                                                                              new
+                                                                              {
+                                                                                  @class = "btn btn-danger btn-sm",
+                                                                                  onclick = $"return confirm('Are you sure you want to delete this comment?');"
 
-                                                                                                           })
+                                                                              })
                     }
                 </div>
             </div>
         }
-        else if (comment.IsDeleted && this.User.IsInRole(WebConstants.ModeratorRole))
+        else if (comment.IsDeleted && User.IsInRole(WebConstants.ModeratorRole))
         {
             <div class="col-md-offset-2 col-md-8 well">
                 <p class="text-justify">@comment.Content</p>
@@ -113,7 +103,6 @@
                 <div class="text-right"><em>Publish Date: @comment.PublishDate.ToShortDateString()</em></div>
                 <br />
                 <div class="text-right">
-                    <a asp-area="" asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.Id" class="btn btn-warning btn-sm">Edit</a>
                     <a asp-area="Moderator" asp-controller="Comments" asp-action="Restore" asp-route-id="@comment.Id" asp-route-supplementId="@Model.Element.Id" class="btn btn-success btn-sm">Restore</a>
                 </div>
             </div>

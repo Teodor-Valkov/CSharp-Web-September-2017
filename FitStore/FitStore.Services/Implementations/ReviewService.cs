@@ -2,8 +2,8 @@
 {
     using AutoMapper.QueryableExtensions;
     using Contracts;
-    using FitStore.Data;
-    using FitStore.Data.Models;
+    using Data;
+    using Data.Models;
     using Microsoft.EntityFrameworkCore;
     using Models.Reviews;
     using System;

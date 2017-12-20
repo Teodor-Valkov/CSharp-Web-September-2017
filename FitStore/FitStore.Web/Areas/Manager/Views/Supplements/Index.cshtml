@@ -68,7 +68,7 @@ else
                         if (!supplement.IsDeleted)
                         {
                             <td>
-                                <a asp-area="Moderator" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">
+                                <a asp-area="Moderator" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl=@Context.Request.Path>
                                     <img id="supplements-index-image" src="@supplement.Picture" alt="supplement-picture">
                                 </a>
                             </td>
@@ -85,7 +85,7 @@ else
                         if (!supplement.IsDeleted)
                         {
                             <td>
-                                <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@ViewData["ReturnUrl"]">
+                                <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl=@Context.Request.Path>
                                     <img id="supplements-index-image" src="@supplement.Picture" alt="supplement-picture">
                                 </a>
                             </td>
@@ -108,14 +108,14 @@ else
                         }
                         else
                         {
-                            <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" class="btn btn-primary" asp-route-returnUrl="@ViewData["ReturnUrl"]">Details</a>
+                            <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" class="btn btn-primary" asp-route-returnUrl=@Context.Request.Path>Details</a>
                             <a asp-area="Manager" asp-controller="Supplements" asp-action="Edit" asp-route-id="@supplement.Id" class="btn btn-warning">Edit</a>
                             @Html.ActionLink("Delete", "Delete", "Supplements", new { area = "Manager", id = supplement.Id },
-                                                                                                                                                                                                                                                                                                             new
-                                                                                                                                                                                                                                                                                                             {
-                                                                                                                                                                                                                                                                                                                 @class = "btn btn-danger",
-                                                                                                                                                                                                                                                                                                                 onclick = $"return confirm('Are you sure you want to delete this supplement?');"
-                                                                                                                                                                                                                                                                                                             })
+                                                                                                                                                                                                                                                                                                                  new
+                                                                                                                                                                                                                                                                                                                  {
+                                                                                                                                                                                                                                                                                                                      @class = "btn btn-danger",
+                                                                                                                                                                                                                                                                                                                      onclick = $"return confirm('Are you sure you want to delete this supplement?');"
+                                                                                                                                                                                                                                                                                                                  })
                         }
                     </td>
                 </tr>

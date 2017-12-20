@@ -33,8 +33,8 @@
             return await manufacturers
                .Where(m => m.IsDeleted == isDeleted)
                .OrderBy(m => m.Name)
-               .Skip((page - 1) * SupplementPageSize)
-               .Take(SupplementPageSize)
+               .Skip((page - 1) * ManufacturerPageSize)
+               .Take(ManufacturerPageSize)
                .ProjectTo<ManufacturerAdvancedServiceModel>()
                .ToListAsync();
         }

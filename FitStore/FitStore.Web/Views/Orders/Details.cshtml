@@ -36,8 +36,15 @@
                 {
                     <tr class="text-center">
                         <td>
-                            <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name">
-                                <img id="supplements-index-image" src="@supplement.Picture" alt="supplement-picture">
+                            <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl="@Context.Request.Path">
+                                @if (supplement.Picture == string.Empty)
+                                {
+                                    <img id="supplements-index-image" src="~/images/image-not-found.jpg" alt="supplement-picture">
+                                }
+                                else
+                                {
+                                    <img id="supplements-index-image" src="@supplement.Picture" alt="supplement-picture">
+                                }
                             </a>
                         </td>
                         <td>@supplement.Name</td>

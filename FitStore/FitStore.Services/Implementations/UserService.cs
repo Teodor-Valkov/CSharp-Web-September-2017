@@ -51,41 +51,57 @@
 
         public async Task<bool> EditProfileAsync(User user, string fullName, string email, string address, string phoneNumber, DateTime birthDate)
         {
+            bool isEdited = false;
+
             if (user.FullName != fullName)
             {
                 user.FullName = fullName;
+                isEdited = true;
             }
 
             if (user.Email != email)
             {
                 await this.userManager.SetEmailAsync(user, email);
+                isEdited = true;
             }
 
             if (user.Address != address)
             {
                 user.Address = address;
+                isEdited = true;
             }
 
             if (user.PhoneNumber != phoneNumber)
             {
                 await this.userManager.SetPhoneNumberAsync(user, phoneNumber);
+                isEdited = true;
             }
 
             if (user.BirthDate != birthDate)
             {
                 user.BirthDate = birthDate;
+                isEdited = true;
             }
 
-            IdentityResult editProfileResult = await this.userManager.UpdateAsync(user);
+            if (isEdited)
+            {
+                await this.userManager.UpdateAsync(user);
+            }
 
-            return editProfileResult.Succeeded;
+            return isEdited;
         }
 
         public async Task<bool> ChangePasswordAsync(User user, string oldPassword, string newPassword)
         {
-            IdentityResult changePasswordResult = await this.userManager.ChangePasswordAsync(user, oldPassword, newPassword);
+            bool isChanged = false;
 
-            return changePasswordResult.Succeeded;
+            if (oldPassword != newPassword)
+            {
+                await this.userManager.ChangePasswordAsync(user, oldPassword, newPassword);
+                isChanged = true;
+            }
+
+            return isChanged;
         }
 
         public async Task<bool> IsUserRestricted(string username)

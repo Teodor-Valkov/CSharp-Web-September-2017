@@ -26,6 +26,7 @@
         public string PhoneNumber { get; set; }
 
         [DataType(DataType.Date)]
+        [Display(Name = UserBirthDateName)]
         public DateTime BirthDate { get; set; }
 
         public IEnumerable<OrderBasicServiceModel> Orders { get; set; }
