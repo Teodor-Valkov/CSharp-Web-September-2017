@@ -2,18 +2,17 @@
 {
     using System.ComponentModel.DataAnnotations;
 
+    using static Common.CommonMessages;
     using static Data.DataConstants;
 
     public class ManufacturerFormViewModel
     {
         [Required]
-        [MinLength(ManufacturerNameMinLength)]
-        [MaxLength(ManufacturerNameMaxLength)]
+        [StringLength(ManufacturerNameMaxLength, ErrorMessage = FieldLengthErrorMessage, MinimumLength = ManufacturerNameMinLength)]
         public string Name { get; set; }
 
         [Required]
-        [MinLength(ManufacturerAddressMinLength)]
-        [MaxLength(ManufacturerAddressMaxLength)]
+        [StringLength(ManufacturerAddressMaxLength, ErrorMessage = FieldLengthErrorMessage, MinimumLength = ManufacturerAddressMinLength)]
         public string Address { get; set; }
     }
 }

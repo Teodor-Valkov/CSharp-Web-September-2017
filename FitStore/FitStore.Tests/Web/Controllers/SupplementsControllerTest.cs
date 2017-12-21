@@ -121,10 +121,9 @@
         [Fact]
         public async Task Details_WithCorrectSupplementIdAndCorrectPageAndIncorrectReturnUrl_ShouldChangeReturnUrlAndReturnValidPaginationModelAndValidViewModel()
         {
+            string expectedReturnUrl = "IncorrectUrl";
             const int page = 1;
             const int totalElements = CommentPageSize;
-
-            string returnUrl = null;
 
             //Arrange
             Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
@@ -145,21 +144,24 @@
             urlHelper
                 .Setup(u => u.IsLocalUrl(It.IsAny<string>()))
                 .Returns(false)
-                .Callback((string url) => { returnUrl = url; });
+                .Callback((string url) => { expectedReturnUrl = url; });
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
 
             SupplementsController supplementsController = new SupplementsController(supplementService.Object)
             {
-                Url = urlHelper.Object
+                Url = urlHelper.Object,
+                TempData = tempData.Object
             };
 
             //Act
-            var result = await supplementsController.Details(supplementId, supplementName, returnUrl, page);
+            var result = await supplementsController.Details(supplementId, supplementName, expectedReturnUrl, page);
 
             //Assert
             result.Should().BeOfType<ViewResult>();
 
             result.As<ViewResult>().ViewData.Should().ContainKey("ReturnUrl");
-            result.As<ViewResult>().ViewData.Should().ContainValue($"/{Home.ToLower()}/{nameof(HomeController.Index).ToLower()}");
+            result.As<ViewResult>().ViewData.Should().ContainValue("/");
 
             result.As<ViewResult>().Model.Should().BeOfType<PagingElementViewModel<SupplementDetailsServiceModel>>();
 
@@ -201,9 +203,12 @@
                 .Setup(u => u.IsLocalUrl(It.IsAny<string>()))
                 .Returns(true);
 
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+
             SupplementsController supplementsController = new SupplementsController(supplementService.Object)
             {
-                Url = urlHelper.Object
+                Url = urlHelper.Object,
+                TempData = tempData.Object
             };
 
             //Act
@@ -255,9 +260,12 @@
                 .Setup(u => u.IsLocalUrl(It.IsAny<string>()))
                 .Returns(true);
 
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+
             SupplementsController supplementsController = new SupplementsController(supplementService.Object)
             {
-                Url = urlHelper.Object
+                Url = urlHelper.Object,
+                TempData = tempData.Object
             };
 
             //Act

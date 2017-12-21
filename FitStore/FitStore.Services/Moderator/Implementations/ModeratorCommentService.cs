@@ -7,6 +7,9 @@
     using System.Linq;
     using System.Threading.Tasks;
 
+    using static Common.CommonConstants;
+    using static Common.CommonMessages;
+
     public class ModeratorCommentService : IModeratorCommentService
     {
         private readonly FitStoreDbContext database;
@@ -16,7 +19,7 @@
             this.database = database;
         }
 
-        public async Task<bool> RestoreAsync(int commentId)
+        public async Task<string> RestoreAsync(int commentId)
         {
             Comment comment = await this.database
                 .Comments
@@ -28,14 +31,14 @@
 
             if (supplement.IsDeleted)
             {
-                return false;
+                return string.Format(EntityNotExists, SupplementEntity);
             }
 
             comment.IsDeleted = false;
 
             await this.database.SaveChangesAsync();
 
-            return true;
+            return string.Empty;
         }
     }
 }

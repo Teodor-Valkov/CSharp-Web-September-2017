@@ -28,7 +28,7 @@
         public const string SupplementRemovedFromCartSuccessMessage = "Supplement was successfully removed from your cart.";
 
         public const string SupplementUnavailableErrorMessage = "This supplement is currently out of stock.";
-        public const string SupplementLastOneJustAddedErrorMessage = "You already added the last available supplement in your cart.";
+        public const string SupplementLastOneJustAddedErrorMessage = "You have already added the last available supplement in your cart.";
 
         public const string CancelOrderSuccessMessage = "Your order was successfully canceled.";
         public const string FinishOrderSuccessMessage = "Thank you for your order.";
@@ -38,5 +38,10 @@
 
         public const string SupplementPictureErrorMessage = "Only pictures in Jpeg format are allowed.";
         public const string SupplementBestBeforeDateErrorMessage = "Best before date should be in the future.";
+        public const string SupplementPriceErrorMessage = "Price should be positive number.";
+        public const string SupplementQuantityErrorMessage = "Quantity should be positive number.";
+
+        public const string PasswordsDoNotMatch = "The Password and Confirmation password do not match.";
+        public const string FieldLengthErrorMessage = "The {0} must be at least {2} and less than {1} characters long.";
     }
 }

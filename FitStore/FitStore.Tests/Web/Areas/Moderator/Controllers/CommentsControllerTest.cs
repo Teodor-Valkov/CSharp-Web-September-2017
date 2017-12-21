@@ -75,13 +75,13 @@
                 .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
                 .Callback((string key, object message) => errorMessage = message as string);
 
-            CommentsController commentsController = new CommentsController(null, commentService.Object, null)
+            CommentsController commentsController = new CommentsController(null, commentService.Object)
             {
                 TempData = tempData.Object
             };
 
             //Act
-            var result = await commentsController.Restore(nonExistingCommentId, supplementId);
+            var result = await commentsController.Restore(nonExistingCommentId, supplementId, null);
 
             //Assert
             errorMessage.Should().Be(string.Format(EntityNotFound, CommentEntity));
@@ -93,134 +93,44 @@
         }
 
         [Fact]
-        public async Task Restore_WithIncorrectSupplementId_ShouldReturnErrorMessageAndReturnToHomeIndex()
-        {
-            string errorMessage = null;
-
-            //Arrange
-            Mock<ICommentService> commentService = new Mock<ICommentService>();
-            commentService
-                .Setup(c => c.IsCommentExistingById(commentId, true))
-                .ReturnsAsync(true);
-
-            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
-            supplementService
-                .Setup(s => s.IsSupplementExistingById(nonExistingSupplementId, true))
-                .ReturnsAsync(false);
-
-            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
-            tempData
-                .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
-                .Callback((string key, object message) => errorMessage = message as string);
-
-            CommentsController commentsController = new CommentsController(null, commentService.Object, supplementService.Object)
-            {
-                TempData = tempData.Object
-            };
-
-            //Act
-            var result = await commentsController.Restore(commentId, nonExistingSupplementId);
-
-            //Assert
-            errorMessage.Should().Be(string.Format(EntityNotFound, SupplementEntity));
-
-            result.Should().BeOfType<RedirectToActionResult>();
-
-            result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
-            result.As<RedirectToActionResult>().ControllerName.Should().Be("Home");
-        }
-
-        [Fact]
-        public async Task Restore_WithUserNotModerator_ShouldReturnToHomeIndex()
-        {
-            //Arrange
-            Mock<ICommentService> commentService = new Mock<ICommentService>();
-            commentService
-                .Setup(c => c.IsCommentExistingById(commentId, true))
-                .ReturnsAsync(true);
-
-            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
-            supplementService
-                .Setup(s => s.IsSupplementExistingById(supplementId, true))
-                .ReturnsAsync(true);
-
-            Mock<HttpContext> httpContext = new Mock<HttpContext>();
-            httpContext
-                .Setup(h => h.User.IsInRole(It.IsAny<string>()))
-                .Returns(false);
-
-            CommentsController commentsController = new CommentsController(null, commentService.Object, supplementService.Object)
-            {
-                ControllerContext = new ControllerContext
-                {
-                    HttpContext = httpContext.Object
-                }
-            };
-
-            //Act
-            var result = await commentsController.Restore(commentId, supplementId);
-
-            //Assert
-            result.Should().BeOfType<RedirectToActionResult>();
-
-            result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
-            result.As<RedirectToActionResult>().ControllerName.Should().Be("Home");
-        }
-
-        [Fact]
         public async Task Restore_WithCorrectDataAndNotRestoredComment_ShouldReturnErrorMessageAndRedirectToModeratorSupplementsDetails()
         {
             string errorMessage = null;
+            string notRestored = "Not Restored.";
 
             //Arrange
             Mock<ICommentService> commentService = new Mock<ICommentService>();
             commentService
                 .Setup(c => c.IsCommentExistingById(commentId, true))
-                .ReturnsAsync(true);
-
-            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
-            supplementService
-                .Setup(s => s.IsSupplementExistingById(supplementId, true))
                 .ReturnsAsync(true);
 
             Mock<IModeratorCommentService> moderatorCommentService = new Mock<IModeratorCommentService>();
             moderatorCommentService
                 .Setup(m => m.RestoreAsync(commentId))
-                .ReturnsAsync(false);
+                .ReturnsAsync(notRestored);
 
             Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
             tempData
                 .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
                 .Callback((string key, object message) => errorMessage = message as string);
 
-            Mock<HttpContext> httpContext = new Mock<HttpContext>();
-            httpContext
-                .Setup(h => h.User.IsInRole(It.IsAny<string>()))
-                .Returns(true);
-
-            CommentsController commentsController = new CommentsController(moderatorCommentService.Object, commentService.Object, supplementService.Object)
+            CommentsController commentsController = new CommentsController(moderatorCommentService.Object, commentService.Object)
             {
-                TempData = tempData.Object,
-                ControllerContext = new ControllerContext
-                {
-                    HttpContext = httpContext.Object
-                }
+                TempData = tempData.Object
             };
 
             //Act
-            var result = await commentsController.Restore(commentId, supplementId);
+            var result = await commentsController.Restore(commentId, supplementId, null);
 
             //Assert
-            errorMessage.Should().Be(string.Format(EntityNotRestored, CommentEntity));
+            errorMessage.Should().Be(string.Format(EntityNotRestored, CommentEntity) + notRestored);
 
             result.Should().BeOfType<RedirectToActionResult>();
 
-            result.As<RedirectToActionResult>().ActionName.Should().Be("Details");
-            result.As<RedirectToActionResult>().ControllerName.Should().Be("Supplements");
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
+            result.As<RedirectToActionResult>().ControllerName.Should().Be("Home");
             result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("area");
-            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(ModeratorArea);
-            result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("id");
-            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(supplementId);
+            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(string.Empty);
         }
 
         [Fact]
@@ -234,49 +144,33 @@
                 .Setup(c => c.IsCommentExistingById(commentId, true))
                 .ReturnsAsync(true);
 
-            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
-            supplementService
-                .Setup(s => s.IsSupplementExistingById(supplementId, true))
-                .ReturnsAsync(true);
-
             Mock<IModeratorCommentService> moderatorCommentService = new Mock<IModeratorCommentService>();
             moderatorCommentService
                 .Setup(m => m.RestoreAsync(commentId))
-                .ReturnsAsync(true);
+                .ReturnsAsync(string.Empty);
 
             Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
             tempData
                 .SetupSet(t => t[TempDataSuccessMessageKey] = It.IsAny<string>())
                 .Callback((string key, object message) => successMessage = message as string);
 
-            Mock<HttpContext> httpContext = new Mock<HttpContext>();
-            httpContext
-                .Setup(h => h.User.IsInRole(It.IsAny<string>()))
-                .Returns(true);
-
-            CommentsController commentsController = new CommentsController(moderatorCommentService.Object, commentService.Object, supplementService.Object)
+            CommentsController commentsController = new CommentsController(moderatorCommentService.Object, commentService.Object)
             {
-                TempData = tempData.Object,
-                ControllerContext = new ControllerContext
-                {
-                    HttpContext = httpContext.Object
-                }
+                TempData = tempData.Object
             };
 
             //Act
-            var result = await commentsController.Restore(commentId, supplementId);
+            var result = await commentsController.Restore(commentId, supplementId, null);
 
             //Assert
             successMessage.Should().Be(string.Format(EntityRestored, CommentEntity));
 
             result.Should().BeOfType<RedirectToActionResult>();
 
-            result.As<RedirectToActionResult>().ActionName.Should().Be("Details");
-            result.As<RedirectToActionResult>().ControllerName.Should().Be("Supplements");
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
+            result.As<RedirectToActionResult>().ControllerName.Should().Be("Home");
             result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("area");
-            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(ModeratorArea);
-            result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("id");
-            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(supplementId);
+            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(string.Empty);
         }
     }
 }

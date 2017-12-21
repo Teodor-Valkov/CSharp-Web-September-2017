@@ -31,7 +31,7 @@
             this.userService = userService;
         }
 
-        public async Task<IActionResult> Create(int id)
+        public async Task<IActionResult> Create(int id, string returnUrl)
         {
             bool isSupplementExisting = await this.supplementService.IsSupplementExistingById(id, false);
 
@@ -53,24 +53,23 @@
                 return this.RedirectToHomeIndex();
             }
 
-            CommentFormViewModel model = new CommentFormViewModel();
-
-            ViewData["SupplementId"] = id;
+            CommentFormViewModel model = new CommentFormViewModel()
+            {
+                SupplementId = id
+            };
 
             return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(int id, CommentFormViewModel model)
+        public async Task<IActionResult> Create(string returnUrl, CommentFormViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                ViewData["SupplementId"] = id;
-
                 return View(model);
             }
 
-            bool isSupplementExisting = await this.supplementService.IsSupplementExistingById(id, false);
+            bool isSupplementExisting = await this.supplementService.IsSupplementExistingById(model.SupplementId, false);
 
             if (!isSupplementExisting)
             {
@@ -92,14 +91,21 @@
 
             string userId = this.userManager.GetUserId(User);
 
-            await this.commentService.CreateAsync(model.Content, userId, id);
+            await this.commentService.CreateAsync(model.Content, userId, model.SupplementId);
 
             TempData.AddSuccessMessage(string.Format(EntityCreated, CommentEntity));
 
-            return this.RedirectToAction(nameof(SupplementsController.Details), Supplements, new { id });
+            bool isUserModerator = User.IsInRole(ModeratorRole);
+
+            if (isUserModerator)
+            {
+                return RedirectToAction(nameof(SupplementsController.Details), Supplements, new { area = ModeratorArea, id = model.SupplementId, returnUrl });
+            }
+
+            return this.RedirectToAction(nameof(SupplementsController.Details), Supplements, new { id = model.SupplementId, returnUrl });
         }
 
-        public async Task<IActionResult> Edit(int id, int supplementId)
+        public async Task<IActionResult> Edit(int id, int supplementId, string returnUrl)
         {
             bool isCommentExistingById = await this.commentService.IsCommentExistingById(id, false);
 
@@ -148,7 +154,7 @@
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, int supplementId, CommentFormViewModel model)
+        public async Task<IActionResult> Edit(int id, string returnUrl, CommentFormViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -164,7 +170,7 @@
                 return this.RedirectToHomeIndex();
             }
 
-            bool isSupplementExistingById = await this.supplementService.IsSupplementExistingById(supplementId, false);
+            bool isSupplementExistingById = await this.supplementService.IsSupplementExistingById(model.SupplementId, false);
 
             if (!isSupplementExistingById)
             {
@@ -207,10 +213,15 @@
 
             TempData.AddSuccessMessage(string.Format(EntityModified, CommentEntity));
 
-            return this.RedirectToAction(nameof(SupplementsController.Details), Supplements, new { id = supplementId });
+            if (isUserModerator)
+            {
+                return RedirectToAction(nameof(SupplementsController.Details), Supplements, new { area = ModeratorArea, id = model.SupplementId, returnUrl });
+            }
+
+            return this.RedirectToAction(nameof(SupplementsController.Details), Supplements, new { id = model.SupplementId, returnUrl });
         }
 
-        public async Task<IActionResult> Delete(int id, int supplementId)
+        public async Task<IActionResult> Delete(int id, int supplementId, string returnUrl)
         {
             bool isCommentExistingById = await this.commentService.IsCommentExistingById(id, false);
 
@@ -257,10 +268,10 @@
 
             if (isUserModerator)
             {
-                return RedirectToAction(nameof(SupplementsController.Details), Supplements, new { area = ModeratorArea, id = supplementId });
+                return RedirectToAction(nameof(SupplementsController.Details), Supplements, new { area = ModeratorArea, id = supplementId, returnUrl });
             }
 
-            return this.RedirectToAction(nameof(SupplementsController.Details), Supplements, new { id = supplementId });
+            return this.RedirectToAction(nameof(SupplementsController.Details), Supplements, new { id = supplementId, returnUrl });
         }
     }
 }

@@ -4,13 +4,13 @@
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
 
+    using static Common.CommonMessages;
     using static Data.DataConstants;
 
     public class ReviewFormViewModel
     {
         [Required]
-        [MinLength(ReviewContentMinLength)]
-        [MaxLength(ReviewContentMaxLength)]
+        [StringLength(ReviewContentMaxLength, ErrorMessage = FieldLengthErrorMessage, MinimumLength = ReviewContentMinLength)]
         public string Content { get; set; }
 
         [Range(1, 10)]

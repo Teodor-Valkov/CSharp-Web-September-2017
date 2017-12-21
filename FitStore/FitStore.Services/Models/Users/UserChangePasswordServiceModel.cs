@@ -5,6 +5,7 @@
     using System.ComponentModel.DataAnnotations;
 
     using static Common.CommonConstants;
+    using static Common.CommonMessages;
     using static Data.DataConstants;
 
     public class UserChangePasswordServiceModel : IMapFrom<User>
@@ -16,12 +17,11 @@
 
         [Required]
         [DataType(DataType.Password)]
-        [MinLength(UserPasswordMinLength, ErrorMessage = "The {0} must be at least {1} symbols long.")]
-        [MaxLength(UserPasswordMaxLength, ErrorMessage = "The {0} must be less than {1} characters long.")]
+        [StringLength(UserPasswordMaxLength, ErrorMessage = FieldLengthErrorMessage, MinimumLength = UserPasswordMinLength)]
         [Display(Name = UserPasswordName)]
         public string NewPassword { get; set; }
 
-        [Compare(nameof(NewPassword), ErrorMessage = "The password and confirmation password do not match.")]
+        [Compare(nameof(NewPassword), ErrorMessage = PasswordsDoNotMatch)]
         [DataType(DataType.Password)]
         [Display(Name = UserConfirmPasswordName)]
         public string ConfirmPassword { get; set; }

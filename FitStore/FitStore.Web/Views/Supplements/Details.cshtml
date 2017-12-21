@@ -59,7 +59,7 @@
         </div>
         <br />
         <div>
-            <a asp-area="" asp-controller="Comments" asp-action="Create" asp-route-id="@Model.Element.Id" class="btn btn-primary">Add Comment</a>
+            <a asp-area="" asp-controller="Comments" asp-action="Create" asp-route-id="@Model.Element.Id" asp-route-returnUrl="@ViewData["ReturnUrl"]" class="btn btn-primary">Add Comment</a>
             <a asp-area="" asp-controller="Reviews" asp-action="Create" asp-route-id="@Model.Element.Id" class="btn btn-primary">Add Review</a>
         </div>
         <br />
@@ -80,14 +80,14 @@
                 <div class="text-right">
                     @if (User.Identity.Name == comment.Author)
                     {
-                        <a asp-area="" asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.Id" class="btn btn-warning btn-sm">Edit</a>
-                        @Html.ActionLink("Delete", "Delete", "Comments", new { id = comment.Id, supplementId = Model.Element.Id },
-                                                                         new
-                                                                         {
-                                                                             @class = "btn btn-danger btn-sm",
-                                                                             onclick = $"return confirm('Are you sure you want to delete this comment?');"
+                        <a asp-area="" asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.Id" asp-route-supplementId="@Model.Element.Id" asp-route-returnUrl="@ViewData["ReturnUrl"]" class="btn btn-warning btn-sm">Edit</a>
+                        @Html.ActionLink("Delete", "Delete", "Comments", new { id = comment.Id, supplementId = Model.Element.Id, returnUrl = ViewData["ReturnUrl"] },
+                                                                                                                 new
+                                                                                                                 {
+                                                                                                                     @class = "btn btn-danger btn-sm",
+                                                                                                                     onclick = $"return confirm('Are you sure you want to delete this comment?');"
 
-                                                                         })
+                                                                                                                 })
                     }
                 </div>
             </div>

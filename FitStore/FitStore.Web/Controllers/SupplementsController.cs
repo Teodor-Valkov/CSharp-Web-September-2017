@@ -51,14 +51,26 @@
                 return RedirectToAction(nameof(Details), new { id, name });
             }
 
-            if (!Url.IsLocalUrl(returnUrl))
+            returnUrl = SetOrUpdateReturnUrl(returnUrl);
+
+            return View(model);
+        }
+
+        private string SetOrUpdateReturnUrl(string returnUrl)
+        {
+            if (!Url.IsLocalUrl(returnUrl) && returnUrl != null)
             {
                 returnUrl = this.ReturnToHomeIndex();
             }
 
-            ViewData["ReturnUrl"] = returnUrl;
+            if (returnUrl == null)
+            {
+                returnUrl = TempData["ReturnUrl"].ToString();
+            }
 
-            return View(model);
+            TempData["ReturnUrl"] = returnUrl;
+            ViewData["ReturnUrl"] = returnUrl;
+            return returnUrl;
         }
     }
 }

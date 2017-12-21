@@ -49,7 +49,7 @@
             return View(model);
         }
 
-        public async Task<IActionResult> Restore(int id)
+        public async Task<IActionResult> Restore(int id, int supplementId)
         {
             bool isReviewExistingById = await this.reviewService.IsReviewExistingById(id, true);
 
@@ -57,13 +57,6 @@
             {
                 TempData.AddErrorMessage(string.Format(EntityNotFound, ReviewEntity));
 
-                return this.RedirectToHomeIndex();
-            }
-
-            bool isUserModerator = User.IsInRole(ModeratorRole);
-
-            if (!isUserModerator)
-            {
                 return this.RedirectToHomeIndex();
             }
 

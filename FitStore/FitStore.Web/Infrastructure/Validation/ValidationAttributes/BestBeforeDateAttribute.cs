@@ -9,7 +9,7 @@
     {
         public BestBeforeDateAttribute()
         {
-            this.ErrorMessage = SupplementPictureErrorMessage;
+            this.ErrorMessage = SupplementBestBeforeDateErrorMessage;
         }
 
         public override bool IsValid(object value)

@@ -14,16 +14,14 @@
     {
         private readonly IModeratorCommentService moderatorCommentService;
         private readonly ICommentService commentService;
-        private readonly ISupplementService supplementService;
 
-        public CommentsController(IModeratorCommentService moderatorCommentService, ICommentService commentService, ISupplementService supplementService)
+        public CommentsController(IModeratorCommentService moderatorCommentService, ICommentService commentService)
         {
             this.moderatorCommentService = moderatorCommentService;
             this.commentService = commentService;
-            this.supplementService = supplementService;
         }
 
-        public async Task<IActionResult> Restore(int id, int supplementId)
+        public async Task<IActionResult> Restore(int id, int supplementId, string returnUrl)
         {
             bool isCommentExistingById = await this.commentService.IsCommentExistingById(id, true);
 
@@ -34,34 +32,18 @@
                 return this.RedirectToHomeIndex();
             }
 
-            bool isSupplementExistingById = await this.supplementService.IsSupplementExistingById(supplementId, true);
+            string restoreResult = await this.moderatorCommentService.RestoreAsync(id);
 
-            if (!isSupplementExistingById)
-            {
-                TempData.AddErrorMessage(string.Format(EntityNotFound, SupplementEntity));
-
-                return this.RedirectToHomeIndex();
-            }
-
-            bool isUserModerator = User.IsInRole(ModeratorRole);
-
-            if (!isUserModerator)
-            {
-                return this.RedirectToHomeIndex();
-            }
-
-            bool restoreResult = await this.moderatorCommentService.RestoreAsync(id);
-
-            if (restoreResult)
+            if (restoreResult == string.Empty)
             {
                 TempData.AddSuccessMessage(string.Format(EntityRestored, CommentEntity));
             }
             else
             {
-                TempData.AddErrorMessage(string.Format(EntityNotRestored, CommentEntity));
+                TempData.AddErrorMessage(string.Format(EntityNotRestored, CommentEntity) + restoreResult);
             }
 
-            return RedirectToAction(nameof(SupplementsController.Details), Supplements, new { area = ModeratorArea, id = supplementId });
+            return RedirectToHomeIndex();
         }
     }
 }

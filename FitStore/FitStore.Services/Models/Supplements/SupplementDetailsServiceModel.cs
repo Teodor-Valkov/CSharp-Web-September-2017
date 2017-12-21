@@ -16,6 +16,7 @@
     {
         public string Description { get; set; }
 
+        [Display(Name = SupplementBestBeforeDateName)]
         public DateTime BestBeforeDate { get; set; }
 
         [Display(Name = CategoryEntity)]

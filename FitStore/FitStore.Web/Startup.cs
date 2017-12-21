@@ -94,16 +94,6 @@
 
             app.UseMvc(routes =>
             {
-                //routes.MapRoute(
-                //    name: "managerCategories",
-                //    template: "Manager/Categories/{action}",
-                //    defaults: new { area = "Manager", controller = "Categories" });
-
-                //routes.MapRoute(
-                //    name: "managerManufacturers",
-                //    template: "Manager/Manufacturers/{action}",
-                //    defaults: new { area = "Manager", controller = "Manufacturers" });
-
                 routes.MapRoute(
                     name: "areas",
                     template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");

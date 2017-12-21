@@ -13,12 +13,12 @@
     {
         protected IActionResult RedirectToHomeIndex()
         {
-            return RedirectToAction(nameof(HomeController.Index), Home);
+            return RedirectToAction(nameof(HomeController.Index), Home, new { area = string.Empty });
         }
 
         protected string ReturnToHomeIndex()
         {
-            return $"/{Home.ToLower()}/{nameof(HomeController.Index).ToLower()}";
+            return $"/";
         }
     }
 }

@@ -27,7 +27,7 @@
         {
             if (page < 1)
             {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { searchToken });
             }
 
             PagingElementsViewModel<ModeratorUserBasicServiceModel> model = new PagingElementsViewModel<ModeratorUserBasicServiceModel>
@@ -44,7 +44,7 @@
 
             if (page > 1 && page > model.Pagination.TotalPages)
             {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { searchToken });
             }
 
             return View(model);

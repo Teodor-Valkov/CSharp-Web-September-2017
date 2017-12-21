@@ -5,13 +5,13 @@
     using System.ComponentModel.DataAnnotations;
 
     using static Common.CommonConstants;
+    using static Common.CommonMessages;
     using static Data.DataConstants;
 
     public class SubcategoryFormViewModel
     {
         [Required]
-        [MinLength(SubcategoryNameMinLength)]
-        [MaxLength(SubcategoryNameMaxLength)]
+        [StringLength(SubcategoryNameMaxLength, ErrorMessage = FieldLengthErrorMessage, MinimumLength = SubcategoryNameMinLength)]
         public string Name { get; set; }
 
         [Display(Name = CategoryEntity)]

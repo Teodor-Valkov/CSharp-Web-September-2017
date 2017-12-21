@@ -518,6 +518,68 @@
         }
 
         [Fact]
+        public async Task CreatePost_WithCorrectSupplementIdAndCorrectViewModelAndModerator_ShouldReturnSuccessMessageAndRedirectToModeratorReviewsIndex()
+        {
+            string successMessage = null;
+
+            //Arrange
+            Mock<UserManager<User>> userManager = UserManagerMock.New();
+            userManager
+                .Setup(u => u.GetUserId(It.IsAny<ClaimsPrincipal>()))
+                .Returns(authorId);
+
+            Mock<IUserService> userService = new Mock<IUserService>();
+            userService
+                .Setup(u => u.IsUserRestricted(username))
+                .ReturnsAsync(false);
+
+            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
+            supplementService
+                .Setup(s => s.IsSupplementExistingById(supplementId, false))
+                .ReturnsAsync(true);
+
+            Mock<IReviewService> reviewService = new Mock<IReviewService>();
+            reviewService
+                .Setup(r => r.CreateAsync(null, 0, null, 0))
+                .Returns(Task.CompletedTask);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataSuccessMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => successMessage = message as string);
+
+            Mock<HttpContext> httpContext = new Mock<HttpContext>();
+            httpContext
+                .Setup(h => h.User.Identity.Name)
+                .Returns(username);
+            httpContext
+                .Setup(h => h.User.IsInRole(ModeratorRole))
+                .Returns(true);
+
+            ReviewsController reviewsController = new ReviewsController(userManager.Object, reviewService.Object, supplementService.Object, userService.Object)
+            {
+                TempData = tempData.Object,
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = httpContext.Object
+                }
+            };
+
+            //Act
+            var result = await reviewsController.Create(supplementId, new ReviewFormViewModel());
+
+            //Assert
+            successMessage.Should().Be(string.Format(EntityCreated, ReviewEntity));
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
+            result.As<RedirectToActionResult>().ControllerName.Should().Be("Reviews");
+            result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("area");
+            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(ModeratorArea);
+        }
+
+        [Fact]
         public async Task EditGet_WithIncorrectReviewId_ShouldReturnErrorMessageAndReturnToHomeIndex()
         {
             string errorMessage = null;
@@ -964,8 +1026,65 @@
             httpContext
                 .Setup(h => h.User.Identity.Name)
                 .Returns(username);
+
+            ReviewsController reviewsController = new ReviewsController(userManager.Object, reviewService.Object, null, userService.Object)
+            {
+                TempData = tempData.Object,
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = httpContext.Object
+                }
+            };
+
+            //Act
+            var result = await reviewsController.Edit(reviewId, new ReviewFormViewModel());
+
+            //Assert
+            successMessage.Should().Be(string.Format(EntityModified, ReviewEntity));
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
+        }
+
+        [Fact]
+        public async Task EditPost_CorrectReviewIdAndCorrectViewModelAndModerator_ShouldReturnSuccessMessageAndReturnToModeratorReviewsIndex()
+        {
+            string successMessage = null;
+
+            //Arrange
+            Mock<UserManager<User>> userManager = UserManagerMock.New();
+            userManager
+                .Setup(u => u.GetUserId(It.IsAny<ClaimsPrincipal>()))
+                .Returns(authorId);
+
+            Mock<IUserService> userService = new Mock<IUserService>();
+            userService
+                .Setup(u => u.IsUserRestricted(username))
+                .ReturnsAsync(false);
+
+            Mock<IReviewService> reviewService = new Mock<IReviewService>();
+            reviewService
+                .Setup(r => r.IsReviewExistingById(reviewId, false))
+                .ReturnsAsync(true);
+            reviewService
+                .Setup(r => r.IsUserAuthor(reviewId, authorId))
+                .ReturnsAsync(true);
+            reviewService
+                .Setup(r => r.IsReviewModified(reviewId, null, 0))
+                .ReturnsAsync(true);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataSuccessMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => successMessage = message as string);
+
+            Mock<HttpContext> httpContext = new Mock<HttpContext>();
             httpContext
-                .Setup(h => h.User.IsInRole(It.IsAny<string>()))
+                .Setup(h => h.User.Identity.Name)
+                .Returns(username);
+            httpContext
+                .Setup(h => h.User.IsInRole(ModeratorRole))
                 .Returns(true);
 
             ReviewsController reviewsController = new ReviewsController(userManager.Object, reviewService.Object, null, userService.Object)
@@ -986,6 +1105,9 @@
             result.Should().BeOfType<RedirectToActionResult>();
 
             result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
+            result.As<RedirectToActionResult>().ControllerName.Should().Be("Reviews");
+            result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("area");
+            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(ModeratorArea);
         }
 
         [Fact]
@@ -1170,10 +1292,10 @@
 
             result.Should().BeOfType<RedirectToActionResult>();
 
-            result.As<RedirectToActionResult>().RouteValues.Keys.Contains("area");
-            result.As<RedirectToActionResult>().RouteValues.Values.Contains(ModeratorArea);
             result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
             result.As<RedirectToActionResult>().ControllerName.Should().Be("Reviews");
+            result.As<RedirectToActionResult>().RouteValues.Keys.Contains("area");
+            result.As<RedirectToActionResult>().RouteValues.Values.Contains(ModeratorArea);
         }
 
         [Fact]

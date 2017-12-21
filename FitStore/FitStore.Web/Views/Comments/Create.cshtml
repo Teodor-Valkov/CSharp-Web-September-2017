@@ -2,6 +2,10 @@
 
 @{
     ViewData["Title"] = "Create Comment";
+    
+    string area = User.IsInRole(WebConstants.ModeratorRole)
+        ? "Moderator"
+        : string.Empty;
 }
 
 <div class="row">
@@ -17,7 +21,8 @@
             @await Html.PartialAsync("_CommentForm", Model)
 
             <div class="text-center">
-                <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@ViewData["SupplementId"]" class="btn btn-default">Back</a>
+                <a asp-area="@area" asp-controller="Supplements" asp-action="Details" asp-route-id="@Model.SupplementId" class="btn btn-default">Back</a>
+                <input type="hidden" name="supplementId" value="@Model.SupplementId"/>
                 <input class="btn btn-success" type="submit" value="Comment" />
             </div>
         </form>

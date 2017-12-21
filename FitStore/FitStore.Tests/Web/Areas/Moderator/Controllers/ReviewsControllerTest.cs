@@ -25,6 +25,8 @@
     {
         private const int nonExistingReviewId = int.MaxValue;
         private const int reviewId = 1;
+        private const int nonExistingSupplementId = int.MaxValue;
+        private const int supplementId = 1;
 
         [Fact]
         public void ControllerShouldBeInModeratorArea()
@@ -203,43 +205,11 @@
             };
 
             //Act
-            var result = await reviewsController.Restore(nonExistingReviewId);
+            var result = await reviewsController.Restore(nonExistingReviewId, supplementId);
 
             //Assert
             errorMessage.Should().Be(string.Format(EntityNotFound, ReviewEntity));
 
-            result.Should().BeOfType<RedirectToActionResult>();
-
-            result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
-            result.As<RedirectToActionResult>().ControllerName.Should().Be("Home");
-        }
-
-        [Fact]
-        public async Task Restore_WithUserNotModerator_ShouldReturnToHomeIndex()
-        {
-            //Arrange
-            Mock<IReviewService> reviewService = new Mock<IReviewService>();
-            reviewService
-                .Setup(r => r.IsReviewExistingById(reviewId, true))
-                .ReturnsAsync(true);
-
-            Mock<HttpContext> httpContext = new Mock<HttpContext>();
-            httpContext
-                .Setup(h => h.User.IsInRole(It.IsAny<string>()))
-                .Returns(false);
-
-            ReviewsController reviewsController = new ReviewsController(null, reviewService.Object)
-            {
-                ControllerContext = new ControllerContext
-                {
-                    HttpContext = httpContext.Object
-                }
-            };
-
-            //Act
-            var result = await reviewsController.Restore(reviewId);
-
-            //Assert
             result.Should().BeOfType<RedirectToActionResult>();
 
             result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
@@ -267,22 +237,13 @@
                 .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
                 .Callback((string key, object message) => errorMessage = message as string);
 
-            Mock<HttpContext> httpContext = new Mock<HttpContext>();
-            httpContext
-                .Setup(h => h.User.IsInRole(It.IsAny<string>()))
-                .Returns(true);
-
             ReviewsController reviewsController = new ReviewsController(moderatorReviewService.Object, reviewService.Object)
             {
-                TempData = tempData.Object,
-                ControllerContext = new ControllerContext
-                {
-                    HttpContext = httpContext.Object
-                }
+                TempData = tempData.Object
             };
 
             //Act
-            var result = await reviewsController.Restore(reviewId);
+            var result = await reviewsController.Restore(reviewId, supplementId);
 
             //Assert
             errorMessage.Should().Be(string.Format(EntityNotRestored, ReviewEntity) + string.Format(EntityNotExists, SupplementEntity));
@@ -313,22 +274,13 @@
                 .SetupSet(t => t[TempDataSuccessMessageKey] = It.IsAny<string>())
                 .Callback((string key, object message) => successMessage = message as string);
 
-            Mock<HttpContext> httpContext = new Mock<HttpContext>();
-            httpContext
-                .Setup(h => h.User.IsInRole(It.IsAny<string>()))
-                .Returns(true);
-
             ReviewsController reviewsController = new ReviewsController(moderatorReviewService.Object, reviewService.Object)
             {
-                TempData = tempData.Object,
-                ControllerContext = new ControllerContext
-                {
-                    HttpContext = httpContext.Object
-                }
+                TempData = tempData.Object
             };
 
             //Act
-            var result = await reviewsController.Restore(reviewId);
+            var result = await reviewsController.Restore(reviewId, supplementId);
 
             //Assert
             successMessage.Should().Be(string.Format(EntityRestored, ReviewEntity));

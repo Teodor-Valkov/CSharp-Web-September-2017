@@ -148,6 +148,13 @@
 
             TempData.AddSuccessMessage(string.Format(EntityCreated, ReviewEntity));
 
+            bool isUserModerator = User.IsInRole(ModeratorRole);
+
+            if (isUserModerator)
+            {
+                return RedirectToAction(nameof(ReviewsController.Index), Reviews, new { area = ModeratorArea });
+            }
+
             return this.RedirectToAction(nameof(Index));
         }
 
@@ -249,6 +256,11 @@
             await this.reviewService.EditAsync(id, model.Content, model.Rating);
 
             TempData.AddSuccessMessage(string.Format(EntityModified, ReviewEntity));
+
+            if (isUserModerator)
+            {
+                return RedirectToAction(nameof(ReviewsController.Index), Reviews, new { area = ModeratorArea });
+            }
 
             return this.RedirectToAction(nameof(Index));
         }

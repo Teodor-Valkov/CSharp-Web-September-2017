@@ -13,7 +13,7 @@
 
         protected string ReturnToHomeIndex()
         {
-            return $"/{Home.ToLower()}/{nameof(HomeController.Index).ToLower()}";
+            return $"/";
         }
 
         protected string ReturnToCategoryDetails(int id, string name)

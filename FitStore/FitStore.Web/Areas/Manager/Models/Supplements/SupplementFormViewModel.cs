@@ -8,24 +8,23 @@
     using System.ComponentModel.DataAnnotations;
 
     using static Common.CommonConstants;
+    using static Common.CommonMessages;
     using static Data.DataConstants;
 
     public class SupplementFormViewModel
     {
         [Required]
-        [MinLength(SupplementNameMinLength)]
-        [MaxLength(SupplementNameMaxLength)]
+        [StringLength(SupplementNameMaxLength, ErrorMessage = FieldLengthErrorMessage, MinimumLength = SupplementNameMinLength)]
         public string Name { get; set; }
 
         [Required]
-        [MinLength(SupplementDescriptionMinLength)]
-        [MaxLength(SupplementDescriptionMaxLength)]
+        [StringLength(SupplementDescriptionMaxLength, ErrorMessage = FieldLengthErrorMessage, MinimumLength = SupplementDescriptionMinLength)]
         public string Description { get; set; }
 
-        [Range(0, int.MaxValue)]
+        [Range(0, int.MaxValue, ErrorMessage = SupplementQuantityErrorMessage)]
         public int Quantity { get; set; }
 
-        [Range(0, double.MaxValue)]
+        [Range(0, double.MaxValue, ErrorMessage = SupplementPriceErrorMessage)]
         public decimal Price { get; set; }
 
         [Required]

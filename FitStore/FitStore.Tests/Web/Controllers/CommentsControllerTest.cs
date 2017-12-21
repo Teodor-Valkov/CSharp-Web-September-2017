@@ -72,7 +72,7 @@
             };
 
             //Act
-            var result = await commentsController.Create(nonExistingSupplementId);
+            var result = await commentsController.Create(nonExistingSupplementId, null);
 
             //Assert
             errorMessage.Should().Be(string.Format(EntityNotFound, SupplementEntity));
@@ -119,7 +119,7 @@
             };
 
             //Act
-            var result = await commentsController.Create(supplementId);
+            var result = await commentsController.Create(supplementId, null);
 
             //Assert
             errorMessage.Should().Be(UserRestrictedErrorMessage);
@@ -158,14 +158,12 @@
             };
 
             //Act
-            var result = await commentsController.Create(supplementId);
+            var result = await commentsController.Create(supplementId, null);
 
             //Assert
             result.Should().BeOfType<ViewResult>();
 
             result.As<ViewResult>().Model.Should().BeOfType<CommentFormViewModel>();
-            result.As<ViewResult>().ViewData.Keys.Should().Contain("SupplementId");
-            result.As<ViewResult>().ViewData.Values.Should().Contain(supplementId);
         }
 
         [Fact]
@@ -177,13 +175,10 @@
             commentsController.ModelState.AddModelError(string.Empty, "Error");
 
             //Act
-            var result = await commentsController.Create(supplementId, new CommentFormViewModel());
+            var result = await commentsController.Create(null, new CommentFormViewModel());
 
             //Assert
             result.Should().BeOfType<ViewResult>();
-
-            result.As<ViewResult>().ViewData.Keys.Should().Contain("SupplementId");
-            result.As<ViewResult>().ViewData.Values.Should().Contain(supplementId);
 
             result.As<ViewResult>().Model.Should().BeOfType<CommentFormViewModel>();
         }
@@ -196,7 +191,7 @@
             //Arrange
             Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
             supplementService
-                .Setup(s => s.IsSupplementExistingById(supplementId, false))
+                .Setup(s => s.IsSupplementExistingById(nonExistingSupplementId, false))
                 .ReturnsAsync(false);
 
             Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
@@ -210,7 +205,7 @@
             };
 
             //Act
-            var result = await commentsController.Create(nonExistingSupplementId, new CommentFormViewModel());
+            var result = await commentsController.Create(null, new CommentFormViewModel() { SupplementId = nonExistingSupplementId });
 
             //Assert
             errorMessage.Should().Be(string.Format(EntityNotFound, SupplementEntity));
@@ -257,7 +252,7 @@
             };
 
             //Act
-            var result = await commentsController.Create(supplementId, new CommentFormViewModel());
+            var result = await commentsController.Create(null, new CommentFormViewModel() { SupplementId = supplementId });
 
             //Assert
             errorMessage.Should().Be(UserRestrictedErrorMessage);
@@ -314,7 +309,7 @@
             };
 
             //Act
-            var result = await commentsController.Create(supplementId, new CommentFormViewModel());
+            var result = await commentsController.Create(null, new CommentFormViewModel() { SupplementId = supplementId });
 
             //Assert
             successMessage.Should().Be(string.Format(EntityCreated, CommentEntity));
@@ -323,6 +318,70 @@
 
             result.As<RedirectToActionResult>().ActionName.Should().Be("Details");
             result.As<RedirectToActionResult>().ControllerName.Should().Be("Supplements");
+            result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("id");
+            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(supplementId);
+        }
+
+        [Fact]
+        public async Task CreatePost_WithCorrectSupplementIdAndCorrectViewModelAndModerator_ShouldReturnSuccessMessageAndRedirectToModeratorSupplementsDetails()
+        {
+            string successMessage = null;
+
+            //Arrange
+            Mock<UserManager<User>> userManager = UserManagerMock.New();
+            userManager
+                .Setup(u => u.GetUserId(It.IsAny<ClaimsPrincipal>()))
+                .Returns(authorId);
+
+            Mock<IUserService> userService = new Mock<IUserService>();
+            userService
+                .Setup(u => u.IsUserRestricted(username))
+                .ReturnsAsync(false);
+
+            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
+            supplementService
+                .Setup(s => s.IsSupplementExistingById(supplementId, false))
+                .ReturnsAsync(true);
+
+            Mock<ICommentService> commentService = new Mock<ICommentService>();
+            commentService
+                .Setup(c => c.CreateAsync(null, null, 0))
+                .Returns(Task.CompletedTask);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataSuccessMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => successMessage = message as string);
+
+            Mock<HttpContext> httpContext = new Mock<HttpContext>();
+            httpContext
+                .Setup(h => h.User.Identity.Name)
+                .Returns(username);
+            httpContext
+                .Setup(h => h.User.IsInRole(ModeratorRole))
+                .Returns(true);
+
+            CommentsController commentsController = new CommentsController(userManager.Object, commentService.Object, supplementService.Object, userService.Object)
+            {
+                TempData = tempData.Object,
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = httpContext.Object
+                }
+            };
+
+            //Act
+            var result = await commentsController.Create(null, new CommentFormViewModel() { SupplementId = supplementId });
+
+            //Assert
+            successMessage.Should().Be(string.Format(EntityCreated, CommentEntity));
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Details");
+            result.As<RedirectToActionResult>().ControllerName.Should().Be("Supplements");
+            result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("area");
+            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(ModeratorArea);
             result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("id");
             result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(supplementId);
         }
@@ -349,7 +408,7 @@
             };
 
             //Act
-            var result = await commentsController.Edit(nonExistingCommentId, supplementId);
+            var result = await commentsController.Edit(nonExistingCommentId, supplementId, null);
 
             //Assert
             errorMessage.Should().Be(string.Format(EntityNotFound, CommentEntity));
@@ -387,7 +446,7 @@
             };
 
             //Act
-            var result = await commentsController.Edit(commentId, nonExistingSupplementId);
+            var result = await commentsController.Edit(commentId, nonExistingSupplementId, null);
 
             //Assert
             errorMessage.Should().Be(string.Format(EntityNotFound, SupplementEntity));
@@ -439,7 +498,7 @@
             };
 
             //Act
-            var result = await commentsController.Edit(commentId, supplementId);
+            var result = await commentsController.Edit(commentId, supplementId, null);
 
             //Assert
             errorMessage.Should().Be(UserRestrictedErrorMessage);
@@ -502,7 +561,7 @@
             };
 
             //Act
-            var result = await commentsController.Edit(commentId, supplementId);
+            var result = await commentsController.Edit(commentId, supplementId, null);
 
             //Assert
             result.Should().BeOfType<RedirectToActionResult>();
@@ -558,7 +617,7 @@
             };
 
             //Act
-            var result = await commentsController.Edit(commentId, supplementId);
+            var result = await commentsController.Edit(commentId, supplementId, null);
 
             //Assert
             result.Should().BeOfType<ViewResult>();
@@ -575,7 +634,7 @@
             commentsController.ModelState.AddModelError(string.Empty, "Error");
 
             //Act
-            var result = await commentsController.Edit(commentId, supplementId, new CommentFormViewModel());
+            var result = await commentsController.Edit(commentId, null, new CommentFormViewModel() { SupplementId = supplementId });
 
             //Assert
             result.Should().BeOfType<ViewResult>();
@@ -605,7 +664,7 @@
             };
 
             //Act
-            var result = await commentsController.Edit(nonExistingCommentId, supplementId, new CommentFormViewModel());
+            var result = await commentsController.Edit(nonExistingCommentId, null, new CommentFormViewModel() { SupplementId = supplementId });
 
             //Assert
             errorMessage.Should().Be(string.Format(EntityNotFound, CommentEntity));
@@ -643,7 +702,7 @@
             };
 
             //Act
-            var result = await commentsController.Edit(commentId, nonExistingSupplementId, new CommentFormViewModel());
+            var result = await commentsController.Edit(commentId, null, new CommentFormViewModel() { SupplementId = nonExistingSupplementId });
 
             //Assert
             errorMessage.Should().Be(string.Format(EntityNotFound, SupplementEntity));
@@ -695,7 +754,7 @@
             };
 
             //Act
-            var result = await commentsController.Edit(commentId, supplementId, new CommentFormViewModel());
+            var result = await commentsController.Edit(commentId, null, new CommentFormViewModel() { SupplementId = supplementId });
 
             //Assert
             errorMessage.Should().Be(UserRestrictedErrorMessage);
@@ -758,7 +817,7 @@
             };
 
             //Act
-            var result = await commentsController.Edit(commentId, supplementId, new CommentFormViewModel());
+            var result = await commentsController.Edit(commentId, null, new CommentFormViewModel() { SupplementId = supplementId });
 
             //Assert
             result.Should().BeOfType<RedirectToActionResult>();
@@ -822,7 +881,7 @@
             };
 
             //Act
-            var result = await commentsController.Edit(commentId, supplementId, new CommentFormViewModel());
+            var result = await commentsController.Edit(commentId, null, new CommentFormViewModel() { SupplementId = supplementId });
 
             //Assert
             warningMessage.Should().Be(EntityNotModified);
@@ -873,8 +932,73 @@
             httpContext
                 .Setup(h => h.User.Identity.Name)
                 .Returns(username);
+
+            CommentsController commentsController = new CommentsController(userManager.Object, commentService.Object, supplementService.Object, userService.Object)
+            {
+                TempData = tempData.Object,
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = httpContext.Object
+                }
+            };
+
+            //Act
+            var result = await commentsController.Edit(commentId, null, new CommentFormViewModel() { SupplementId = supplementId });
+
+            //Assert
+            successMessage.Should().Be(string.Format(EntityModified, CommentEntity));
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Details");
+            result.As<RedirectToActionResult>().ControllerName.Should().Be("Supplements");
+            result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("id");
+            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(supplementId);
+        }
+
+        [Fact]
+        public async Task EditPost_WithCorrectCommentIdIdAndCorrectSupplementIdAndModerator_ShouldReturnSuccessMessageAndRedirectToModeratorSupplementsDetails()
+        {
+            string successMessage = null;
+
+            //Arrange
+            Mock<UserManager<User>> userManager = UserManagerMock.New();
+            userManager
+                .Setup(u => u.GetUserId(It.IsAny<ClaimsPrincipal>()))
+                .Returns(authorId);
+
+            Mock<ICommentService> commentService = new Mock<ICommentService>();
+            commentService
+                .Setup(c => c.IsCommentExistingById(commentId, false))
+                .ReturnsAsync(true);
+            commentService
+                .Setup(c => c.IsUserAuthor(commentId, authorId))
+                .ReturnsAsync(true);
+            commentService
+                .Setup(c => c.IsCommentModified(commentId, null))
+                .ReturnsAsync(true);
+
+            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
+            supplementService
+                .Setup(s => s.IsSupplementExistingById(supplementId, false))
+                .ReturnsAsync(true);
+
+            Mock<IUserService> userService = new Mock<IUserService>();
+            userService
+                .Setup(u => u.IsUserRestricted(username))
+                .ReturnsAsync(false);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataSuccessMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => successMessage = message as string);
+
+            Mock<HttpContext> httpContext = new Mock<HttpContext>();
             httpContext
-                .Setup(h => h.User.IsInRole(It.IsAny<string>()))
+                .Setup(h => h.User.Identity.Name)
+                .Returns(username);
+            httpContext
+                .Setup(h => h.User.IsInRole(ModeratorRole))
                 .Returns(true);
 
             CommentsController commentsController = new CommentsController(userManager.Object, commentService.Object, supplementService.Object, userService.Object)
@@ -887,7 +1011,7 @@
             };
 
             //Act
-            var result = await commentsController.Edit(commentId, supplementId, new CommentFormViewModel());
+            var result = await commentsController.Edit(commentId, null, new CommentFormViewModel() { SupplementId = supplementId });
 
             //Assert
             successMessage.Should().Be(string.Format(EntityModified, CommentEntity));
@@ -896,6 +1020,8 @@
 
             result.As<RedirectToActionResult>().ActionName.Should().Be("Details");
             result.As<RedirectToActionResult>().ControllerName.Should().Be("Supplements");
+            result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("area");
+            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(ModeratorArea);
             result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("id");
             result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(supplementId);
         }
@@ -922,7 +1048,7 @@
             };
 
             //Act
-            var result = await commentsController.Delete(nonExistingCommentId, supplementId);
+            var result = await commentsController.Delete(nonExistingCommentId, supplementId, null);
 
             //Assert
             errorMessage.Should().Be(string.Format(EntityNotFound, CommentEntity));
@@ -960,7 +1086,7 @@
             };
 
             //Act
-            var result = await commentsController.Delete(commentId, nonExistingSupplementId);
+            var result = await commentsController.Delete(commentId, nonExistingSupplementId, null);
 
             //Assert
             errorMessage.Should().Be(string.Format(EntityNotFound, SupplementEntity));
@@ -1012,7 +1138,7 @@
             };
 
             //Act
-            var result = await commentsController.Delete(commentId, supplementId);
+            var result = await commentsController.Delete(commentId, supplementId, null);
 
             //Assert
             errorMessage.Should().Be(UserRestrictedErrorMessage);
@@ -1067,7 +1193,7 @@
             };
 
             //Act
-            var result = await commentsController.Delete(commentId, supplementId);
+            var result = await commentsController.Delete(commentId, supplementId, null);
 
             //Assert
             result.Should().BeOfType<RedirectToActionResult>();
@@ -1131,7 +1257,7 @@
             };
 
             //Act
-            var result = await commentsController.Delete(commentId, supplementId);
+            var result = await commentsController.Delete(commentId, supplementId, null);
 
             //Assert
             successMessage.Should().Be(string.Format(EntityDeleted, CommentEntity));
@@ -1201,7 +1327,7 @@
             };
 
             //Act
-            var result = await commentsController.Delete(commentId, supplementId);
+            var result = await commentsController.Delete(commentId, supplementId, null);
 
             //Assert
             successMessage.Should().Be(string.Format(EntityDeleted, CommentEntity));

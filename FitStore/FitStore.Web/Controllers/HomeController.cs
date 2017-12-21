@@ -25,7 +25,7 @@
         {
             if (page < 1)
             {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { searchToken });
             }
 
             PagingElementViewModel<HomeIndexViewModel> model = new PagingElementViewModel<HomeIndexViewModel>
@@ -46,7 +46,7 @@
 
             if (page > 1 && page > model.Pagination.TotalPages)
             {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { searchToken });
             }
 
             ViewData["SearchToken"] = searchToken;

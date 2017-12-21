@@ -158,7 +158,7 @@
 
             await this.database.SaveChangesAsync();
 
-            return null;
+            return string.Empty;
         }
 
         public async Task<bool> IsSubcategoryModified(int subcategoryId, string name, int categoryId)

@@ -4,6 +4,6 @@
 
     public interface IModeratorCommentService
     {
-        Task<bool> RestoreAsync(int commentId);
+        Task<string> RestoreAsync(int commentId);
     }
 }

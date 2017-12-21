@@ -2,13 +2,15 @@
 {
     using System.ComponentModel.DataAnnotations;
 
+    using static Common.CommonMessages;
     using static Data.DataConstants;
 
     public class CommentFormViewModel
     {
         [Required]
-        [MinLength(CommentContentMinLength)]
-        [MaxLength(CommentContentMaxLength)]
+        [StringLength(CommentContentMaxLength, ErrorMessage = FieldLengthErrorMessage, MinimumLength = CommentContentMinLength)]
         public string Content { get; set; }
+
+        public int SupplementId { get; set; }
     }
 }
