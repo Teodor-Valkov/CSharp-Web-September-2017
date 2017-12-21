@@ -216,6 +216,8 @@
             result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
         }
 
+        // To test Controller with mocked RoleManager
+
         //[Fact]
         //public async Task Details_WithCorrectUsername_ShouldReturnValidViewModel()
         //{

@@ -46,7 +46,7 @@
         {
             if (page < 1)
             {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { searchToken, isDeleted });
             }
 
             PagingElementsViewModel<SupplementAdvancedServiceModel> model = new PagingElementsViewModel<SupplementAdvancedServiceModel>
@@ -64,7 +64,7 @@
 
             if (page > 1 && page > model.Pagination.TotalPages)
             {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { searchToken, isDeleted });
             }
 
             return View(model);
@@ -83,6 +83,13 @@
         [HttpPost]
         public async Task<IActionResult> ChooseCategory(SupplementCategoryServiceModel category)
         {
+            if (!ModelState.IsValid)
+            {
+                category.Categories = await this.GetCategoriesSelectListItems();
+
+                return View(nameof(ChooseCategory), category);
+            }
+
             bool isCategoryExistingById = await this.categoryService.IsCategoryExistingById(category.CategoryId, false);
 
             if (!isCategoryExistingById)
@@ -92,7 +99,7 @@
                 return RedirectToAction(nameof(Index));
             }
 
-            return RedirectToAction(nameof(Create), category.CategoryId);
+            return RedirectToAction(nameof(Create), new { category.CategoryId });
         }
 
         public async Task<IActionResult> Create(int categoryId)

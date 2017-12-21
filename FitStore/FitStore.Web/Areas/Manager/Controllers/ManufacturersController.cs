@@ -28,7 +28,7 @@
         {
             if (page < 1)
             {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { searchToken, isDeleted });
             }
 
             PagingElementsViewModel<ManufacturerAdvancedServiceModel> model = new PagingElementsViewModel<ManufacturerAdvancedServiceModel>
@@ -46,7 +46,7 @@
 
             if (page > 1 && page > model.Pagination.TotalPages)
             {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { searchToken, isDeleted });
             }
 
             return View(model);

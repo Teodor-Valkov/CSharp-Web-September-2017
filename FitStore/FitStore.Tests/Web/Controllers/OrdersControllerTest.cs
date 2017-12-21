@@ -105,6 +105,8 @@
             result.As<RedirectToActionResult>().ControllerName.Should().Be("Home");
         }
 
+        // To test Controller with mocked static class ShoppingCart
+
         //[Fact]
         //public async Task Add_WithAlreadyAddedLastAvailableSupplement_ShouldReturnErrorMessageAndReturnToReturnUrl()
         //{
