@@ -89,8 +89,6 @@
                     await userManager.CreateAsync(admin, adminPassword);
 
                     await userManager.AddToRoleAsync(admin, AdministratorRole);
-                    await userManager.AddToRoleAsync(admin, ModeratorRole);
-                    await userManager.AddToRoleAsync(admin, ManagerRole);
                 }
 
                 string managerUsername = "Manager";

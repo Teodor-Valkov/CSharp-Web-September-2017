@@ -582,6 +582,49 @@
         }
 
         [Fact]
+        public async Task ChangePassworPost_WithCorrectUsernameAndUserWithOldPasswordNotValid_ShouldReturnErrorMessageAndReturnValidViewModel()
+        {
+            string errorMessage = null;
+
+            //Arrange
+            Mock<UserManager<User>> userManager = UserManagerMock.New();
+            userManager
+                .Setup(u => u.FindByNameAsync(username))
+                .ReturnsAsync(user);
+            userManager
+               .Setup(u => u.HasPasswordAsync(user))
+               .ReturnsAsync(true);
+
+            Mock<IUserService> userService = new Mock<IUserService>();
+            userService
+                .Setup(u => u.ChangePasswordAsync(user, null, null))
+                .ReturnsAsync(false);
+            userService
+               .Setup(u => u.IsOldPasswordValid(user, null))
+               .ReturnsAsync(false);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => errorMessage = message as string);
+
+            UsersController usersController = new UsersController(userManager.Object, userService.Object)
+            {
+                TempData = tempData.Object
+            };
+
+            //Assert
+            var result = await usersController.ChangePassword(username, new UserChangePasswordServiceModel());
+
+            //Assert
+            errorMessage.Should().Be(UserOldPasswordNotValid);
+
+            result.Should().BeOfType<ViewResult>();
+
+            result.As<ViewResult>().Model.Should().BeOfType<UserChangePasswordServiceModel>();
+        }
+
+        [Fact]
         public async Task ChangePassworPost_WithCorrectUsernameAndUserWithPasswordAndPasswordNotModified_ShouldReturnWarningMessageAndReturnValidViewModel()
         {
             string warningMessage = null;
@@ -599,6 +642,9 @@
             userService
                 .Setup(u => u.ChangePasswordAsync(user, null, null))
                 .ReturnsAsync(false);
+            userService
+                .Setup(u => u.IsOldPasswordValid(user, null))
+                .ReturnsAsync(true);
 
             Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
             tempData
@@ -639,6 +685,9 @@
             userService
                 .Setup(u => u.ChangePasswordAsync(user, null, null))
                 .ReturnsAsync(true);
+            userService
+               .Setup(u => u.IsOldPasswordValid(user, null))
+               .ReturnsAsync(true);
 
             Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
             tempData

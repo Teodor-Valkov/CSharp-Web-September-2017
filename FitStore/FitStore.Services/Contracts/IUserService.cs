@@ -17,6 +17,8 @@
 
         Task<bool> ChangePasswordAsync(User user, string oldPassword, string newPassword);
 
+        Task<bool> IsOldPasswordValid(User user, string oldPassword);
+
         Task<bool> IsUserRestricted(string username);
 
         Task<int> TotalOrdersAsync(string username);

@@ -25,19 +25,19 @@
         public async Task<UserProfileServiceModel> GetProfileByUsernameAsync(string username, int page)
         {
             return await this.database
-              .Users
-              .Where(u => u.UserName == username)
-              .ProjectTo<UserProfileServiceModel>(new { username, page })
-              .FirstOrDefaultAsync();
+               .Users
+               .Where(u => u.UserName == username)
+               .ProjectTo<UserProfileServiceModel>(new { username, page })
+               .FirstOrDefaultAsync();
         }
 
         public async Task<UserEditProfileServiceModel> GetEditProfileByUsernameAsync(string username)
         {
             return await this.database
-                 .Users
-                 .Where(u => u.UserName == username)
-                 .ProjectTo<UserEditProfileServiceModel>()
-                 .FirstOrDefaultAsync();
+               .Users
+               .Where(u => u.UserName == username)
+               .ProjectTo<UserEditProfileServiceModel>()
+               .FirstOrDefaultAsync();
         }
 
         public async Task<UserChangePasswordServiceModel> GetChangePasswordByUsernameAsync(string username)
@@ -77,7 +77,7 @@
                 isEdited = true;
             }
 
-            if (user.BirthDate != birthDate)
+            if (user.BirthDate.Date != birthDate.Date)
             {
                 user.BirthDate = birthDate;
                 isEdited = true;
@@ -86,6 +86,7 @@
             if (isEdited)
             {
                 await this.userManager.UpdateAsync(user);
+                await this.database.SaveChangesAsync();
             }
 
             return isEdited;
@@ -102,6 +103,11 @@
             }
 
             return isChanged;
+        }
+
+        public async Task<bool> IsOldPasswordValid(User user, string oldPassword)
+        {
+            return await this.userManager.CheckPasswordAsync(user, oldPassword);
         }
 
         public async Task<bool> IsUserRestricted(string username)

@@ -108,19 +108,19 @@
 
             await PrepareModelToReturn(categoryId, model);
 
-            TempData["CategoryId"] = categoryId;
+            ViewData["CategoryId"] = categoryId;
 
             return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> FinishCreate(SupplementFormViewModel model)
+        public async Task<IActionResult> FinishCreate(int categoryId, SupplementFormViewModel model)
         {
-            int categoryId = int.Parse(TempData["CategoryId"].ToString());
-
             if (!ModelState.IsValid)
             {
                 await PrepareModelToReturn(categoryId, model);
+
+                ViewData["CategoryId"] = categoryId;
 
                 return View(nameof(Create), model);
             }
@@ -196,19 +196,19 @@
 
             await PrepareModelToReturn(categoryId, model);
 
-            TempData["CategoryId"] = categoryId;
+            ViewData["CategoryId"] = categoryId;
 
             return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, SupplementFormViewModel model)
+        public async Task<IActionResult> Edit(int id, int categoryId, SupplementFormViewModel model)
         {
-            int categoryId = int.Parse(TempData["CategoryId"].ToString());
-
             if (!ModelState.IsValid)
             {
                 await PrepareModelToReturn(categoryId, model);
+
+                ViewData["CategoryId"] = categoryId;
 
                 return View(model);
             }
@@ -320,14 +320,14 @@
 
         private async Task PrepareModelToReturn(int categoryId, SupplementFormViewModel model)
         {
-            model.BestBeforeDate = DateTime.UtcNow;
+            model.BestBeforeDate = DateTime.UtcNow.AddDays(1);
             model.Subcategories = await this.GetSubcategoriesSelectListItems(categoryId);
             model.Manufacturers = await this.GetManufacturersSelectListItems();
         }
 
         private async Task<IEnumerable<SelectListItem>> GetCategoriesSelectListItems()
         {
-            IEnumerable<CategoryBasicServiceModel> categories = await this.managerCategoryService.GetAllBasicListingAsync(false);
+            IEnumerable<CategoryBasicServiceModel> categories = await this.managerCategoryService.GetAllBasicListingWithAnySubcategoriesAsync(false);
 
             return categories.Select(c => new SelectListItem
             {

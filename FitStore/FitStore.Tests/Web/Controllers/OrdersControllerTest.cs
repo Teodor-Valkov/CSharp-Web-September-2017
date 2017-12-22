@@ -2,10 +2,7 @@
 {
     using FitStore.Services.Models;
     using FitStore.Web.Controllers;
-    using FitStore.Web.Infrastructure.Extensions;
-    using FitStore.Web.Models.Comments;
     using FluentAssertions;
-    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.ViewFeatures;
     using Moq;

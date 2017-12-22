@@ -1,6 +1,7 @@
 ﻿namespace FitStore.Web
 {
     using AutoMapper;
+    using Controllers;
     using Data;
     using Data.Models;
     using Infrastructure.Extensions;
@@ -83,7 +84,7 @@
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler($"/{Errors}/{nameof(ErrorsController.InternalServerError)}");
             }
 
             app.UseStaticFiles();
@@ -91,6 +92,22 @@
             app.UseAuthentication();
 
             app.UseSession();
+
+            app.Use(async (httpContext, next) =>
+            {
+                await next();
+
+                if (httpContext.Response.StatusCode == 404 && !httpContext.Response.HasStarted)
+                {
+                    string originalPath = httpContext.Request.Path.Value;
+
+                    httpContext.Items["originalPath"] = originalPath;
+
+                    httpContext.Request.Path = $"/{Errors}/{nameof(ErrorsController.PageNotFound)}";
+
+                    await next();
+                }
+            });
 
             app.UseMvc(routes =>
             {

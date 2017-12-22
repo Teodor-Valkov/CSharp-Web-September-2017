@@ -158,6 +158,15 @@
                 return RedirectToAction(nameof(Profile), new { username });
             }
 
+            bool oldPasswordIsValid = await this.userService.IsOldPasswordValid(user, model.OldPassword);
+
+            if (!oldPasswordIsValid)
+            {
+                TempData.AddErrorMessage(UserOldPasswordNotValid);
+
+                return View(model);
+            }
+
             bool changePasswordResult = await this.userService.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
 
             if (!changePasswordResult)

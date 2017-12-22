@@ -10,6 +10,8 @@
 
         Task<IEnumerable<CategoryBasicServiceModel>> GetAllBasicListingAsync(bool isDeleted);
 
+        Task<IEnumerable<CategoryBasicServiceModel>> GetAllBasicListingWithAnySubcategoriesAsync(bool isDeleted);
+
         Task CreateAsync(string name);
 
         Task<CategoryBasicServiceModel> GetEditModelAsync(int categoryId);

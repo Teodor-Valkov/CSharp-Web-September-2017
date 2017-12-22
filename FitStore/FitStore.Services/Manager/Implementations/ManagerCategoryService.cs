@@ -43,7 +43,18 @@
         {
             return await this.database
                .Categories
+               .Where(c => c.IsDeleted == isDeleted)
+               .OrderBy(c => c.Name)
+               .ProjectTo<CategoryBasicServiceModel>()
+               .ToListAsync();
+        }
+
+        public async Task<IEnumerable<CategoryBasicServiceModel>> GetAllBasicListingWithAnySubcategoriesAsync(bool isDeleted)
+        {
+            return await this.database
+               .Categories
                .Where(c => c.IsDeleted == isDeleted && c.Subcategories.Any())
+               .OrderBy(c => c.Name)
                .ProjectTo<CategoryBasicServiceModel>()
                .ToListAsync();
         }

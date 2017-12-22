@@ -19,6 +19,7 @@
 
         public const string UserEditProfileSuccessMessage = "Your profile was successfully changed.";
 
+        public const string UserOldPasswordNotValid = "Current password is not valid.";
         public const string UserChangePasswordExternalLoginErrorMessage = "You do not have a password. You are using an external login provider.";
         public const string UserChangePasswordErrorMessage = "Error. Your password could not be changed. Please try again.";
         public const string UserChangePasswordSuccessMessage = "Your password was successfully changed.";

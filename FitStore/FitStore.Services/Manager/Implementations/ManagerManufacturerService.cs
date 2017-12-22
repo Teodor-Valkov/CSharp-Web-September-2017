@@ -44,6 +44,7 @@
             return await this.database
                .Manufacturers
                .Where(m => m.IsDeleted == isDeleted)
+               .OrderBy(m => m.Name)
                .ProjectTo<ManufacturerBasicServiceModel>()
                .ToListAsync();
         }

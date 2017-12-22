@@ -2,22 +2,21 @@
 {
     using System.ComponentModel.DataAnnotations;
 
+    using static Common.CommonMessages;
     using static Data.DataConstants;
 
     public class LoginViewModel
     {
         [Required]
-        [MinLength(UserUsernameMinLength, ErrorMessage = "The {0} must be at least {1} symbols long.")]
-        [MaxLength(UserUsernameMaxLength, ErrorMessage = "The {0} must be less than {1} characters long.")]
+        [StringLength(UserUsernameMaxLength, ErrorMessage = FieldLengthErrorMessage, MinimumLength = UserUsernameMinLength)]
         public string Username { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
-        [MinLength(UserPasswordMinLength, ErrorMessage = "The {0} must be at least {1} symbols long.")]
-        [MaxLength(UserPasswordMaxLength, ErrorMessage = "The {0} must be less than {1} characters long.")]
+        [StringLength(UserPasswordMaxLength, ErrorMessage = FieldLengthErrorMessage, MinimumLength = UserPasswordMinLength)]
         public string Password { get; set; }
 
-        [Display(Name = "Remember me?")]
+        [Display(Name = "Remember me")]
         public bool RememberMe { get; set; }
     }
 }

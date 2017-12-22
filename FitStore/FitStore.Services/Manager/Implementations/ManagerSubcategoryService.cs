@@ -45,6 +45,7 @@
             return await this.database
                .Subcategories
                .Where(s => s.CategoryId == categoryId && s.IsDeleted == isDeleted)
+               .OrderBy(s => s.Name)
                .ProjectTo<SubcategoryBasicServiceModel>()
                .ToListAsync();
         }

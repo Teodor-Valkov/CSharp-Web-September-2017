@@ -1,9 +1,7 @@
 ﻿namespace FitStore.Tests.Web.Controllers
 {
-    using AutoMapper;
     using Data.Models;
     using FitStore.Web.Controllers;
-    using FitStore.Web.Infrastructure.Mapping;
     using FitStore.Web.Models.Comments;
     using FluentAssertions;
     using Microsoft.AspNetCore.Authorization;
@@ -548,7 +546,7 @@
                 .Setup(h => h.User.Identity.Name)
                 .Returns(username);
             httpContext
-                .Setup(h => h.User.IsInRole(It.IsAny<string>()))
+                .Setup(h => h.User.IsInRole(ModeratorRole))
                 .Returns(false);
 
             CommentsController commentsController = new CommentsController(userManager.Object, commentService.Object, supplementService.Object, userService.Object)
@@ -605,7 +603,7 @@
                 .Setup(h => h.User.Identity.Name)
                 .Returns(username);
             httpContext
-                .Setup(h => h.User.IsInRole(It.IsAny<string>()))
+                .Setup(h => h.User.IsInRole(ModeratorRole))
                 .Returns(true);
 
             CommentsController commentsController = new CommentsController(userManager.Object, commentService.Object, supplementService.Object, userService.Object)
@@ -804,7 +802,7 @@
                 .Setup(h => h.User.Identity.Name)
                 .Returns(username);
             httpContext
-                .Setup(h => h.User.IsInRole(It.IsAny<string>()))
+                .Setup(h => h.User.IsInRole(ModeratorRole))
                 .Returns(false);
 
             CommentsController commentsController = new CommentsController(userManager.Object, commentService.Object, supplementService.Object, userService.Object)
@@ -868,7 +866,7 @@
                 .Setup(h => h.User.Identity.Name)
                 .Returns(username);
             httpContext
-                .Setup(h => h.User.IsInRole(It.IsAny<string>()))
+                .Setup(h => h.User.IsInRole(ModeratorRole))
                 .Returns(true);
 
             CommentsController commentsController = new CommentsController(userManager.Object, commentService.Object, supplementService.Object, userService.Object)
@@ -1181,7 +1179,7 @@
                 .Setup(h => h.User.Identity.Name)
                 .Returns(username);
             httpContext
-                .Setup(h => h.User.IsInRole(It.IsAny<string>()))
+                .Setup(h => h.User.IsInRole(ModeratorRole))
                 .Returns(false);
 
             CommentsController commentsController = new CommentsController(userManager.Object, commentService.Object, supplementService.Object, userService.Object)
@@ -1244,7 +1242,7 @@
                 .Setup(h => h.User.Identity.Name)
                 .Returns(username);
             httpContext
-                .Setup(h => h.User.IsInRole(It.IsAny<string>()))
+                .Setup(h => h.User.IsInRole(ModeratorRole))
                 .Returns(true);
 
             CommentsController commentsController = new CommentsController(userManager.Object, commentService.Object, supplementService.Object, userService.Object)
@@ -1314,7 +1312,7 @@
                 .Setup(h => h.User.Identity.Name)
                 .Returns(username);
             httpContext
-                .Setup(h => h.User.IsInRole(It.IsAny<string>()))
+                .Setup(h => h.User.IsInRole(ModeratorRole))
                 .Returns(true);
 
             CommentsController commentsController = new CommentsController(userManager.Object, commentService.Object, supplementService.Object, userService.Object)

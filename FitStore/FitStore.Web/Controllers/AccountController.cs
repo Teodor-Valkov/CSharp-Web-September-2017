@@ -210,7 +210,7 @@
         public IActionResult Register(string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
-            return View();
+            return View(new RegisterViewModel() { BirthDate = DateTime.UtcNow });
         }
 
         [HttpPost]
@@ -227,6 +227,7 @@
                     FullName = model.FullName,
                     Email = model.Email,
                     Address = model.Address,
+                    PhoneNumber = model.PhoneNumber,
                     BirthDate = model.BirthDate,
                     RegistrationDate = DateTime.UtcNow
                 };
@@ -335,6 +336,7 @@
                     FullName = model.FullName,
                     Email = model.Email,
                     Address = model.Address,
+                    PhoneNumber = model.PhoneNumber,
                     BirthDate = model.BirthDate,
                     RegistrationDate = DateTime.UtcNow
                 };

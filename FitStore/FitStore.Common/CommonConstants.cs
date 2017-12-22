@@ -25,6 +25,7 @@
         public const string Subcategories = "Subcategories";
         public const string Supplements = "Supplements";
         public const string Orders = "Orders";
+        public const string Errors = "Errors";
 
         public const string UserSessionShoppingCartKey = "*#@User_Session_Shopping_Cart@#*";
         public const string UserFullNameName = "Full Name";
