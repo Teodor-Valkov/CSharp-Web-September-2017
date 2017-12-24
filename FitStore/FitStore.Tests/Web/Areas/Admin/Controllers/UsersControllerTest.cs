@@ -1,20 +1,17 @@
 ﻿namespace FitStore.Tests.Web.Areas.Admin.Controllers
 {
-    using FitStore.Data.Models;
-    using FitStore.Services.Admin.Contracts;
-    using FitStore.Services.Admin.Models.Users;
-    using FitStore.Tests.Mocks;
+    using Data.Models;
     using FitStore.Web.Areas.Admin.Controllers;
     using FitStore.Web.Models.Pagination;
     using FluentAssertions;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.Rendering;
     using Microsoft.AspNetCore.Mvc.ViewFeatures;
+    using Mocks;
     using Moq;
-    using Services.Moderator.Contracts;
-    using Services.Moderator.Models.Users;
+    using Services.Admin.Contracts;
+    using Services.Admin.Models.Users;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -216,7 +213,7 @@
             result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
         }
 
-        // To test Controller with mocked RoleManager
+        // To test UsersController with mocked RoleManager class
 
         //[Fact]
         //public async Task Details_WithCorrectUsername_ShouldReturnValidViewModel()

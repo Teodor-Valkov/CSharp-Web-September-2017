@@ -1,18 +1,19 @@
 ﻿namespace FitStore.Tests.Web.Areas.Manager.Controllers
 {
-    using FitStore.Services.Contracts;
-    using FitStore.Services.Models.Categories;
-    using FitStore.Services.Models.Manufacturers;
-    using FitStore.Services.Models.Subcategories;
     using FitStore.Web.Areas.Manager.Controllers;
     using FitStore.Web.Areas.Manager.Models.Supplements;
     using FitStore.Web.Models.Pagination;
     using FluentAssertions;
     using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.ViewFeatures;
     using Moq;
+    using Services.Contracts;
     using Services.Manager.Contracts;
+    using Services.Models.Categories;
+    using Services.Models.Manufacturers;
+    using Services.Models.Subcategories;
     using Services.Models.Supplements;
     using System;
     using System.Collections.Generic;
@@ -321,6 +322,8 @@
 
             //Assert
             result.Should().BeOfType<ViewResult>();
+            result.As<ViewResult>().ViewData.Keys.Should().Contain("CategoryId");
+            result.As<ViewResult>().ViewData.Values.Should().Contain(categoryId);
 
             result.As<ViewResult>().Model.Should().BeOfType<SupplementFormViewModel>();
 
@@ -343,22 +346,114 @@
                 .Setup(m => m.GetAllBasicListingAsync(false))
                 .ReturnsAsync(new List<ManufacturerBasicServiceModel>());
 
-            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
-            tempData
-                .SetupGet(t => t["CategoryId"])
-                .Returns(categoryId);
-
-            SupplementsController supplementsController = new SupplementsController(null, null, managerSubcategoryService.Object, managerManufacturerService.Object, null, null, null, null)
-            {
-                TempData = tempData.Object
-            };
-
+            SupplementsController supplementsController = new SupplementsController(null, null, managerSubcategoryService.Object, managerManufacturerService.Object, null, null, null, null);
             supplementsController.ModelState.AddModelError(string.Empty, "Error");
 
             //Act
             var result = await supplementsController.FinishCreate(categoryId, new SupplementFormViewModel());
 
             //Assert
+            result.Should().BeOfType<ViewResult>();
+            result.As<ViewResult>().ViewData.Keys.Should().Contain("CategoryId");
+            result.As<ViewResult>().ViewData.Values.Should().Contain(categoryId);
+
+            result.As<ViewResult>().Model.Should().BeOfType<SupplementFormViewModel>();
+
+            SupplementFormViewModel model = result.As<ViewResult>().Model.As<SupplementFormViewModel>();
+            model.Subcategories.Should().HaveCount(0);
+            model.Manufacturers.Should().HaveCount(0);
+        }
+
+        [Fact]
+        public async Task FinishCreate_WithSupplementExistingByName_ShouldShowErrorMessageAndReturnToCreateAndReturnValidViewModel()
+        {
+            string errorMessage = null;
+
+            //Arrange
+            Mock<IManagerSubcategoryService> managerSubcategoryService = new Mock<IManagerSubcategoryService>();
+            managerSubcategoryService
+                .Setup(m => m.GetAllBasicListingAsync(categoryId, false))
+                .ReturnsAsync(new List<SubcategoryBasicServiceModel>());
+
+            Mock<IManagerManufacturerService> managerManufacturerService = new Mock<IManagerManufacturerService>();
+            managerManufacturerService
+                .Setup(m => m.GetAllBasicListingAsync(false))
+                .ReturnsAsync(new List<ManufacturerBasicServiceModel>());
+
+            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
+            supplementService
+                .Setup(s => s.IsSupplementExistingByName(null))
+                .ReturnsAsync(true);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => errorMessage = message as string);
+
+            SupplementsController supplementsController = new SupplementsController(null, null, managerSubcategoryService.Object, managerManufacturerService.Object, supplementService.Object, null, null, null)
+            {
+                TempData = tempData.Object
+            };
+
+            //Act
+            var result = await supplementsController.FinishCreate(categoryId, new SupplementFormViewModel());
+
+            //Assert
+            errorMessage.Should().Be(string.Format(EntityExists, SupplementEntity));
+
+            result.Should().BeOfType<ViewResult>();
+            result.As<ViewResult>().ViewData.Keys.Should().Contain("CategoryId");
+            result.As<ViewResult>().ViewData.Values.Should().Contain(categoryId);
+
+            result.As<ViewResult>().Model.Should().BeOfType<SupplementFormViewModel>();
+
+            SupplementFormViewModel model = result.As<ViewResult>().Model.As<SupplementFormViewModel>();
+            model.Subcategories.Should().HaveCount(0);
+            model.Manufacturers.Should().HaveCount(0);
+        }
+
+        [Fact]
+        public async Task FinishCreate_WithIncorrectSubcategoryId_ShouldShowErrorMessageAndReturnToCreateAndReturnValidViewModel()
+        {
+            string errorMessage = null;
+
+            //Arrange
+            Mock<IManagerSubcategoryService> managerSubcategoryService = new Mock<IManagerSubcategoryService>();
+            managerSubcategoryService
+                .Setup(m => m.GetAllBasicListingAsync(categoryId, false))
+                .ReturnsAsync(new List<SubcategoryBasicServiceModel>());
+
+            Mock<IManagerManufacturerService> managerManufacturerService = new Mock<IManagerManufacturerService>();
+            managerManufacturerService
+                .Setup(m => m.GetAllBasicListingAsync(false))
+                .ReturnsAsync(new List<ManufacturerBasicServiceModel>());
+
+            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
+            supplementService
+                .Setup(s => s.IsSupplementExistingByName(null))
+                .ReturnsAsync(false);
+
+            Mock<ISubcategoryService> subcategoryService = new Mock<ISubcategoryService>();
+            subcategoryService
+                .Setup(s => s.IsSubcategoryExistingById(nonExistingSubcategoryId, false))
+                .ReturnsAsync(false);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => errorMessage = message as string);
+
+            SupplementsController supplementsController = new SupplementsController(null, null, managerSubcategoryService.Object, managerManufacturerService.Object, supplementService.Object, null, subcategoryService.Object, null)
+            {
+                TempData = tempData.Object
+            };
+
+            //Act
+            var result = await supplementsController.FinishCreate(categoryId, new SupplementFormViewModel() { SubcategoryId = nonExistingSubcategoryId });
+
+            //Assert
+            errorMessage.Should().Be(string.Format(EntityNotFound, SubcategoryEntity));
+
             result.Should().BeOfType<ViewResult>();
 
             result.As<ViewResult>().Model.Should().BeOfType<SupplementFormViewModel>();
@@ -368,7 +463,206 @@
             model.Manufacturers.Should().HaveCount(0);
         }
 
-        // To test FinishCreate, EditGet and EditPost actions on Controller
+        [Fact]
+        public async Task FinishCreate_WithIncorrectManufacturerId_ShouldShowErrorMessageAndReturnToCreateAndReturnValidViewModel()
+        {
+            string errorMessage = null;
+
+            //Arrange
+            Mock<IManagerSubcategoryService> managerSubcategoryService = new Mock<IManagerSubcategoryService>();
+            managerSubcategoryService
+                .Setup(m => m.GetAllBasicListingAsync(categoryId, false))
+                .ReturnsAsync(new List<SubcategoryBasicServiceModel>());
+
+            Mock<IManagerManufacturerService> managerManufacturerService = new Mock<IManagerManufacturerService>();
+            managerManufacturerService
+                .Setup(m => m.GetAllBasicListingAsync(false))
+                .ReturnsAsync(new List<ManufacturerBasicServiceModel>());
+
+            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
+            supplementService
+                .Setup(s => s.IsSupplementExistingByName(null))
+                .ReturnsAsync(false);
+
+            Mock<ISubcategoryService> subcategoryService = new Mock<ISubcategoryService>();
+            subcategoryService
+                .Setup(s => s.IsSubcategoryExistingById(subcategoryId, false))
+                .ReturnsAsync(true);
+
+            Mock<IManufacturerService> manufacturerService = new Mock<IManufacturerService>();
+            manufacturerService
+                .Setup(m => m.IsManufacturerExistingById(nonExistingManufacturerId, false))
+                .ReturnsAsync(false);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => errorMessage = message as string);
+
+            SupplementsController supplementsController = new SupplementsController(null, null, managerSubcategoryService.Object, managerManufacturerService.Object, supplementService.Object, null, subcategoryService.Object, manufacturerService.Object)
+            {
+                TempData = tempData.Object
+            };
+
+            //Act
+            var result = await supplementsController.FinishCreate(categoryId, new SupplementFormViewModel() { SubcategoryId = subcategoryId, ManufacturerId = nonExistingManufacturerId });
+
+            //Assert
+            errorMessage.Should().Be(string.Format(EntityNotFound, ManufacturerEntity));
+
+            result.Should().BeOfType<ViewResult>();
+
+            result.As<ViewResult>().Model.Should().BeOfType<SupplementFormViewModel>();
+
+            SupplementFormViewModel model = result.As<ViewResult>().Model.As<SupplementFormViewModel>();
+            model.Subcategories.Should().HaveCount(0);
+            model.Manufacturers.Should().HaveCount(0);
+        }
+
+        [Fact]
+        public async Task FinishCreate_WithCorrectData_ShouldShowSuccessMessageAndReturnToSupplementsIndex()
+        {
+            string successMessage = null;
+
+            //Arrange
+            Mock<IManagerSupplementService> managerSupplementService = new Mock<IManagerSupplementService>();
+            managerSupplementService
+                .Setup(m => m.CreateAsync(null, null, 0, 0, null, DateTime.UtcNow, subcategoryId, manufacturerId))
+                .Returns(Task.CompletedTask);
+
+            Mock<IManagerSubcategoryService> managerSubcategoryService = new Mock<IManagerSubcategoryService>();
+            managerSubcategoryService
+                .Setup(m => m.GetAllBasicListingAsync(categoryId, false))
+                .ReturnsAsync(new List<SubcategoryBasicServiceModel>());
+
+            Mock<IManagerManufacturerService> managerManufacturerService = new Mock<IManagerManufacturerService>();
+            managerManufacturerService
+                .Setup(m => m.GetAllBasicListingAsync(false))
+                .ReturnsAsync(new List<ManufacturerBasicServiceModel>());
+
+            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
+            supplementService
+                .Setup(s => s.IsSupplementExistingByName(null))
+                .ReturnsAsync(false);
+
+            Mock<ISubcategoryService> subcategoryService = new Mock<ISubcategoryService>();
+            subcategoryService
+                .Setup(s => s.IsSubcategoryExistingById(subcategoryId, false))
+                .ReturnsAsync(true);
+
+            Mock<IManufacturerService> manufacturerService = new Mock<IManufacturerService>();
+            manufacturerService
+                .Setup(m => m.IsManufacturerExistingById(manufacturerId, false))
+                .ReturnsAsync(true);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataSuccessMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => successMessage = message as string);
+
+            Mock<IFormFile> picture = new Mock<IFormFile>();
+
+            SupplementsController supplementsController = new SupplementsController(managerSupplementService.Object, null, managerSubcategoryService.Object, managerManufacturerService.Object, supplementService.Object, null, subcategoryService.Object, manufacturerService.Object)
+            {
+                TempData = tempData.Object
+            };
+
+            //Act
+            var result = await supplementsController.FinishCreate(categoryId, new SupplementFormViewModel() { SubcategoryId = subcategoryId, ManufacturerId = manufacturerId, Picture = picture.Object });
+
+            //Assert
+            successMessage.Should().Be(string.Format(EntityCreated, SupplementEntity));
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
+            result.As<RedirectToActionResult>().ControllerName.Should().Be("Supplements");
+            result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("isDeleted");
+            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(false);
+        }
+
+        [Fact]
+        public async Task EditGet_WithIncorrectSupplementId_ShouldShowErrorMessageAndReturnToSupplementsIndex()
+        {
+            string errorMessage = null;
+
+            //Arrange
+            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
+            supplementService
+                .Setup(s => s.IsSupplementExistingById(nonExistingSupplementId, false))
+                .ReturnsAsync(false);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => errorMessage = message as string);
+
+            SupplementsController supplementsController = new SupplementsController(null, null, null, null, supplementService.Object, null, null, null)
+            {
+                TempData = tempData.Object
+            };
+
+            //Act
+            var result = await supplementsController.Edit(nonExistingSupplementId);
+
+            //Assert
+            errorMessage.Should().Be(string.Format(EntityNotFound, SupplementEntity));
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
+            result.As<RedirectToActionResult>().ControllerName.Should().Be("Supplements");
+            result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("isDeleted");
+            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(false);
+        }
+
+        [Fact]
+        public async Task EditGet_WithCorrectSupplementId_ShouldReturnReturnValidViewModel()
+        {
+            //Arrange
+            Mock<ISubcategoryService> subcategoryService = new Mock<ISubcategoryService>();
+            subcategoryService
+                .Setup(s => s.GetCategoryIdBySubcategoryId(subcategoryId))
+                .ReturnsAsync(categoryId);
+
+            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
+            supplementService
+                .Setup(s => s.IsSupplementExistingById(supplementId, false))
+                .ReturnsAsync(true);
+
+            Mock<IManagerSupplementService> managerSupplementService = new Mock<IManagerSupplementService>();
+            managerSupplementService
+                .Setup(m => m.GetEditModelAsync(supplementId))
+                .ReturnsAsync(new SupplementServiceModel() { SubcategoryId = subcategoryId, ManufacturerId = manufacturerId });
+
+            Mock<IManagerSubcategoryService> managerSubcategoryService = new Mock<IManagerSubcategoryService>();
+            managerSubcategoryService
+                .Setup(m => m.GetAllBasicListingAsync(categoryId, false))
+                .ReturnsAsync(new List<SubcategoryBasicServiceModel>());
+
+            Mock<IManagerManufacturerService> managerManufacturerService = new Mock<IManagerManufacturerService>();
+            managerManufacturerService
+                .Setup(m => m.GetAllBasicListingAsync(false))
+                .ReturnsAsync(new List<ManufacturerBasicServiceModel>());
+
+            SupplementsController supplementsController = new SupplementsController(managerSupplementService.Object, null, managerSubcategoryService.Object, managerManufacturerService.Object, supplementService.Object, null, subcategoryService.Object, null);
+
+            //Act
+            var result = await supplementsController.Edit(supplementId);
+
+            //Assert
+            result.Should().BeOfType<ViewResult>();
+            result.As<ViewResult>().ViewData.Keys.Should().Contain("CategoryId");
+            result.As<ViewResult>().ViewData.Values.Should().Contain(categoryId);
+
+            result.As<ViewResult>().Model.Should().BeOfType<SupplementFormViewModel>();
+
+            SupplementFormViewModel model = result.As<ViewResult>().Model.As<SupplementFormViewModel>();
+            model.Subcategories.Should().HaveCount(0);
+            model.SubcategoryId.Should().Be(subcategoryId);
+            model.Manufacturers.Should().HaveCount(0);
+            model.ManufacturerId.Should().Be(manufacturerId);
+        }
 
         [Fact]
         public async Task Delete_WithIncorrectSupplementId_ShouldReturnErrorMessageAndReturnToSupplementsIndex()
@@ -396,6 +690,387 @@
 
             //Assert
             errorMessage.Should().Be(string.Format(EntityNotFound, SupplementEntity));
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
+            result.As<RedirectToActionResult>().ControllerName.Should().Be("Supplements");
+            result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("isDeleted");
+            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(false);
+        }
+
+        [Fact]
+        public async Task EditPost_WithInvalidModelState_ShouldReturnValidViewModel()
+        {
+            //Arrange
+            Mock<IManagerSubcategoryService> managerSubcategoryService = new Mock<IManagerSubcategoryService>();
+            managerSubcategoryService
+                .Setup(m => m.GetAllBasicListingAsync(categoryId, false))
+                .ReturnsAsync(new List<SubcategoryBasicServiceModel>());
+
+            Mock<IManagerManufacturerService> managerManufacturerService = new Mock<IManagerManufacturerService>();
+            managerManufacturerService
+                .Setup(m => m.GetAllBasicListingAsync(false))
+                .ReturnsAsync(new List<ManufacturerBasicServiceModel>());
+
+            SupplementsController supplementsController = new SupplementsController(null, null, managerSubcategoryService.Object, managerManufacturerService.Object, null, null, null, null);
+            supplementsController.ModelState.AddModelError(string.Empty, "Error");
+
+            //Act
+            var result = await supplementsController.Edit(supplementId, categoryId, new SupplementFormViewModel());
+
+            //Assert
+            result.Should().BeOfType<ViewResult>();
+            result.As<ViewResult>().ViewData.Keys.Should().Contain("CategoryId");
+            result.As<ViewResult>().ViewData.Values.Should().Contain(categoryId);
+
+            result.As<ViewResult>().Model.Should().BeOfType<SupplementFormViewModel>();
+
+            SupplementFormViewModel model = result.As<ViewResult>().Model.As<SupplementFormViewModel>();
+            model.Subcategories.Should().HaveCount(0);
+            model.Manufacturers.Should().HaveCount(0);
+        }
+
+        [Fact]
+        public async Task EditPost_WithIncorrectSupplementId_ShouldShowErrorMessageAndReturnToSupplementsIndex()
+        {
+            string errorMessage = null;
+
+            //Arrange
+            Mock<IManagerSubcategoryService> managerSubcategoryService = new Mock<IManagerSubcategoryService>();
+            managerSubcategoryService
+                .Setup(m => m.GetAllBasicListingAsync(categoryId, false))
+                .ReturnsAsync(new List<SubcategoryBasicServiceModel>());
+
+            Mock<IManagerManufacturerService> managerManufacturerService = new Mock<IManagerManufacturerService>();
+            managerManufacturerService
+                .Setup(m => m.GetAllBasicListingAsync(false))
+                .ReturnsAsync(new List<ManufacturerBasicServiceModel>());
+
+            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
+            supplementService
+                .Setup(s => s.IsSupplementExistingById(nonExistingSupplementId, false))
+                .ReturnsAsync(false);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => errorMessage = message as string);
+
+            SupplementsController supplementsController = new SupplementsController(null, null, managerSubcategoryService.Object, managerManufacturerService.Object, supplementService.Object, null, null, null)
+            {
+                TempData = tempData.Object
+            };
+
+            //Act
+            var result = await supplementsController.Edit(nonExistingSupplementId, categoryId, new SupplementFormViewModel());
+
+            //Assert
+            errorMessage.Should().Be(string.Format(EntityNotFound, SupplementEntity));
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
+            result.As<RedirectToActionResult>().ControllerName.Should().Be("Supplements");
+            result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("isDeleted");
+            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(false);
+        }
+
+        [Fact]
+        public async Task EditPost_WithSupplementNotModified_ShouldShowWarningMessageAndReturnValidViewModel()
+        {
+            string warningMessage = null;
+
+            //Arrange
+            Mock<IManagerSubcategoryService> managerSubcategoryService = new Mock<IManagerSubcategoryService>();
+            managerSubcategoryService
+                .Setup(m => m.GetAllBasicListingAsync(categoryId, false))
+                .ReturnsAsync(new List<SubcategoryBasicServiceModel>());
+
+            Mock<IManagerManufacturerService> managerManufacturerService = new Mock<IManagerManufacturerService>();
+            managerManufacturerService
+                .Setup(m => m.GetAllBasicListingAsync(false))
+                .ReturnsAsync(new List<ManufacturerBasicServiceModel>());
+
+            Mock<IManagerSupplementService> managerSupplementService = new Mock<IManagerSupplementService>();
+            managerSupplementService
+                .Setup(m => m.IsSupplementModified(supplementId, null, null, 0, 0, new byte[0], DateTime.UtcNow.Date, subcategoryId, manufacturerId))
+                .ReturnsAsync(true);
+
+            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
+            supplementService
+                .Setup(s => s.IsSupplementExistingById(supplementId, false))
+                .ReturnsAsync(true);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataWarningMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => warningMessage = message as string);
+
+            Mock<IFormFile> picture = new Mock<IFormFile>();
+
+            SupplementsController supplementsController = new SupplementsController(managerSupplementService.Object, null, managerSubcategoryService.Object, managerManufacturerService.Object, supplementService.Object, null, null, null)
+            {
+                TempData = tempData.Object
+            };
+
+            //Act
+            var result = await supplementsController.Edit(supplementId, categoryId, new SupplementFormViewModel() { Picture = picture.Object });
+
+            //Assert
+            warningMessage.Should().Be(string.Format(EntityNotModified, SupplementEntity));
+
+            result.Should().BeOfType<ViewResult>();
+
+            result.As<ViewResult>().Model.Should().BeOfType<SupplementFormViewModel>();
+
+            SupplementFormViewModel model = result.As<ViewResult>().Model.As<SupplementFormViewModel>();
+            model.Subcategories.Should().HaveCount(0);
+            model.Manufacturers.Should().HaveCount(0);
+        }
+
+        [Fact]
+        public async Task EditPost_WithSupplementExistingByName_ShouldShowErrorMessageAndReturnValidViewModel()
+        {
+            string errorMessage = null;
+
+            //Arrange
+            Mock<IManagerSubcategoryService> managerSubcategoryService = new Mock<IManagerSubcategoryService>();
+            managerSubcategoryService
+                .Setup(m => m.GetAllBasicListingAsync(categoryId, false))
+                .ReturnsAsync(new List<SubcategoryBasicServiceModel>());
+
+            Mock<IManagerManufacturerService> managerManufacturerService = new Mock<IManagerManufacturerService>();
+            managerManufacturerService
+                .Setup(m => m.GetAllBasicListingAsync(false))
+                .ReturnsAsync(new List<ManufacturerBasicServiceModel>());
+
+            Mock<IManagerSupplementService> managerSupplementService = new Mock<IManagerSupplementService>();
+            managerSupplementService
+                .Setup(m => m.IsSupplementModified(supplementId, null, null, 0, 0, new byte[0], DateTime.UtcNow.Date, subcategoryId, manufacturerId))
+                .ReturnsAsync(true);
+
+            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
+            supplementService
+                .Setup(s => s.IsSupplementExistingById(supplementId, false))
+                .ReturnsAsync(true);
+            supplementService
+                .Setup(s => s.IsSupplementExistingByIdAndName(supplementId, null))
+                .ReturnsAsync(true);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => errorMessage = message as string);
+
+            Mock<IFormFile> picture = new Mock<IFormFile>();
+
+            SupplementsController supplementsController = new SupplementsController(managerSupplementService.Object, null, managerSubcategoryService.Object, managerManufacturerService.Object, supplementService.Object, null, null, null)
+            {
+                TempData = tempData.Object
+            };
+
+            //Act
+            var result = await supplementsController.Edit(supplementId, categoryId, new SupplementFormViewModel() { Picture = picture.Object, BestBeforeDate = DateTime.UtcNow.Date, SubcategoryId = subcategoryId, ManufacturerId = manufacturerId });
+
+            //Assert
+            errorMessage.Should().Be(string.Format(EntityExists, SupplementEntity));
+
+            result.Should().BeOfType<ViewResult>();
+
+            result.As<ViewResult>().Model.Should().BeOfType<SupplementFormViewModel>();
+
+            SupplementFormViewModel model = result.As<ViewResult>().Model.As<SupplementFormViewModel>();
+            model.Subcategories.Should().HaveCount(0);
+            model.Manufacturers.Should().HaveCount(0);
+        }
+
+        [Fact]
+        public async Task EditPost_WithIncorrectSubcategoryId_ShouldShowErrorMessageAndReturnValidViewModel()
+        {
+            string errorMessage = null;
+
+            //Arrange
+            Mock<IManagerSubcategoryService> managerSubcategoryService = new Mock<IManagerSubcategoryService>();
+            managerSubcategoryService
+                .Setup(m => m.GetAllBasicListingAsync(categoryId, false))
+                .ReturnsAsync(new List<SubcategoryBasicServiceModel>());
+
+            Mock<IManagerManufacturerService> managerManufacturerService = new Mock<IManagerManufacturerService>();
+            managerManufacturerService
+                .Setup(m => m.GetAllBasicListingAsync(false))
+                .ReturnsAsync(new List<ManufacturerBasicServiceModel>());
+
+            Mock<IManagerSupplementService> managerSupplementService = new Mock<IManagerSupplementService>();
+            managerSupplementService
+                .Setup(m => m.IsSupplementModified(supplementId, null, null, 0, 0, new byte[0], DateTime.UtcNow.Date, subcategoryId, manufacturerId))
+                .ReturnsAsync(true);
+
+            Mock<ISubcategoryService> subcategoryService = new Mock<ISubcategoryService>();
+            subcategoryService
+                .Setup(s => s.IsSubcategoryExistingById(nonExistingSubcategoryId, false))
+                .ReturnsAsync(false);
+
+            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
+            supplementService
+                .Setup(s => s.IsSupplementExistingById(supplementId, false))
+                .ReturnsAsync(true);
+            supplementService
+                .Setup(s => s.IsSupplementExistingByIdAndName(supplementId, null))
+                .ReturnsAsync(false);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => errorMessage = message as string);
+
+            Mock<IFormFile> picture = new Mock<IFormFile>();
+
+            SupplementsController supplementsController = new SupplementsController(managerSupplementService.Object, null, managerSubcategoryService.Object, managerManufacturerService.Object, supplementService.Object, null, subcategoryService.Object, null)
+            {
+                TempData = tempData.Object
+            };
+
+            //Act
+            var result = await supplementsController.Edit(supplementId, categoryId, new SupplementFormViewModel() { Picture = picture.Object, BestBeforeDate = DateTime.UtcNow.Date, SubcategoryId = subcategoryId, ManufacturerId = manufacturerId });
+
+            //Assert
+            errorMessage.Should().Be(string.Format(EntityNotFound, SubcategoryEntity));
+
+            result.Should().BeOfType<ViewResult>();
+
+            result.As<ViewResult>().Model.Should().BeOfType<SupplementFormViewModel>();
+
+            SupplementFormViewModel model = result.As<ViewResult>().Model.As<SupplementFormViewModel>();
+            model.Subcategories.Should().HaveCount(0);
+            model.Manufacturers.Should().HaveCount(0);
+        }
+
+        [Fact]
+        public async Task EditPost_WithIncorrectManufacturerId_ShouldShowErrorMessageAndReturnValidViewModel()
+        {
+            string errorMessage = null;
+
+            //Arrange
+            Mock<IManagerSubcategoryService> managerSubcategoryService = new Mock<IManagerSubcategoryService>();
+            managerSubcategoryService
+                .Setup(m => m.GetAllBasicListingAsync(categoryId, false))
+                .ReturnsAsync(new List<SubcategoryBasicServiceModel>());
+
+            Mock<IManagerManufacturerService> managerManufacturerService = new Mock<IManagerManufacturerService>();
+            managerManufacturerService
+                .Setup(m => m.GetAllBasicListingAsync(false))
+                .ReturnsAsync(new List<ManufacturerBasicServiceModel>());
+
+            Mock<IManagerSupplementService> managerSupplementService = new Mock<IManagerSupplementService>();
+            managerSupplementService
+                .Setup(m => m.IsSupplementModified(supplementId, null, null, 0, 0, new byte[0], DateTime.UtcNow.Date, subcategoryId, manufacturerId))
+                .ReturnsAsync(true);
+
+            Mock<ISubcategoryService> subcategoryService = new Mock<ISubcategoryService>();
+            subcategoryService
+                .Setup(s => s.IsSubcategoryExistingById(subcategoryId, false))
+                .ReturnsAsync(true);
+
+            Mock<IManufacturerService> manufacturerService = new Mock<IManufacturerService>();
+            manufacturerService
+                .Setup(s => s.IsManufacturerExistingById(nonExistingManufacturerId, false))
+                .ReturnsAsync(false);
+
+            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
+            supplementService
+                .Setup(s => s.IsSupplementExistingById(supplementId, false))
+                .ReturnsAsync(true);
+            supplementService
+                .Setup(s => s.IsSupplementExistingByIdAndName(supplementId, null))
+                .ReturnsAsync(false);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => errorMessage = message as string);
+
+            Mock<IFormFile> picture = new Mock<IFormFile>();
+
+            SupplementsController supplementsController = new SupplementsController(managerSupplementService.Object, null, managerSubcategoryService.Object, managerManufacturerService.Object, supplementService.Object, null, subcategoryService.Object, manufacturerService.Object)
+            {
+                TempData = tempData.Object
+            };
+
+            //Act
+            var result = await supplementsController.Edit(supplementId, categoryId, new SupplementFormViewModel() { Picture = picture.Object, BestBeforeDate = DateTime.UtcNow.Date, SubcategoryId = subcategoryId, ManufacturerId = manufacturerId });
+
+            //Assert
+            errorMessage.Should().Be(string.Format(EntityNotFound, ManufacturerEntity));
+
+            result.Should().BeOfType<ViewResult>();
+
+            result.As<ViewResult>().Model.Should().BeOfType<SupplementFormViewModel>();
+
+            SupplementFormViewModel model = result.As<ViewResult>().Model.As<SupplementFormViewModel>();
+            model.Subcategories.Should().HaveCount(0);
+            model.Manufacturers.Should().HaveCount(0);
+        }
+
+        [Fact]
+        public async Task EditPost_WithCorrectData_ShouldShowSucccessMessageAndReturnToSupplementsIndex()
+        {
+            string successMessage = null;
+
+            //Arrange
+            Mock<IManagerSubcategoryService> managerSubcategoryService = new Mock<IManagerSubcategoryService>();
+            managerSubcategoryService
+                .Setup(m => m.GetAllBasicListingAsync(categoryId, false))
+                .ReturnsAsync(new List<SubcategoryBasicServiceModel>());
+
+            Mock<IManagerManufacturerService> managerManufacturerService = new Mock<IManagerManufacturerService>();
+            managerManufacturerService
+                .Setup(m => m.GetAllBasicListingAsync(false))
+                .ReturnsAsync(new List<ManufacturerBasicServiceModel>());
+
+            Mock<IManagerSupplementService> managerSupplementService = new Mock<IManagerSupplementService>();
+            managerSupplementService
+                .Setup(m => m.IsSupplementModified(supplementId, null, null, 0, 0, new byte[0], DateTime.UtcNow.Date, subcategoryId, manufacturerId))
+                .ReturnsAsync(true);
+            managerSupplementService
+                .Setup(m => m.EditAsync(supplementId, null, null, 0, 0, new byte[0], DateTime.UtcNow.Date, subcategoryId, manufacturerId))
+                .Returns(Task.CompletedTask);
+
+            Mock<ISubcategoryService> subcategoryService = new Mock<ISubcategoryService>();
+            subcategoryService
+                .Setup(s => s.IsSubcategoryExistingById(subcategoryId, false))
+                .ReturnsAsync(true);
+
+            Mock<IManufacturerService> manufacturerService = new Mock<IManufacturerService>();
+            manufacturerService
+                .Setup(s => s.IsManufacturerExistingById(manufacturerId, false))
+                .ReturnsAsync(true);
+
+            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
+            supplementService
+                .Setup(s => s.IsSupplementExistingById(supplementId, false))
+                .ReturnsAsync(true);
+            supplementService
+                .Setup(s => s.IsSupplementExistingByIdAndName(supplementId, null))
+                .ReturnsAsync(false);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataSuccessMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => successMessage = message as string);
+
+            Mock<IFormFile> picture = new Mock<IFormFile>();
+
+            SupplementsController supplementsController = new SupplementsController(managerSupplementService.Object, null, managerSubcategoryService.Object, managerManufacturerService.Object, supplementService.Object, null, subcategoryService.Object, manufacturerService.Object)
+            {
+                TempData = tempData.Object
+            };
+
+            //Act
+            var result = await supplementsController.Edit(supplementId, categoryId, new SupplementFormViewModel() { Picture = picture.Object, BestBeforeDate = DateTime.UtcNow.Date, SubcategoryId = subcategoryId, ManufacturerId = manufacturerId });
+
+            //Assert
+            successMessage.Should().Be(string.Format(EntityModified, SupplementEntity));
 
             result.Should().BeOfType<RedirectToActionResult>();
 

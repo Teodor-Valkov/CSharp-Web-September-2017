@@ -1,11 +1,9 @@
 ﻿namespace FitStore.Web.Controllers
 {
-    using FitStore.Web.Models.Pagination;
     using Microsoft.AspNetCore.Mvc;
-    using Models;
     using Models.Home;
+    using Models.Pagination;
     using Services.Contracts;
-    using System.Diagnostics;
     using System.Threading.Tasks;
 
     using static Common.CommonConstants;
@@ -21,9 +19,9 @@
             this.supplementService = supplementService;
         }
 
-        public async Task<IActionResult> Index(string searchToken, int page = 1)
+        public async Task<IActionResult> Index(string searchToken, int page = MinPage)
         {
-            if (page < 1)
+            if (page < MinPage)
             {
                 return RedirectToAction(nameof(Index), new { searchToken });
             }
@@ -44,7 +42,7 @@
                 }
             };
 
-            if (page > 1 && page > model.Pagination.TotalPages)
+            if (page > MinPage && page > model.Pagination.TotalPages)
             {
                 return RedirectToAction(nameof(Index), new { searchToken });
             }
@@ -52,11 +50,6 @@
             ViewData["SearchToken"] = searchToken;
 
             return View(model);
-        }
-
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

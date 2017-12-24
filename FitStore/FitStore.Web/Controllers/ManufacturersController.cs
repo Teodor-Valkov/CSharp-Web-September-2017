@@ -1,8 +1,8 @@
 ﻿namespace FitStore.Web.Controllers
 {
-    using FitStore.Web.Models.Pagination;
     using Infrastructure.Extensions;
     using Microsoft.AspNetCore.Mvc;
+    using Models.Pagination;
     using Services.Contracts;
     using Services.Models.Manufacturers;
     using System.Threading.Tasks;
@@ -19,9 +19,9 @@
             this.manufacturerService = manufacturerService;
         }
 
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int page = MinPage)
         {
-            if (page < 1)
+            if (page < MinPage)
             {
                 return RedirectToAction(nameof(Index));
             }
@@ -37,7 +37,7 @@
                 }
             };
 
-            if (page > 1 && page > model.Pagination.TotalPages)
+            if (page > MinPage && page > model.Pagination.TotalPages)
             {
                 return RedirectToAction(nameof(Index));
             }
@@ -45,7 +45,7 @@
             return View(model);
         }
 
-        public async Task<IActionResult> Details(int id, string name, int page = 1)
+        public async Task<IActionResult> Details(int id, string name, int page = MinPage)
         {
             bool isManufacturerExisting = await this.manufacturerService.IsManufacturerExistingById(id, false);
 
@@ -56,7 +56,7 @@
                 return this.RedirectToHomeIndex();
             }
 
-            if (page < 1)
+            if (page < MinPage)
             {
                 return RedirectToAction(nameof(Details), new { id, name });
             }
@@ -72,7 +72,7 @@
                 }
             };
 
-            if (page > 1 && page > model.Pagination.TotalPages)
+            if (page > MinPage && page > model.Pagination.TotalPages)
             {
                 return RedirectToAction(nameof(Details), new { id, name });
             }

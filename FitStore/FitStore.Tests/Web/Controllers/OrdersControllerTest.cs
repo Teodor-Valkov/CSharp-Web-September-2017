@@ -1,12 +1,20 @@
 ﻿namespace FitStore.Tests.Web.Controllers
 {
-    using FitStore.Services.Models;
     using FitStore.Web.Controllers;
+    using FitStore.Web.Infrastructure.Extensions;
     using FluentAssertions;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.ViewFeatures;
     using Moq;
     using Services.Contracts;
+    using Services.Models;
+    using Services.Models.Orders;
+    using Services.Models.Supplements;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
     using System.Threading.Tasks;
     using Xunit;
 
@@ -18,6 +26,8 @@
     {
         private const int supplementId = 1;
         private const int nonExistingSupplementId = int.MaxValue;
+        private const int orderId = 1;
+        private const int nonExistingOrderId = int.MaxValue;
         private const string returnUrl = "returnUrl";
         private ShoppingCart shoppingCart = new ShoppingCart();
 
@@ -102,7 +112,7 @@
             result.As<RedirectToActionResult>().ControllerName.Should().Be("Home");
         }
 
-        // To test Controller with mocked static class ShoppingCart
+        // To test OrdersController with mocked ShoppingCart class - received from session by extension method
 
         //[Fact]
         //public async Task Add_WithAlreadyAddedLastAvailableSupplement_ShouldReturnErrorMessageAndReturnToReturnUrl()
@@ -156,5 +166,93 @@
         //    result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
         //    result.As<RedirectToActionResult>().ControllerName.Should().Be("Home");
         //}
+
+        //[Fact]
+        //public void Details_ShouldReturnShoppingCart()
+        //{
+        //    //Arrange
+        //    Mock<HttpContext> httpContext = new Mock<HttpContext>();
+        //    httpContext
+        //        .SetupGet(h => h.Session.GetShoppingCart<ShoppingCart>(UserSessionShoppingCartKey))
+        //        .Returns(new ShoppingCart());
+
+        //    OrdersController ordersController = new OrdersController(null, null, null)
+        //    {
+        //        ControllerContext = new ControllerContext
+        //        {
+        //            HttpContext = httpContext.Object
+        //        }
+        //    };
+
+        //    //Act
+        //    var result = ordersController.Details();
+
+        //    //Assert
+        //    result.Should().BeOfType<ViewResult>();
+
+        //    result.As<ViewResult>().Model.Should().BeOfType<ShoppingCart>();
+        //}
+
+        [Fact]
+        public void Review_ShouldBeAccessedByAutorizedUsers()
+        {
+            //Arrange
+            MethodInfo method = typeof(OrdersController).GetMethod(nameof(OrdersController.Review));
+
+            //Act
+            object[] authorizeAttribute = method.GetCustomAttributes(true);
+
+            //Assert
+            authorizeAttribute
+                .Should()
+                .Match(attr => attr.Any(a => a.GetType() == typeof(AuthorizeAttribute)));
+        }
+
+        [Fact]
+        public async Task Review_WithIncorrectOrderId_ShouldReturnToHomeIndex()
+        {
+            //Arrange
+            Mock<IOrderService> orderService = new Mock<IOrderService>();
+            orderService
+                .Setup(o => o.IsOrderExistingById(nonExistingOrderId))
+                .ReturnsAsync(false);
+
+            OrdersController ordersController = new OrdersController(null, orderService.Object, null);
+
+            //Act
+            var result = await ordersController.Review(nonExistingSupplementId);
+
+            //Assert
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
+            result.As<RedirectToActionResult>().ControllerName.Should().Be("Home");
+        }
+
+        [Fact]
+        public async Task Review_WithCorrectOrderId_ShouldReturnValidViewModel()
+        {
+            //Arrange
+            Mock<IOrderService> orderService = new Mock<IOrderService>();
+            orderService
+                .Setup(o => o.IsOrderExistingById(orderId))
+                .ReturnsAsync(true);
+            orderService
+                .Setup(o => o.GetDetailsByIdAsync(orderId))
+                .ReturnsAsync(new OrderDetailsServiceModel() { Supplements = new List<SupplementInOrderServiceModel>() });
+
+            OrdersController ordersController = new OrdersController(null, orderService.Object, null);
+
+            //Act
+            var result = await ordersController.Review(orderId);
+
+            //Assert
+            result.Should().BeOfType<ViewResult>();
+
+            result.As<ViewResult>().Model.Should().BeOfType<OrderDetailsServiceModel>();
+
+            OrderDetailsServiceModel model = result.As<ViewResult>().Model.As<OrderDetailsServiceModel>();
+            model.Supplements.Should().HaveCount(0);
+        }
     }
 }

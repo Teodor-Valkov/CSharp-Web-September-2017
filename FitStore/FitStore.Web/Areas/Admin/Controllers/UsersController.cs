@@ -35,9 +35,9 @@
             this.adminUserService = adminUserService;
         }
 
-        public async Task<IActionResult> Index(string searchToken, int page = 1)
+        public async Task<IActionResult> Index(string searchToken, int page = MinPage)
         {
-            if (page < 1)
+            if (page < MinPage)
             {
                 return RedirectToAction(nameof(Index), new { searchToken });
             }
@@ -54,7 +54,7 @@
                 }
             };
 
-            if (page > 1 && page > model.Pagination.TotalPages)
+            if (page > MinPage && page > model.Pagination.TotalPages)
             {
                 return RedirectToAction(nameof(Index), new { searchToken });
             }

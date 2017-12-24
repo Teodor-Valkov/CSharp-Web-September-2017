@@ -8,7 +8,6 @@
 
     using static Common.CommonConstants;
     using static Common.CommonMessages;
-    using static WebConstants;
 
     public class CommentsController : BaseModeratorController
     {

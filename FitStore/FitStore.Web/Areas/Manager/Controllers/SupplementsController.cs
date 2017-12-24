@@ -42,9 +42,9 @@
             this.manufacturerService = manufacturerService;
         }
 
-        public async Task<IActionResult> Index(string searchToken, bool isDeleted, int page = 1)
+        public async Task<IActionResult> Index(string searchToken, bool isDeleted, int page = MinPage)
         {
-            if (page < 1)
+            if (page < MinPage)
             {
                 return RedirectToAction(nameof(Index), new { searchToken, isDeleted });
             }
@@ -62,7 +62,7 @@
                 }
             };
 
-            if (page > 1 && page > model.Pagination.TotalPages)
+            if (page > MinPage && page > model.Pagination.TotalPages)
             {
                 return RedirectToAction(nameof(Index), new { searchToken, isDeleted });
             }
@@ -132,6 +132,8 @@
                 TempData.AddErrorMessage(string.Format(EntityExists, SupplementEntity));
 
                 await PrepareModelToReturn(categoryId, model);
+
+                ViewData["CategoryId"] = categoryId;
 
                 return View(nameof(Create), model);
             }

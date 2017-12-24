@@ -1,15 +1,15 @@
 ﻿namespace FitStore.Web.Controllers
 {
     using Data.Models;
-    using FitStore.Services.Models.Reviews;
-    using FitStore.Web.Models.Pagination;
-    using FitStore.Web.Models.Reviews;
     using Infrastructure.Extensions;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
+    using Models.Pagination;
+    using Models.Reviews;
     using Services.Contracts;
+    using Services.Models.Reviews;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -35,9 +35,9 @@
         }
 
         [AllowAnonymous]
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int page = MinPage)
         {
-            if (page < 1)
+            if (page < MinPage)
             {
                 return RedirectToAction(nameof(Index));
             }
@@ -53,7 +53,7 @@
                 }
             };
 
-            if (page > 1 && page > model.Pagination.TotalPages)
+            if (page > MinPage && page > model.Pagination.TotalPages)
             {
                 return RedirectToAction(nameof(Index));
             }

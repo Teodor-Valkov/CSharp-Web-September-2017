@@ -3,7 +3,7 @@
     using AutoMapper;
     using FitStore.Web.Infrastructure.Mapping;
 
-    public class BaseControllerTest
+    public abstract class BaseControllerTest
     {
         static BaseControllerTest()
         {

@@ -18,6 +18,8 @@
     using static Common.CommonConstants;
     using static Common.CommonMessages;
     using static FitStore.Web.WebConstants;
+    using FitStore.Services.Models.Comments;
+    using System.Collections.Generic;
 
     public class SupplementsControllerTest
     {
@@ -153,110 +155,182 @@
             result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(supplementName);
         }
 
-        // To Mock TempData with ["ReturnUrl"]
+        [Fact]
+        public async Task Details_WithCorrectSupplementIdAndCorrectPageAndIncorrectReturnUrl_ShouldChangeReturnUrlAndReturnValidPaginationModelAndValidViewModel()
+        {
+            string expectedReturnUrl = "IncorrectUrl";
+            const int page = 1;
+            const int totalElements = CommentPageSize;
 
-        //[Fact]
-        //public async Task Details_WithCorrectSupplementIdAndTotalPagesEqualToOne_ShouldReturnValidPaginationModelAndValidViewModel()
-        //{
-        //    const int page = 1;
-        //    const int totalElements = CommentPageSize;
+            //Arrange
+            Mock<IModeratorSupplementService> moderatorSupplementService = new Mock<IModeratorSupplementService>();
+            moderatorSupplementService
+                .Setup(m => m.GetDetailsWithDeletedCommentsByIdAsync(supplementId, page))
+                 .ReturnsAsync(new SupplementDetailsWithDeletedCommentsServiceModel() { Comments = new List<CommentAdvancedServiceModel>() { new CommentAdvancedServiceModel() } });
 
-        //    //Arrange
-        //    Mock<IModeratorSupplementService> moderatorSupplementService = new Mock<IModeratorSupplementService>();
-        //    moderatorSupplementService
-        //        .Setup(m => m.GetDetailsWithDeletedCommentsByIdAsync(supplementId, page))
-        //        .ReturnsAsync(new SupplementDetailsWithDeletedCommentsServiceModel());
+            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
+            supplementService
+                .Setup(s => s.IsSupplementExistingById(supplementId, false))
+                .ReturnsAsync(true);
+            supplementService
+                .Setup(s => s.TotalCommentsAsync(supplementId, true))
+                .ReturnsAsync(totalElements);
 
-        //    Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
-        //    supplementService
-        //        .Setup(s => s.IsSupplementExistingById(supplementId, false))
-        //        .ReturnsAsync(true);
-        //    supplementService
-        //        .Setup(s => s.TotalCommentsAsync(supplementId, true))
-        //        .ReturnsAsync(totalElements);
+            Mock<IUrlHelper> urlHelper = new Mock<IUrlHelper>();
+            urlHelper
+                .Setup(u => u.IsLocalUrl(It.IsAny<string>()))
+                .Returns(false)
+                .Callback((string url) => { expectedReturnUrl = url; });
 
-        //    Mock<IUrlHelper> urlHelper = new Mock<IUrlHelper>();
-        //    urlHelper
-        //        .Setup(u => u.IsLocalUrl(It.IsAny<string>()))
-        //        .Returns(true);
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupGet(t => t["ReturnUrl"])
+                .Returns("/");
 
-        //    Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            SupplementsController supplementsController = new SupplementsController(moderatorSupplementService.Object, supplementService.Object)
+            {
+                Url = urlHelper.Object,
+                TempData = tempData.Object
+            };
 
-        //    SupplementsController supplementsController = new SupplementsController(moderatorSupplementService.Object, supplementService.Object)
-        //    {
-        //        Url = urlHelper.Object,
-        //        TempData = tempData.Object
-        //    };
+            //Act
+            var result = await supplementsController.Details(supplementId, supplementName, null, page);
 
-        //    //Act
-        //    var result = await supplementsController.Details(supplementId, supplementName, null, page);
+            //Assert
+            result.Should().BeOfType<ViewResult>();
 
-        //    //Assert
-        //    result.Should().BeOfType<ViewResult>();
+            result.As<ViewResult>().ViewData.Should().ContainKey("ReturnUrl");
+            result.As<ViewResult>().ViewData.Should().ContainValue("/");
 
-        //    result.As<ViewResult>().Model.Should().BeOfType<PagingElementViewModel<SupplementDetailsWithDeletedCommentsServiceModel>>();
+            result.As<ViewResult>().Model.Should().BeOfType<PagingElementViewModel<SupplementDetailsWithDeletedCommentsServiceModel>>();
 
-        //    PagingElementViewModel<SupplementDetailsWithDeletedCommentsServiceModel> model = result.As<ViewResult>().Model.As<PagingElementViewModel<SupplementDetailsWithDeletedCommentsServiceModel>>();
+            PagingElementViewModel<SupplementDetailsWithDeletedCommentsServiceModel> model = result.As<ViewResult>().Model.As<PagingElementViewModel<SupplementDetailsWithDeletedCommentsServiceModel>>();
 
-        //    model.Pagination.CurrentPage.Should().Be(page);
-        //    model.Pagination.PreviousPage.Should().Be(page);
-        //    model.Pagination.NextPage.Should().Be(page);
-        //    model.Pagination.TotalPages.Should().Be(page);
-        //    model.Pagination.TotalElements.Should().Be(totalElements);
-        //    model.Pagination.PageSize.Should().Be(CommentPageSize);
-        //}
+            model.Element.Comments.Should().HaveCount(1);
+            model.Pagination.CurrentPage.Should().Be(page);
+            model.Pagination.PreviousPage.Should().Be(page);
+            model.Pagination.NextPage.Should().Be(page);
+            model.Pagination.TotalPages.Should().Be(page);
+            model.Pagination.TotalElements.Should().Be(totalElements);
+            model.Pagination.PageSize.Should().Be(CommentPageSize);
+        }
 
-        // To Mock TempData with ["ReturnUrl"]
+        [Fact]
+        public async Task Details_WithCorrectSupplementIdAndTotalPagesEqualToOne_ShouldReturnValidPaginationModelAndValidViewModel()
+        {
+            const string returnUrl = "returnUrl";
+            const int page = 1;
+            const int totalElements = CommentPageSize;
 
-        //[Fact]
-        //public async Task Details_WithCorrectSupplementIdAndCorrectPage_ShouldReturnValidPaginationModelAndValidViewModel()
-        //{
-        //    const int page = 3;
-        //    const int totalElements = 20;
+            //Arrange
+            Mock<IModeratorSupplementService> moderatorSupplementService = new Mock<IModeratorSupplementService>();
+            moderatorSupplementService
+                .Setup(m => m.GetDetailsWithDeletedCommentsByIdAsync(supplementId, page))
+                .ReturnsAsync(new SupplementDetailsWithDeletedCommentsServiceModel() { Comments = new List<CommentAdvancedServiceModel>() { new CommentAdvancedServiceModel() } });
 
-        //    //Arrange
-        //    Mock<IModeratorSupplementService> moderatorSupplementService = new Mock<IModeratorSupplementService>();
-        //    moderatorSupplementService
-        //        .Setup(m => m.GetDetailsWithDeletedCommentsByIdAsync(supplementId, page))
-        //        .ReturnsAsync(new SupplementDetailsWithDeletedCommentsServiceModel());
+            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
+            supplementService
+                .Setup(s => s.IsSupplementExistingById(supplementId, false))
+                .ReturnsAsync(true);
+            supplementService
+                .Setup(s => s.TotalCommentsAsync(supplementId, true))
+                .ReturnsAsync(totalElements);
 
-        //    Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
-        //    supplementService
-        //        .Setup(s => s.IsSupplementExistingById(supplementId, false))
-        //        .ReturnsAsync(true);
-        //    supplementService
-        //        .Setup(s => s.TotalCommentsAsync(supplementId, true))
-        //        .ReturnsAsync(totalElements);
+            Mock<IUrlHelper> urlHelper = new Mock<IUrlHelper>();
+            urlHelper
+                .Setup(u => u.IsLocalUrl(It.IsAny<string>()))
+                .Returns(true);
 
-        //    Mock<IUrlHelper> urlHelper = new Mock<IUrlHelper>();
-        //    urlHelper
-        //        .Setup(u => u.IsLocalUrl(It.IsAny<string>()))
-        //        .Returns(true);
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupGet(t => t["ReturnUrl"])
+                .Returns(returnUrl);
 
-        //    Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            SupplementsController supplementsController = new SupplementsController(moderatorSupplementService.Object, supplementService.Object)
+            {
+                Url = urlHelper.Object,
+                TempData = tempData.Object
+            };
 
-        //    SupplementsController supplementsController = new SupplementsController(moderatorSupplementService.Object, supplementService.Object)
-        //    {
-        //        Url = urlHelper.Object,
-        //        TempData = tempData.Object
-        //    };
+            //Act
+            var result = await supplementsController.Details(supplementId, supplementName, null, page);
 
-        //    //Act
-        //    var result = await supplementsController.Details(supplementId, supplementName, null, page);
+            //Assert
+            result.Should().BeOfType<ViewResult>();
 
-        //    //Assert
-        //    result.Should().BeOfType<ViewResult>();
+            result.As<ViewResult>().ViewData.Should().ContainKey("ReturnUrl");
+            result.As<ViewResult>().ViewData.Should().ContainValue(returnUrl);
 
-        //    result.As<ViewResult>().Model.Should().BeOfType<PagingElementViewModel<SupplementDetailsWithDeletedCommentsServiceModel>>();
+            result.As<ViewResult>().Model.Should().BeOfType<PagingElementViewModel<SupplementDetailsWithDeletedCommentsServiceModel>>();
 
-        //    PagingElementViewModel<SupplementDetailsWithDeletedCommentsServiceModel> model = result.As<ViewResult>().Model.As<PagingElementViewModel<SupplementDetailsWithDeletedCommentsServiceModel>>();
+            PagingElementViewModel<SupplementDetailsWithDeletedCommentsServiceModel> model = result.As<ViewResult>().Model.As<PagingElementViewModel<SupplementDetailsWithDeletedCommentsServiceModel>>();
 
-        //    model.Pagination.CurrentPage.Should().Be(page);
-        //    model.Pagination.PreviousPage.Should().Be(2);
-        //    model.Pagination.NextPage.Should().Be(4);
-        //    model.Pagination.TotalPages.Should().Be(4);
-        //    model.Pagination.TotalElements.Should().Be(totalElements);
-        //    model.Pagination.PageSize.Should().Be(CommentPageSize);
-        //}
+            model.Element.Comments.Should().HaveCount(1);
+            model.Pagination.CurrentPage.Should().Be(page);
+            model.Pagination.PreviousPage.Should().Be(page);
+            model.Pagination.NextPage.Should().Be(page);
+            model.Pagination.TotalPages.Should().Be(page);
+            model.Pagination.TotalElements.Should().Be(totalElements);
+            model.Pagination.PageSize.Should().Be(CommentPageSize);
+        }
+
+        [Fact]
+        public async Task Details_WithCorrectSupplementIdAndCorrectPage_ShouldReturnValidPaginationModelAndValidViewModel()
+        {
+            const string returnUrl = "returnUrl";
+            const int page = 3;
+            const int totalElements = 20;
+
+            //Arrange
+            Mock<IModeratorSupplementService> moderatorSupplementService = new Mock<IModeratorSupplementService>();
+            moderatorSupplementService
+                .Setup(m => m.GetDetailsWithDeletedCommentsByIdAsync(supplementId, page))
+                .ReturnsAsync(new SupplementDetailsWithDeletedCommentsServiceModel() { Comments = new List<CommentAdvancedServiceModel>() { new CommentAdvancedServiceModel() } });
+
+            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
+            supplementService
+                .Setup(s => s.IsSupplementExistingById(supplementId, false))
+                .ReturnsAsync(true);
+            supplementService
+                .Setup(s => s.TotalCommentsAsync(supplementId, true))
+                .ReturnsAsync(totalElements);
+
+            Mock<IUrlHelper> urlHelper = new Mock<IUrlHelper>();
+            urlHelper
+                .Setup(u => u.IsLocalUrl(It.IsAny<string>()))
+                .Returns(true);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupGet(t => t["ReturnUrl"])
+                .Returns(returnUrl);
+
+            SupplementsController supplementsController = new SupplementsController(moderatorSupplementService.Object, supplementService.Object)
+            {
+                Url = urlHelper.Object,
+                TempData = tempData.Object
+            };
+
+            //Act
+            var result = await supplementsController.Details(supplementId, supplementName, null, page);
+
+            //Assert
+            result.Should().BeOfType<ViewResult>();
+
+            result.As<ViewResult>().ViewData.Keys.Should().Contain("ReturnUrl");
+            result.As<ViewResult>().ViewData.Values.Should().Contain(returnUrl);
+
+            result.As<ViewResult>().Model.Should().BeOfType<PagingElementViewModel<SupplementDetailsWithDeletedCommentsServiceModel>>();
+
+            PagingElementViewModel<SupplementDetailsWithDeletedCommentsServiceModel> model = result.As<ViewResult>().Model.As<PagingElementViewModel<SupplementDetailsWithDeletedCommentsServiceModel>>();
+
+            model.Element.Comments.Should().HaveCount(1);
+            model.Pagination.CurrentPage.Should().Be(page);
+            model.Pagination.PreviousPage.Should().Be(2);
+            model.Pagination.NextPage.Should().Be(4);
+            model.Pagination.TotalPages.Should().Be(4);
+            model.Pagination.TotalElements.Should().Be(totalElements);
+            model.Pagination.PageSize.Should().Be(CommentPageSize);
+        }
     }
 }

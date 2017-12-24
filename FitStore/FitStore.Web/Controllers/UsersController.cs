@@ -25,7 +25,7 @@
             this.userService = userService;
         }
 
-        public async Task<IActionResult> Profile(string username, int page = 1)
+        public async Task<IActionResult> Profile(string username, int page = MinPage)
         {
             User user = await this.userManager.FindByNameAsync(username);
 
@@ -36,7 +36,7 @@
                 return this.RedirectToHomeIndex();
             }
 
-            if (page < 1)
+            if (page < MinPage)
             {
                 return RedirectToAction(nameof(Profile), new { username });
             }
@@ -52,7 +52,7 @@
                 }
             };
 
-            if (page > 1 && page > model.Pagination.TotalPages)
+            if (page > MinPage && page > model.Pagination.TotalPages)
             {
                 return RedirectToAction(nameof(Profile), new { username });
             }

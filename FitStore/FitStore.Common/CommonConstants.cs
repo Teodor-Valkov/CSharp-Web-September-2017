@@ -9,6 +9,7 @@
         public const int OrderPageSize = 3;
         public const int SupplementPageSize = 3;
         public const int ManufacturerPageSize = 3;
+        public const int MinPage = 1;
 
         public const string CategoryEntity = "Category";
         public const string CommentEntity = "Comment";

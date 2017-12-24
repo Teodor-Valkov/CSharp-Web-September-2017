@@ -132,7 +132,7 @@
         {
             ShoppingCart shoppingCart = HttpContext.Session.GetShoppingCart<ShoppingCart>(UserSessionShoppingCartKey);
 
-            return this.View(shoppingCart);
+            return View(shoppingCart);
         }
 
         [Authorize]

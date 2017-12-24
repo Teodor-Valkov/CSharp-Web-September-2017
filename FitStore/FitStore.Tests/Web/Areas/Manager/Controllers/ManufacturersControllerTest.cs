@@ -1,6 +1,5 @@
 ﻿namespace FitStore.Tests.Web.Areas.Manager.Controllers
 {
-    using FitStore.Tests.Web.Controllers;
     using FitStore.Web.Areas.Manager.Controllers;
     using FitStore.Web.Areas.Manager.Models.Manufacturers;
     using FitStore.Web.Models.Pagination;
@@ -16,6 +15,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Web.Controllers;
     using Xunit;
 
     using static Common.CommonConstants;

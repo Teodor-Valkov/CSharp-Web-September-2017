@@ -1,6 +1,5 @@
 ﻿namespace FitStore.Web.Areas.Moderator.Controllers
 {
-    using FitStore.Web.Controllers;
     using Infrastructure.Extensions;
     using Microsoft.AspNetCore.Mvc;
     using Models.Pagination;
@@ -23,7 +22,7 @@
             this.supplementService = supplementService;
         }
 
-        public async Task<IActionResult> Details(int id, string name, string returnUrl, int page = 1)
+        public async Task<IActionResult> Details(int id, string name, string returnUrl, int page = MinPage)
         {
             bool isSupplementExisting = await this.supplementService.IsSupplementExistingById(id, false);
 
@@ -34,7 +33,7 @@
                 return this.RedirectToHomeIndex();
             }
 
-            if (page < 1)
+            if (page < MinPage)
             {
                 return RedirectToAction(nameof(Details), new { id, name });
             }
@@ -50,7 +49,7 @@
                 }
             };
 
-            if (page > 1 && page > model.Pagination.TotalPages)
+            if (page > MinPage && page > model.Pagination.TotalPages)
             {
                 return RedirectToAction(nameof(Details), new { id, name });
             }
@@ -74,6 +73,7 @@
 
             TempData["ReturnUrl"] = returnUrl;
             ViewData["ReturnUrl"] = returnUrl;
+
             return returnUrl;
         }
     }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is used by the publish/package process of your Web project. You can customize the behavior of this process
+by editing this MSBuild file. In order to learn more about this please visit https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAwT2QWQtunU+1aUw+JpPhZgAAAAACAAAAAAAQZgAAAAEAACAAAADBtX5HcEOzwfRWB+Wbxtt3COg2IPCILRXaB4B+runZFgAAAAAOgAAAAAIAACAAAABGCwxB88ucwDxEov+ABuKSA1KLZAtI3SucUzaYw6qcxIAAAAAMFpKLmDn7YdjiPXpE2NTtBkneLHDP31klbplb492mbEAAO1UemTP5ITvvb5fjcSeErRiPptQfojEGF2HLcsquHQ/EYlHX41OtxCRSEehmBBw/qEVeKTP7g8ERQk+P++y94Bi8gIL8boKqzn61FWT5Z+/tvM+GrpMojB+pp0AhhkAAAABJ9twftg6/qSK/wXcTtFsGaQO/Lo4RkapbMH3rR47boFGKJkz7SC6JO2D3UI0O0Y0b4O4iPYK01kSOadQ8uC5s</EncryptedPassword>
+  </PropertyGroup>
+  <ItemGroup>
+    <DestinationConnectionStrings Include="DefaultConnection">
+      <Value>Server=tcp:fitstore.database.windows.net,1433;Initial Catalog=FitStoreDb;Persist Security Info=False;User ID=fitstoreadmin;Password=ACmilan16;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;</Value>
+    </DestinationConnectionStrings>
+  </ItemGroup>
+</Project>

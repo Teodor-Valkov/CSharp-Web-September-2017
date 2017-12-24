@@ -147,6 +147,9 @@
                 .Callback((string url) => { expectedReturnUrl = url; });
 
             Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupGet(t => t["ReturnUrl"])
+                .Returns("/");
 
             SupplementsController supplementsController = new SupplementsController(supplementService.Object)
             {
@@ -204,6 +207,9 @@
                 .Returns(true);
 
             Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupGet(t => t["ReturnUrl"])
+                .Returns(returnUrl);
 
             SupplementsController supplementsController = new SupplementsController(supplementService.Object)
             {
@@ -261,6 +267,9 @@
                 .Returns(true);
 
             Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupGet(t => t["ReturnUrl"])
+                .Returns(returnUrl);
 
             SupplementsController supplementsController = new SupplementsController(supplementService.Object)
             {
@@ -274,8 +283,8 @@
             //Assert
             result.Should().BeOfType<ViewResult>();
 
-            result.As<ViewResult>().ViewData.Should().ContainKey("ReturnUrl");
-            result.As<ViewResult>().ViewData.Should().ContainValue(returnUrl);
+            result.As<ViewResult>().ViewData.Keys.Should().Contain("ReturnUrl");
+            result.As<ViewResult>().ViewData.Values.Should().Contain(returnUrl);
 
             result.As<ViewResult>().Model.Should().BeOfType<PagingElementViewModel<SupplementDetailsServiceModel>>();
 
