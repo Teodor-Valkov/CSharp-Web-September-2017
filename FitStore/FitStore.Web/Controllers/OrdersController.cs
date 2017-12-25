@@ -93,7 +93,7 @@
             }
             else
             {
-                TempData.AddErrorMessage(SupplementRemovedFromCartErrorMessage);
+                TempData.AddErrorMessage(SupplementCannotBeRemovedFromCartErrorMessage);
             }
 
             return RedirectToAction(nameof(Details));
@@ -122,7 +122,7 @@
             }
             else
             {
-                TempData.AddErrorMessage(SupplementRemovedFromCartErrorMessage);
+                TempData.AddErrorMessage(SupplementCannotBeRemovedFromCartErrorMessage);
             }
 
             return RedirectToAction(nameof(Details));

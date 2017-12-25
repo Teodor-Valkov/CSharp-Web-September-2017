@@ -77,7 +77,7 @@
 
             IList<string> currentRolesAsString = await this.userManager.GetRolesAsync(user);
 
-            IEnumerable<SelectListItem> currentRoles = await this.roleManager
+            IEnumerable<SelectListItem> currentRoles = this.roleManager
                 .Roles
                 .Where(r => currentRolesAsString.Contains(r.Name))
                 .Select(r => new SelectListItem
@@ -85,9 +85,9 @@
                     Value = r.Name,
                     Text = r.Name
                 })
-                .ToListAsync();
+                .ToList();
 
-            IEnumerable<SelectListItem> allRoles = await this.roleManager
+            IEnumerable<SelectListItem> allRoles = this.roleManager
                 .Roles
                 .Where(r => !currentRolesAsString.Contains(r.Name))
                 .Select(r => new SelectListItem
@@ -95,7 +95,7 @@
                     Value = r.Name,
                     Text = r.Name
                 })
-                .ToListAsync();
+                .ToList();
 
             model.CurrentRoles = currentRoles;
             model.AllRoles = allRoles;
@@ -130,7 +130,7 @@
 
             await this.userManager.UpdateAsync(user);
 
-            TempData.AddSuccessMessage(string.Format(AddToRoleSuccessMessage, user.UserName, model.Role));
+            TempData.AddSuccessMessage(string.Format(AddToRoleSuccessMessage, model.Username, model.Role));
 
             return RedirectToAction(nameof(Details), new { model.Username });
         }
@@ -162,7 +162,7 @@
 
             await this.userManager.UpdateAsync(user);
 
-            TempData.AddSuccessMessage(string.Format(RemoveFromRoleSuccessMessage, user.UserName, model.Role));
+            TempData.AddSuccessMessage(string.Format(RemoveFromRoleSuccessMessage, model.Username, model.Role));
 
             return RedirectToAction(nameof(Details), new { model.Username });
         }

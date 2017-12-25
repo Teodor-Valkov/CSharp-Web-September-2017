@@ -25,7 +25,7 @@
         public const string UserChangePasswordSuccessMessage = "Your password was successfully changed.";
 
         public const string SupplementAddedToCartSuccessMessage = "Supplement was successfully added to your cart.";
-        public const string SupplementRemovedFromCartErrorMessage = "You do not have this supplement in your cart.";
+        public const string SupplementCannotBeRemovedFromCartErrorMessage = "You do not have this supplement in your cart.";
         public const string SupplementRemovedFromCartSuccessMessage = "Supplement was successfully removed from your cart.";
 
         public const string SupplementUnavailableErrorMessage = "This supplement is currently out of stock.";

@@ -1,13 +1,16 @@
 ﻿namespace FitStore.Tests.Web.Controllers
 {
+    using Data.Models;
     using FitStore.Web.Controllers;
-    using FitStore.Web.Infrastructure.Extensions;
     using FluentAssertions;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.ViewFeatures;
+    using Mocks;
     using Moq;
+    using Newtonsoft.Json;
     using Services.Contracts;
     using Services.Models;
     using Services.Models.Orders;
@@ -15,6 +18,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using System.Security.Claims;
     using System.Threading.Tasks;
     using Xunit;
 
@@ -28,11 +32,12 @@
         private const int nonExistingSupplementId = int.MaxValue;
         private const int orderId = 1;
         private const int nonExistingOrderId = int.MaxValue;
+        private const string authorId = "authorId";
         private const string returnUrl = "returnUrl";
-        private ShoppingCart shoppingCart = new ShoppingCart();
+        private const string userSessionShoppingCartKey = UserSessionShoppingCartKey;
 
         [Fact]
-        public async Task Add_WithCorrectUrlAndIncorrectSupplementId_ShouldReturnErrorMessageAndReturnToHomeIndex()
+        public async Task Add_WithCorrectUrlAndIncorrectSupplementId_ShouldShowErrorMessageAndReturnToHomeIndex()
         {
             string errorMessage = null;
 
@@ -71,7 +76,7 @@
         }
 
         [Fact]
-        public async Task Add_WithIncorrectUrlAndIncorrectSupplementId_ShouldChangeReturnUrlAndReturnErrorMessageAndReturnToHomeIndex()
+        public async Task Add_WithIncorrectUrlAndIncorrectSupplementId_ShouldChangeReturnUrlAndShowErrorMessageAndReturnToHomeIndex()
         {
             string errorMessage = null;
             string incorrectReturnUrl = null;
@@ -112,86 +117,830 @@
             result.As<RedirectToActionResult>().ControllerName.Should().Be("Home");
         }
 
-        // To test OrdersController with mocked ShoppingCart class - received from session by extension method
+        [Fact]
+        public async Task Add_WithAlreadyAddedLastAvailableSupplement_ShouldShowErrorMessageAndReturnToReturnUrl()
+        {
+            string errorMessage = null;
+            const string returnUrl = "returnUrl";
 
-        //[Fact]
-        //public async Task Add_WithAlreadyAddedLastAvailableSupplement_ShouldReturnErrorMessageAndReturnToReturnUrl()
-        //{
-        //    string errorMessage = null;
+            //Arrange
+            Mock<IUrlHelper> urlHelper = new Mock<IUrlHelper>();
+            urlHelper
+                .Setup(u => u.IsLocalUrl(It.IsAny<string>()))
+                .Returns(true);
 
-        //    //Arrange
-        //    Mock<IUrlHelper> urlHelper = new Mock<IUrlHelper>();
-        //    urlHelper
-        //        .Setup(u => u.IsLocalUrl(It.IsAny<string>()))
-        //        .Returns(true);
+            Mock<IOrderService> orderService = new Mock<IOrderService>();
+            orderService
+                .Setup(o => o.IsLastAvailableSupplementAlreadyAdded(supplementId, It.IsAny<ShoppingCart>()))
+                .ReturnsAsync(true);
 
-        //    Mock<IOrderService> orderService = new Mock<IOrderService>();
-        //    orderService
-        //        .Setup(o => o.IsLastAvailableSupplementAlreadyAdded(supplementId, shoppingCart))
-        //        .ReturnsAsync(true);
+            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
+            supplementService
+                .Setup(s => s.IsSupplementExistingById(supplementId, false))
+                .ReturnsAsync(true);
 
-        //    Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
-        //    supplementService
-        //        .Setup(s => s.IsSupplementExistingById(supplementId, false))
-        //        .ReturnsAsync(true);
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => errorMessage = message as string);
 
-        //    Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
-        //    tempData
-        //        .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
-        //        .Callback((string key, object message) => errorMessage = message as string);
+            Mock<ISession> session = new Mock<ISession>();
 
-        //    Mock<HttpContext> httpContext = new Mock<HttpContext>();
-        //    httpContext
-        //        .Setup(h => h.Session.GetShoppingCart<ShoppingCart>(UserSessionShoppingCartKey))
-        //        .Callback(null);
+            Mock<HttpContext> httpContext = new Mock<HttpContext>();
+            httpContext
+                .SetupGet(h => h.Session)
+                .Returns(session.Object);
 
-        //    OrdersController ordersController = new OrdersController(null, orderService.Object, supplementService.Object)
-        //    {
-        //        Url = urlHelper.Object,
-        //        TempData = tempData.Object,
-        //        ControllerContext = new ControllerContext
-        //        {
-        //            HttpContext = httpContext.Object
-        //        }
-        //    };
+            OrdersController ordersController = new OrdersController(null, orderService.Object, supplementService.Object)
+            {
+                Url = urlHelper.Object,
+                TempData = tempData.Object,
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = httpContext.Object
+                }
+            };
 
-        //    //Act
-        //    var result = await ordersController.Add(supplementId, returnUrl);
+            //Act
+            var result = await ordersController.Add(supplementId, returnUrl);
 
-        //    //Assert
-        //    errorMessage.Should().Be(SupplementLastOneJustAddedErrorMessage);
+            //Assert
+            errorMessage.Should().Be(SupplementLastOneJustAddedErrorMessage);
 
-        //    result.Should().BeOfType<RedirectToActionResult>();
+            result.Should().BeOfType<RedirectResult>();
 
-        //    result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
-        //    result.As<RedirectToActionResult>().ControllerName.Should().Be("Home");
-        //}
+            result.As<RedirectResult>().Url.Should().Be(returnUrl);
+        }
 
-        //[Fact]
-        //public void Details_ShouldReturnShoppingCart()
-        //{
-        //    //Arrange
-        //    Mock<HttpContext> httpContext = new Mock<HttpContext>();
-        //    httpContext
-        //        .SetupGet(h => h.Session.GetShoppingCart<ShoppingCart>(UserSessionShoppingCartKey))
-        //        .Returns(new ShoppingCart());
+        [Fact]
+        public async Task Add_WithoutSuccessResult_ShouldShowErrorMessageAndReturnToReturnUrl()
+        {
+            string errorMessage = null;
+            const string returnUrl = "returnUrl";
 
-        //    OrdersController ordersController = new OrdersController(null, null, null)
-        //    {
-        //        ControllerContext = new ControllerContext
-        //        {
-        //            HttpContext = httpContext.Object
-        //        }
-        //    };
+            //Arrange
+            Mock<IUrlHelper> urlHelper = new Mock<IUrlHelper>();
+            urlHelper
+                .Setup(u => u.IsLocalUrl(It.IsAny<string>()))
+                .Returns(true);
 
-        //    //Act
-        //    var result = ordersController.Details();
+            Mock<IOrderService> orderService = new Mock<IOrderService>();
+            orderService
+                .Setup(o => o.IsLastAvailableSupplementAlreadyAdded(supplementId, It.IsAny<ShoppingCart>()))
+                .ReturnsAsync(false);
+            orderService
+                .Setup(o => o.AddSupplementToCartAsync(supplementId, It.IsAny<ShoppingCart>()))
+                .ReturnsAsync(false);
 
-        //    //Assert
-        //    result.Should().BeOfType<ViewResult>();
+            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
+            supplementService
+                .Setup(s => s.IsSupplementExistingById(supplementId, false))
+                .ReturnsAsync(true);
 
-        //    result.As<ViewResult>().Model.Should().BeOfType<ShoppingCart>();
-        //}
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => errorMessage = message as string);
+
+            Mock<ISession> session = new Mock<ISession>();
+
+            Mock<HttpContext> httpContext = new Mock<HttpContext>();
+            httpContext
+                .SetupGet(h => h.Session)
+                .Returns(session.Object);
+
+            OrdersController ordersController = new OrdersController(null, orderService.Object, supplementService.Object)
+            {
+                Url = urlHelper.Object,
+                TempData = tempData.Object,
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = httpContext.Object
+                }
+            };
+
+            //Act
+            var result = await ordersController.Add(supplementId, returnUrl);
+
+            //Assert
+            errorMessage.Should().Be(SupplementUnavailableErrorMessage);
+
+            result.Should().BeOfType<RedirectResult>();
+
+            result.As<RedirectResult>().Url.Should().Be(returnUrl);
+        }
+
+        [Fact]
+        public async Task Add_WithSuccessResult_ShouldShowSuccessMessageAndReturnToReturnUrl()
+        {
+            string successMessage = null;
+            const string returnUrl = "returnUrl";
+
+            //Arrange
+            Mock<IUrlHelper> urlHelper = new Mock<IUrlHelper>();
+            urlHelper
+                .Setup(u => u.IsLocalUrl(It.IsAny<string>()))
+                .Returns(true);
+
+            Mock<IOrderService> orderService = new Mock<IOrderService>();
+            orderService
+                .Setup(o => o.IsLastAvailableSupplementAlreadyAdded(supplementId, It.IsAny<ShoppingCart>()))
+                .ReturnsAsync(false);
+            orderService
+                .Setup(o => o.AddSupplementToCartAsync(supplementId, It.IsAny<ShoppingCart>()))
+                .ReturnsAsync(true);
+
+            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
+            supplementService
+                .Setup(s => s.IsSupplementExistingById(supplementId, false))
+                .ReturnsAsync(true);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataSuccessMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => successMessage = message as string);
+
+            Mock<ISession> session = new Mock<ISession>();
+
+            Mock<HttpContext> httpContext = new Mock<HttpContext>();
+            httpContext
+                .SetupGet(h => h.Session)
+                .Returns(session.Object);
+
+            OrdersController ordersController = new OrdersController(null, orderService.Object, supplementService.Object)
+            {
+                Url = urlHelper.Object,
+                TempData = tempData.Object,
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = httpContext.Object
+                }
+            };
+
+            //Act
+            var result = await ordersController.Add(supplementId, returnUrl);
+
+            //Assert
+            successMessage.Should().Be(SupplementAddedToCartSuccessMessage);
+
+            result.Should().BeOfType<RedirectResult>();
+
+            result.As<RedirectResult>().Url.Should().Be(returnUrl);
+        }
+
+        [Fact]
+        public async Task Remove_WithIncorrectSupplementId_ShouldShowErrorMessageAndReturnToDetails()
+        {
+            string errorMessage = null;
+
+            //Arrange
+            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
+            supplementService
+                .Setup(s => s.IsSupplementExistingById(supplementId, false))
+                .ReturnsAsync(false);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => errorMessage = message as string);
+
+            Mock<ISession> session = new Mock<ISession>();
+
+            Mock<HttpContext> httpContext = new Mock<HttpContext>();
+            httpContext
+                .SetupGet(h => h.Session)
+                .Returns(session.Object);
+
+            OrdersController ordersController = new OrdersController(null, null, supplementService.Object)
+            {
+                TempData = tempData.Object,
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = httpContext.Object
+                }
+            };
+
+            //Act
+            var result = await ordersController.Remove(supplementId);
+
+            //Assert
+            errorMessage.Should().Be(string.Format(EntityNotFound, SupplementEntity));
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Details");
+        }
+
+        [Fact]
+        public async Task Remove_WithoutSuccessResult_ShouldShowErrorMessageAndReturnToDetails()
+        {
+            string errorMessage = null;
+
+            //Arrange
+            Mock<IOrderService> orderService = new Mock<IOrderService>();
+            orderService
+                .Setup(o => o.RemoveSupplementFromCartAsync(supplementId, It.IsAny<ShoppingCart>()))
+                .Returns(false);
+
+            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
+            supplementService
+                .Setup(s => s.IsSupplementExistingById(supplementId, false))
+                .ReturnsAsync(true);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => errorMessage = message as string);
+
+            Mock<ISession> session = new Mock<ISession>();
+
+            Mock<HttpContext> httpContext = new Mock<HttpContext>();
+            httpContext
+                .SetupGet(h => h.Session)
+                .Returns(session.Object);
+
+            OrdersController ordersController = new OrdersController(null, orderService.Object, supplementService.Object)
+            {
+                TempData = tempData.Object,
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = httpContext.Object
+                }
+            };
+
+            //Act
+            var result = await ordersController.Remove(supplementId);
+
+            //Assert
+            errorMessage.Should().Be(SupplementCannotBeRemovedFromCartErrorMessage);
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Details");
+        }
+
+        [Fact]
+        public async Task Remove_WithSuccessResult_ShouldShowSuccessMessageAndReturnToDetails()
+        {
+            string successMessage = null;
+
+            //Arrange
+            Mock<IOrderService> orderService = new Mock<IOrderService>();
+            orderService
+                .Setup(o => o.RemoveSupplementFromCartAsync(supplementId, It.IsAny<ShoppingCart>()))
+                .Returns(true);
+
+            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
+            supplementService
+                .Setup(s => s.IsSupplementExistingById(supplementId, false))
+                .ReturnsAsync(true);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataSuccessMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => successMessage = message as string);
+
+            Mock<ISession> session = new Mock<ISession>();
+
+            Mock<HttpContext> httpContext = new Mock<HttpContext>();
+            httpContext
+                .SetupGet(h => h.Session)
+                .Returns(session.Object);
+
+            OrdersController ordersController = new OrdersController(null, orderService.Object, supplementService.Object)
+            {
+                TempData = tempData.Object,
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = httpContext.Object
+                }
+            };
+
+            //Act
+            var result = await ordersController.Remove(supplementId);
+
+            //Assert
+            successMessage.Should().Be(SupplementRemovedFromCartSuccessMessage);
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Details");
+        }
+
+        [Fact]
+        public async Task RemoveAll_WithIncorrectSupplementId_ShouldShowErrorMessageAndReturnToDetails()
+        {
+            string errorMessage = null;
+
+            //Arrange
+            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
+            supplementService
+                .Setup(s => s.IsSupplementExistingById(supplementId, false))
+                .ReturnsAsync(false);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => errorMessage = message as string);
+
+            Mock<ISession> session = new Mock<ISession>();
+
+            Mock<HttpContext> httpContext = new Mock<HttpContext>();
+            httpContext
+                .SetupGet(h => h.Session)
+                .Returns(session.Object);
+
+            OrdersController ordersController = new OrdersController(null, null, supplementService.Object)
+            {
+                TempData = tempData.Object,
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = httpContext.Object
+                }
+            };
+
+            //Act
+            var result = await ordersController.RemoveAll(supplementId);
+
+            //Assert
+            errorMessage.Should().Be(string.Format(EntityNotFound, SupplementEntity));
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Details");
+        }
+
+        [Fact]
+        public async Task RemoveAll_WithoutSuccessResult_ShouldShowErrorMessageAndReturnToDetails()
+        {
+            string errorMessage = null;
+
+            //Arrange
+            Mock<IOrderService> orderService = new Mock<IOrderService>();
+            orderService
+                .Setup(o => o.RemoveAllSupplementsFromCartAsync(supplementId, It.IsAny<ShoppingCart>()))
+                .Returns(false);
+
+            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
+            supplementService
+                .Setup(s => s.IsSupplementExistingById(supplementId, false))
+                .ReturnsAsync(true);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => errorMessage = message as string);
+
+            Mock<ISession> session = new Mock<ISession>();
+
+            Mock<HttpContext> httpContext = new Mock<HttpContext>();
+            httpContext
+                .SetupGet(h => h.Session)
+                .Returns(session.Object);
+
+            OrdersController ordersController = new OrdersController(null, orderService.Object, supplementService.Object)
+            {
+                TempData = tempData.Object,
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = httpContext.Object
+                }
+            };
+
+            //Act
+            var result = await ordersController.RemoveAll(supplementId);
+
+            //Assert
+            errorMessage.Should().Be(SupplementCannotBeRemovedFromCartErrorMessage);
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Details");
+        }
+
+        [Fact]
+        public async Task RemoveAll_WithSuccessResult_ShouldShowSuccessMessageAndReturnToDetails()
+        {
+            string successMessage = null;
+
+            //Arrange
+            Mock<IOrderService> orderService = new Mock<IOrderService>();
+            orderService
+                .Setup(o => o.RemoveAllSupplementsFromCartAsync(supplementId, It.IsAny<ShoppingCart>()))
+                .Returns(true);
+
+            Mock<ISupplementService> supplementService = new Mock<ISupplementService>();
+            supplementService
+                .Setup(s => s.IsSupplementExistingById(supplementId, false))
+                .ReturnsAsync(true);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataSuccessMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => successMessage = message as string);
+
+            Mock<ISession> session = new Mock<ISession>();
+
+            Mock<HttpContext> httpContext = new Mock<HttpContext>();
+            httpContext
+                .SetupGet(h => h.Session)
+                .Returns(session.Object);
+
+            OrdersController ordersController = new OrdersController(null, orderService.Object, supplementService.Object)
+            {
+                TempData = tempData.Object,
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = httpContext.Object
+                }
+            };
+
+            //Act
+            var result = await ordersController.RemoveAll(supplementId);
+
+            //Assert
+            successMessage.Should().Be(SupplementRemovedFromCartSuccessMessage);
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Details");
+        }
+
+        [Fact]
+        public void Details_ShouldReturnShoppingCart()
+        {
+            //Arrange
+            Mock<ISession> session = new Mock<ISession>();
+
+            Mock<HttpContext> httpContext = new Mock<HttpContext>();
+            httpContext
+                .SetupGet(h => h.Session)
+                .Returns(session.Object);
+
+            OrdersController ordersController = new OrdersController(null, null, null)
+            {
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = httpContext.Object,
+                }
+            };
+
+            //Act
+            var result = ordersController.Details();
+
+            //Assert
+            result.Should().BeOfType<ViewResult>();
+
+            result.As<ViewResult>().Model.Should().BeOfType<ShoppingCart>();
+        }
+
+        [Fact]
+        public void Checkout_ShouldBeAccessedByAutorizedUsers()
+        {
+            //Arrange
+            MethodInfo method = typeof(OrdersController).GetMethod(nameof(OrdersController.Checkout));
+
+            //Act
+            object[] authorizeAttribute = method.GetCustomAttributes(true);
+
+            //Assert
+            authorizeAttribute
+                .Should()
+                .Match(attr => attr.Any(a => a.GetType() == typeof(AuthorizeAttribute)));
+        }
+
+        [Fact]
+        public void Checkout_WithShoppingCartWithoutSupplements_ShouldReturnToHomeIndex()
+        {
+            //Arrange
+            ShoppingCart shoppingCart = new ShoppingCart() { Supplements = new List<SupplementInCartServiceModel>() };
+
+            byte[] shoppingCartAsByteArray = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(shoppingCart));
+
+            Mock<ISession> session = new Mock<ISession>();
+            session
+                .Setup(s => s.TryGetValue(UserSessionShoppingCartKey, out shoppingCartAsByteArray))
+                .Returns(true);
+
+            Mock<HttpContext> httpContext = new Mock<HttpContext>();
+            httpContext
+                .SetupGet(h => h.Session)
+                .Returns(session.Object);
+
+            OrdersController ordersController = new OrdersController(null, null, null)
+            {
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = httpContext.Object
+                }
+            };
+
+            //Act
+            var result = ordersController.Checkout();
+
+            //Assert
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
+            result.As<RedirectToActionResult>().ControllerName.Should().Be("Home");
+        }
+
+        [Fact]
+        public void Checkout_WithShoppingCartWithSupplements_ShouldReturnValidViewModel()
+        {
+            //Arrange
+            ShoppingCart shoppingCart = new ShoppingCart() { Supplements = new List<SupplementInCartServiceModel>() { new SupplementInCartServiceModel() } };
+
+            byte[] shoppingCartAsByteArray = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(shoppingCart));
+
+            Mock<ISession> session = new Mock<ISession>();
+            session
+                .Setup(s => s.TryGetValue(UserSessionShoppingCartKey, out shoppingCartAsByteArray))
+                .Returns(true);
+
+            Mock<HttpContext> httpContext = new Mock<HttpContext>();
+            httpContext
+                .SetupGet(h => h.Session)
+                .Returns(session.Object);
+
+            OrdersController ordersController = new OrdersController(null, null, null)
+            {
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = httpContext.Object
+                }
+            };
+
+            var result = ordersController.Checkout();
+
+            //Assert
+            result.Should().BeOfType<ViewResult>();
+
+            result.As<ViewResult>().Model.Should().BeOfType<ShoppingCart>();
+        }
+
+        [Fact]
+        public void Cancel_ShouldBeAccessedByAutorizedUsers()
+        {
+            //Arrange
+            MethodInfo method = typeof(OrdersController).GetMethod(nameof(OrdersController.Cancel));
+
+            //Act
+            object[] authorizeAttribute = method.GetCustomAttributes(true);
+
+            //Assert
+            authorizeAttribute
+                .Should()
+                .Match(attr => attr.Any(a => a.GetType() == typeof(AuthorizeAttribute)));
+        }
+
+        [Fact]
+        public void Cancel_WithShoppingCartWithoutSupplements_ShouldReturnToHomeIndex()
+        {
+            //Arrange
+            ShoppingCart shoppingCart = new ShoppingCart() { Supplements = new List<SupplementInCartServiceModel>() };
+
+            byte[] shoppingCartAsByteArray = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(shoppingCart));
+
+            Mock<ISession> session = new Mock<ISession>();
+            session
+                .Setup(s => s.TryGetValue(UserSessionShoppingCartKey, out shoppingCartAsByteArray))
+                .Returns(true);
+
+            Mock<HttpContext> httpContext = new Mock<HttpContext>();
+            httpContext
+                .SetupGet(h => h.Session)
+                .Returns(session.Object);
+
+            OrdersController ordersController = new OrdersController(null, null, null)
+            {
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = httpContext.Object
+                }
+            };
+
+            //Act
+            var result = ordersController.Cancel();
+
+            //Assert
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
+            result.As<RedirectToActionResult>().ControllerName.Should().Be("Home");
+        }
+
+        [Fact]
+        public void Cancel_WithShoppingCartWithSupplements_ShouldReturnSuccessMessageAndReturnToDetails()
+        {
+            string successMessage = null;
+
+            //Arrange
+            ShoppingCart shoppingCart = new ShoppingCart() { Supplements = new List<SupplementInCartServiceModel>() { new SupplementInCartServiceModel() } };
+
+            byte[] shoppingCartAsByteArray = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(shoppingCart));
+
+            Mock<ISession> session = new Mock<ISession>();
+            session
+                .Setup(s => s.TryGetValue(UserSessionShoppingCartKey, out shoppingCartAsByteArray))
+                .Returns(true);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataSuccessMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => successMessage = message as string);
+
+            Mock<HttpContext> httpContext = new Mock<HttpContext>();
+            httpContext
+                .SetupGet(h => h.Session)
+                .Returns(session.Object);
+
+            OrdersController ordersController = new OrdersController(null, null, null)
+            {
+                TempData = tempData.Object,
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = httpContext.Object
+                }
+            };
+
+            var result = ordersController.Cancel();
+
+            //Assert
+            successMessage.Should().Be(CancelOrderSuccessMessage);
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Details");
+        }
+
+        [Fact]
+        public void Order_ShouldBeAccessedByAutorizedUsers()
+        {
+            //Arrange
+            MethodInfo method = typeof(OrdersController).GetMethod(nameof(OrdersController.Order));
+
+            //Act
+            object[] authorizeAttribute = method.GetCustomAttributes(true);
+
+            //Assert
+            authorizeAttribute
+                .Should()
+                .Match(attr => attr.Any(a => a.GetType() == typeof(AuthorizeAttribute)));
+        }
+
+        [Fact]
+        public async Task Order_WithShoppingCartWithoutSupplements_ShouldReturnToHomeIndex()
+        {
+            //Arrange
+            Mock<UserManager<User>> userManager = UserManagerMock.New();
+            userManager
+                .Setup(u => u.GetUserId(It.IsAny<ClaimsPrincipal>()))
+                .Returns(authorId);
+
+            ShoppingCart shoppingCart = new ShoppingCart() { Supplements = new List<SupplementInCartServiceModel>() };
+
+            byte[] shoppingCartAsByteArray = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(shoppingCart));
+
+            Mock<ISession> session = new Mock<ISession>();
+            session
+                .Setup(s => s.TryGetValue(UserSessionShoppingCartKey, out shoppingCartAsByteArray))
+                .Returns(true);
+
+            Mock<HttpContext> httpContext = new Mock<HttpContext>();
+            httpContext
+                .SetupGet(h => h.Session)
+                .Returns(session.Object);
+
+            OrdersController ordersController = new OrdersController(userManager.Object, null, null)
+            {
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = httpContext.Object
+                }
+            };
+
+            //Act
+            var result = await ordersController.Order();
+
+            //Assert
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
+            result.As<RedirectToActionResult>().ControllerName.Should().Be("Home");
+        }
+
+        [Fact]
+        public async Task Order_WithoutSuccessResult_ShouldShowErrorMessageAndReturnToHomeIndex()
+        {
+            string errorMessage = null;
+
+            //Arrange
+            Mock<UserManager<User>> userManager = UserManagerMock.New();
+            userManager
+                .Setup(u => u.GetUserId(It.IsAny<ClaimsPrincipal>()))
+                .Returns(authorId);
+
+            Mock<IOrderService> orderService = new Mock<IOrderService>();
+            orderService
+                .Setup(o => o.FinishOrderAsync(authorId, It.IsAny<ShoppingCart>()))
+                .ReturnsAsync(false);
+
+            ShoppingCart shoppingCart = new ShoppingCart() { Supplements = new List<SupplementInCartServiceModel>() { new SupplementInCartServiceModel() } };
+
+            byte[] shoppingCartAsByteArray = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(shoppingCart));
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => errorMessage = message as string);
+
+            Mock<ISession> session = new Mock<ISession>();
+            session
+                .Setup(s => s.TryGetValue(UserSessionShoppingCartKey, out shoppingCartAsByteArray))
+                .Returns(true);
+
+            Mock<HttpContext> httpContext = new Mock<HttpContext>();
+            httpContext
+                .SetupGet(h => h.Session)
+                .Returns(session.Object);
+
+            OrdersController ordersController = new OrdersController(userManager.Object, orderService.Object, null)
+            {
+                TempData = tempData.Object,
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = httpContext.Object
+                }
+            };
+
+            //Act
+            var result = await ordersController.Order();
+
+            //Assert
+            errorMessage.Should().Be(FinishOrderErrorMessage);
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
+            result.As<RedirectToActionResult>().ControllerName.Should().Be("Home");
+        }
+
+        [Fact]
+        public async Task Order_WithSuccessResult_ShouldReturnToHomeIndex()
+        {
+            string successMessage = null;
+
+            //Arrange
+            Mock<UserManager<User>> userManager = UserManagerMock.New();
+            userManager
+                .Setup(u => u.GetUserId(It.IsAny<ClaimsPrincipal>()))
+                .Returns(authorId);
+
+            Mock<IOrderService> orderService = new Mock<IOrderService>();
+            orderService
+                .Setup(o => o.FinishOrderAsync(authorId, It.IsAny<ShoppingCart>()))
+                .ReturnsAsync(true);
+
+            ShoppingCart shoppingCart = new ShoppingCart() { Supplements = new List<SupplementInCartServiceModel>() { new SupplementInCartServiceModel() } };
+
+            byte[] shoppingCartAsByteArray = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(shoppingCart));
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataSuccessMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => successMessage = message as string);
+
+            Mock<ISession> session = new Mock<ISession>();
+            session
+                .Setup(s => s.TryGetValue(UserSessionShoppingCartKey, out shoppingCartAsByteArray))
+                .Returns(true);
+
+            Mock<HttpContext> httpContext = new Mock<HttpContext>();
+            httpContext
+                .SetupGet(h => h.Session)
+                .Returns(session.Object);
+
+            OrdersController ordersController = new OrdersController(userManager.Object, orderService.Object, null)
+            {
+                TempData = tempData.Object,
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = httpContext.Object
+                }
+            };
+
+            //Act
+            var result = await ordersController.Order();
+
+            //Assert
+            successMessage.Should().Be(FinishOrderSuccessMessage);
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
+            result.As<RedirectToActionResult>().ControllerName.Should().Be("Home");
+        }
 
         [Fact]
         public void Review_ShouldBeAccessedByAutorizedUsers()

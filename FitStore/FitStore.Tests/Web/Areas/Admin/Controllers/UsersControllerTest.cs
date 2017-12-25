@@ -2,6 +2,7 @@
 {
     using Data.Models;
     using FitStore.Web.Areas.Admin.Controllers;
+    using FitStore.Web.Areas.Admin.Models.Users;
     using FitStore.Web.Models.Pagination;
     using FluentAssertions;
     using Microsoft.AspNetCore.Authorization;
@@ -26,6 +27,7 @@
     {
         private const string searchToken = "searchToken";
         private const string username = "username";
+        private const string role = "role";
         private User user = new User();
 
         [Fact]
@@ -213,37 +215,452 @@
             result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
         }
 
-        // To test UsersController with mocked RoleManager class
+        [Fact]
+        public async Task Details_WithCorrectUsername_ShouldReturnValidViewModel()
+        {
+            //Arrange
+            IQueryable<IdentityRole> roles = new List<IdentityRole>() { new IdentityRole("firstRole"), new IdentityRole("secondRole"), new IdentityRole("thirdRole") }.AsQueryable();
 
-        //[Fact]
-        //public async Task Details_WithCorrectUsername_ShouldReturnValidViewModel()
-        //{
-        //    //Arrange
-        //    Mock<RoleManager<IdentityRole>> roleManager = RoleManagerMock.New();
+            Mock<RoleManager<IdentityRole>> roleManager = RoleManagerMock.New();
+            roleManager
+                .Setup(r => r.Roles)
+                .Returns(roles);
 
-        //    Mock<UserManager<User>> userManager = UserManagerMock.New();
-        //    userManager
-        //        .Setup(u => u.FindByNameAsync(username))
-        //        .ReturnsAsync(user);
-        //    userManager
-        //        .Setup(u => u.GetRolesAsync(user))
-        //        .ReturnsAsync(new List<string>() { "firstRole", "secondRole", "thirdRole" });
+            Mock<UserManager<User>> userManager = UserManagerMock.New();
+            userManager
+                .Setup(u => u.FindByNameAsync(username))
+                .ReturnsAsync(user);
+            userManager
+                .Setup(u => u.GetRolesAsync(user))
+                .ReturnsAsync(new List<string>() { "firstRole", "secondRole", "thirdRole" });
 
-        //    Mock<IAdminUserService> adminUserService = new Mock<IAdminUserService>();
-        //    adminUserService
-        //        .Setup(a => a.GetDetailsByUsernameAsync(username))
-        //        .ReturnsAsync(new AdminUserDetailsServiceModel());
+            Mock<IAdminUserService> adminUserService = new Mock<IAdminUserService>();
+            adminUserService
+                .Setup(a => a.GetDetailsByUsernameAsync(username))
+                .ReturnsAsync(new AdminUserDetailsServiceModel());
 
-        //    UsersController usersController = new UsersController(roleManager.Object, userManager.Object, adminUserService.Object);
+            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, adminUserService.Object);
 
-        //    //Assert
-        //    var result = await usersController.Details(username);
+            //Assert
+            var result = await usersController.Details(username);
 
-        //    //Assert
+            //Assert
+            result.Should().BeOfType<ViewResult>();
 
-        //    result.Should().BeOfType<RedirectToActionResult>();
+            result.As<ViewResult>().Model.Should().BeOfType<AdminUserDetailsServiceModel>();
 
-        //    result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
-        //}
+            AdminUserDetailsServiceModel model = result.As<ViewResult>().Model.As<AdminUserDetailsServiceModel>();
+            model.CurrentRoles.First().Text.Should().Be(roles.First().Name);
+            model.CurrentRoles.First().Value.Should().Be(roles.First().Name);
+            model.CurrentRoles.Last().Text.Should().Be(roles.Last().Name);
+            model.CurrentRoles.Last().Value.Should().Be(roles.Last().Name);
+            model.AllRoles.Should().HaveCount(0);
+        }
+
+        [Fact]
+        public async Task AddToRole_WithInvalidModelState_ShouldShowErrorAndReturnToDetails()
+        {
+            string errorMessage = null;
+
+            //Arrange
+            Mock<RoleManager<IdentityRole>> roleManager = RoleManagerMock.New();
+            roleManager
+                .Setup(r => r.RoleExistsAsync(role))
+                .ReturnsAsync(true);
+
+            Mock<UserManager<User>> userManager = UserManagerMock.New();
+            userManager
+                .Setup(u => u.FindByNameAsync(username))
+                .ReturnsAsync(user);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => errorMessage = message as string);
+
+            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null)
+            {
+                TempData = tempData.Object
+            };
+
+            usersController.ModelState.AddModelError(string.Empty, "Error");
+
+            //Assert
+            var result = await usersController.AddToRole(new UserWithRoleFormViewModel() { Role = role, Username = username });
+
+            //Assert
+            errorMessage.Should().Be(InvalidIdentityDetailsErroMessage);
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Details");
+            result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("Username");
+            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(username);
+        }
+
+        [Fact]
+        public async Task AddToRole_WithIncorrectRole_ShouldShowErrorAndReturnToDetails()
+        {
+            string errorMessage = null;
+
+            //Arrange
+            Mock<RoleManager<IdentityRole>> roleManager = RoleManagerMock.New();
+            roleManager
+                .Setup(r => r.RoleExistsAsync(role))
+                .ReturnsAsync(false);
+
+            Mock<UserManager<User>> userManager = UserManagerMock.New();
+            userManager
+                .Setup(u => u.FindByNameAsync(username))
+                .ReturnsAsync(user);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => errorMessage = message as string);
+
+            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null)
+            {
+                TempData = tempData.Object
+            };
+
+            //Assert
+            var result = await usersController.AddToRole(new UserWithRoleFormViewModel() { Role = role, Username = username });
+
+            //Assert
+            errorMessage.Should().Be(InvalidIdentityDetailsErroMessage);
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Details");
+            result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("Username");
+            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(username);
+        }
+
+        [Fact]
+        public async Task AddToRole_WithIncorrectUsername_ShouldShowErrorAndReturnToDetails()
+        {
+            string errorMessage = null;
+
+            //Arrange
+            Mock<RoleManager<IdentityRole>> roleManager = RoleManagerMock.New();
+            roleManager
+                .Setup(r => r.RoleExistsAsync(role))
+                .ReturnsAsync(true);
+
+            Mock<UserManager<User>> userManager = UserManagerMock.New();
+            userManager
+                .Setup(u => u.FindByNameAsync(username))
+                .ReturnsAsync(default(User));
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => errorMessage = message as string);
+
+            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null)
+            {
+                TempData = tempData.Object
+            };
+
+            //Assert
+            var result = await usersController.AddToRole(new UserWithRoleFormViewModel() { Role = role, Username = username });
+
+            //Assert
+            errorMessage.Should().Be(InvalidIdentityDetailsErroMessage);
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Details");
+            result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("Username");
+            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(username);
+        }
+
+        [Fact]
+        public async Task AddToRole_WithoutAddToRoleSuccessResult_ShouldShowErrorAndReturnToDetails()
+        {
+            string errorMessage = null;
+
+            //Arrange
+            Mock<RoleManager<IdentityRole>> roleManager = RoleManagerMock.New();
+            roleManager
+                .Setup(r => r.RoleExistsAsync(role))
+                .ReturnsAsync(true);
+
+            Mock<UserManager<User>> userManager = UserManagerMock.New();
+            userManager
+                .Setup(u => u.FindByNameAsync(username))
+                .ReturnsAsync(user);
+            userManager
+                .Setup(u => u.AddToRoleAsync(user, role))
+                .ReturnsAsync(new IdentityResult());
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => errorMessage = message as string);
+
+            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null)
+            {
+                TempData = tempData.Object
+            };
+
+            //Assert
+            var result = await usersController.AddToRole(new UserWithRoleFormViewModel() { Role = role, Username = username });
+
+            //Assert
+            errorMessage.Should().Be(string.Format(ChangeRoleErrorMessage, string.Empty));
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Details");
+            result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("Username");
+            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(username);
+        }
+
+        [Fact]
+        public async Task AddToRole_WithAddToRoleSuccessResult_ShouldShowErrorAndReturnToDetails()
+        {
+            string successMessage = null;
+
+            //Arrange
+            Mock<RoleManager<IdentityRole>> roleManager = RoleManagerMock.New();
+            roleManager
+                .Setup(r => r.RoleExistsAsync(role))
+                .ReturnsAsync(true);
+
+            Mock<UserManager<User>> userManager = UserManagerMock.New();
+            userManager
+                .Setup(u => u.FindByNameAsync(username))
+                .ReturnsAsync(user);
+            userManager
+                .Setup(u => u.AddToRoleAsync(user, role))
+                .ReturnsAsync(IdentityResult.Success);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataSuccessMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => successMessage = message as string);
+
+            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null)
+            {
+                TempData = tempData.Object
+            };
+
+            //Assert
+            var result = await usersController.AddToRole(new UserWithRoleFormViewModel() { Role = role, Username = username });
+
+            //Assert
+            successMessage.Should().Be(string.Format(AddToRoleSuccessMessage, username, role));
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Details");
+            result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("Username");
+            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(username);
+        }
+
+        [Fact]
+        public async Task RemoveFromRole_WithInvalidModelState_ShouldShowErrorAndReturnToDetails()
+        {
+            string errorMessage = null;
+
+            //Arrange
+            Mock<RoleManager<IdentityRole>> roleManager = RoleManagerMock.New();
+            roleManager
+                .Setup(r => r.RoleExistsAsync(role))
+                .ReturnsAsync(true);
+
+            Mock<UserManager<User>> userManager = UserManagerMock.New();
+            userManager
+                .Setup(u => u.FindByNameAsync(username))
+                .ReturnsAsync(user);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => errorMessage = message as string);
+
+            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null)
+            {
+                TempData = tempData.Object
+            };
+
+            usersController.ModelState.AddModelError(string.Empty, "Error");
+
+            //Assert
+            var result = await usersController.RemoveFromRole(new UserWithRoleFormViewModel() { Role = role, Username = username });
+
+            //Assert
+            errorMessage.Should().Be(InvalidIdentityDetailsErroMessage);
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Details");
+            result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("Username");
+            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(username);
+        }
+
+        [Fact]
+        public async Task RemoveFromRole_WithIncorrectRole_ShouldShowErrorAndReturnToDetails()
+        {
+            string errorMessage = null;
+
+            //Arrange
+            Mock<RoleManager<IdentityRole>> roleManager = RoleManagerMock.New();
+            roleManager
+                .Setup(r => r.RoleExistsAsync(role))
+                .ReturnsAsync(false);
+
+            Mock<UserManager<User>> userManager = UserManagerMock.New();
+            userManager
+                .Setup(u => u.FindByNameAsync(username))
+                .ReturnsAsync(user);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => errorMessage = message as string);
+
+            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null)
+            {
+                TempData = tempData.Object
+            };
+
+            //Assert
+            var result = await usersController.RemoveFromRole(new UserWithRoleFormViewModel() { Role = role, Username = username });
+
+            //Assert
+            errorMessage.Should().Be(InvalidIdentityDetailsErroMessage);
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Details");
+            result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("Username");
+            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(username);
+        }
+
+        [Fact]
+        public async Task RemoveFromRole_WithIncorrectUsername_ShouldShowErrorAndReturnToDetails()
+        {
+            string errorMessage = null;
+
+            //Arrange
+            Mock<RoleManager<IdentityRole>> roleManager = RoleManagerMock.New();
+            roleManager
+                .Setup(r => r.RoleExistsAsync(role))
+                .ReturnsAsync(true);
+
+            Mock<UserManager<User>> userManager = UserManagerMock.New();
+            userManager
+                .Setup(u => u.FindByNameAsync(username))
+                .ReturnsAsync(default(User));
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => errorMessage = message as string);
+
+            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null)
+            {
+                TempData = tempData.Object
+            };
+
+            //Assert
+            var result = await usersController.RemoveFromRole(new UserWithRoleFormViewModel() { Role = role, Username = username });
+
+            //Assert
+            errorMessage.Should().Be(InvalidIdentityDetailsErroMessage);
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Details");
+            result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("Username");
+            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(username);
+        }
+
+        [Fact]
+        public async Task RemoveFromRole_WithoutRemoveFromRoleSuccessResult_ShouldShowErrorAndReturnToDetails()
+        {
+            string errorMessage = null;
+
+            //Arrange
+            Mock<RoleManager<IdentityRole>> roleManager = RoleManagerMock.New();
+            roleManager
+                .Setup(r => r.RoleExistsAsync(role))
+                .ReturnsAsync(true);
+
+            Mock<UserManager<User>> userManager = UserManagerMock.New();
+            userManager
+                .Setup(u => u.FindByNameAsync(username))
+                .ReturnsAsync(user);
+            userManager
+                .Setup(u => u.RemoveFromRoleAsync(user, role))
+                .ReturnsAsync(new IdentityResult());
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => errorMessage = message as string);
+
+            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null)
+            {
+                TempData = tempData.Object
+            };
+
+            //Assert
+            var result = await usersController.RemoveFromRole(new UserWithRoleFormViewModel() { Role = role, Username = username });
+
+            //Assert
+            errorMessage.Should().Be(string.Format(ChangeRoleErrorMessage, string.Empty));
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Details");
+            result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("Username");
+            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(username);
+        }
+
+        [Fact]
+        public async Task RemoveFromRole_WithRemoveFromRoleSuccessResult_ShouldShowErrorAndReturnToDetails()
+        {
+            string successMessage = null;
+
+            //Arrange
+            Mock<RoleManager<IdentityRole>> roleManager = RoleManagerMock.New();
+            roleManager
+                .Setup(r => r.RoleExistsAsync(role))
+                .ReturnsAsync(true);
+
+            Mock<UserManager<User>> userManager = UserManagerMock.New();
+            userManager
+                .Setup(u => u.FindByNameAsync(username))
+                .ReturnsAsync(user);
+            userManager
+                .Setup(u => u.RemoveFromRoleAsync(user, role))
+                .ReturnsAsync(IdentityResult.Success);
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataSuccessMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => successMessage = message as string);
+
+            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null)
+            {
+                TempData = tempData.Object
+            };
+
+            //Assert
+            var result = await usersController.RemoveFromRole(new UserWithRoleFormViewModel() { Role = role, Username = username });
+
+            //Assert
+            successMessage.Should().Be(string.Format(RemoveFromRoleSuccessMessage, username, role));
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Details");
+            result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("Username");
+            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(username);
+        }
     }
 }
