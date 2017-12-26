@@ -1,6 +1,8 @@
 ﻿namespace FitStore.Tests.Web.Areas.Admin.Controllers
 {
     using Data.Models;
+    using FitStore.Services.Contracts;
+    using FitStore.Services.Models.Orders;
     using FitStore.Web.Areas.Admin.Controllers;
     using FitStore.Web.Areas.Admin.Models.Users;
     using FitStore.Web.Models.Pagination;
@@ -70,7 +72,7 @@
         public async Task Index_WithPageLessThanOneOrEqualToZero_ShouldReturnToIndex(int page)
         {
             //Arrange
-            UsersController usersController = new UsersController(null, null, null);
+            UsersController usersController = new UsersController(null, null, null, null, null);
 
             //Act
             var result = await usersController.Index(searchToken, page);
@@ -98,7 +100,7 @@
                 .Setup(a => a.TotalCountAsync(searchToken))
                 .ReturnsAsync(totalElements);
 
-            UsersController usersController = new UsersController(null, null, adminUserService.Object);
+            UsersController usersController = new UsersController(null, null, adminUserService.Object, null, null);
 
             //Act
             var result = await usersController.Index(searchToken, page);
@@ -126,7 +128,7 @@
                 .Setup(a => a.TotalCountAsync(searchToken))
                 .ReturnsAsync(totalElements);
 
-            UsersController usersController = new UsersController(null, null, adminUserService.Object);
+            UsersController usersController = new UsersController(null, null, adminUserService.Object, null, null);
 
             //Assert
             var result = await usersController.Index(searchToken, page);
@@ -162,7 +164,7 @@
                 .Setup(a => a.TotalCountAsync(searchToken))
                 .ReturnsAsync(totalElements);
 
-            UsersController usersController = new UsersController(null, null, adminUserService.Object);
+            UsersController usersController = new UsersController(null, null, adminUserService.Object, null, null);
 
             //Assert
             var result = await usersController.Index(searchToken, page);
@@ -199,7 +201,7 @@
                 .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
                 .Callback((string key, object message) => errorMessage = message as string);
 
-            UsersController usersController = new UsersController(null, userManager.Object, null)
+            UsersController usersController = new UsersController(null, userManager.Object, null, null, null)
             {
                 TempData = tempData.Object
             };
@@ -239,7 +241,7 @@
                 .Setup(a => a.GetDetailsByUsernameAsync(username))
                 .ReturnsAsync(new AdminUserDetailsServiceModel());
 
-            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, adminUserService.Object);
+            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, adminUserService.Object, null, null);
 
             //Assert
             var result = await usersController.Details(username);
@@ -255,6 +257,235 @@
             model.CurrentRoles.Last().Text.Should().Be(roles.Last().Name);
             model.CurrentRoles.Last().Value.Should().Be(roles.Last().Name);
             model.AllRoles.Should().HaveCount(0);
+        }
+
+        [Fact]
+        public async Task Orders_WithIncorrectUsername_ShouldReturnToIndex()
+        {
+            string errorMessage = null;
+
+            //Arrange
+            Mock<UserManager<User>> userManager = UserManagerMock.New();
+            userManager
+                .Setup(u => u.FindByNameAsync(username))
+                .ReturnsAsync(default(User));
+
+            Mock<ITempDataDictionary> tempData = new Mock<ITempDataDictionary>();
+            tempData
+                .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
+                .Callback((string key, object message) => errorMessage = message as string);
+
+            UsersController usersController = new UsersController(null, userManager.Object, null, null, null)
+            {
+                TempData = tempData.Object
+            };
+
+            //Act
+            var result = await usersController.Orders(username);
+
+            //Assert
+            errorMessage.Should().Be(string.Format(EntityNotFound, UserEntity));
+
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
+        }
+
+        [Theory]
+        [InlineData(-5)]
+        [InlineData(0)]
+        public async Task Orders_WithPageLessThanOneOrEqualToZero_ShouldReturnToOrders(int page)
+        {
+            //Arrange
+            Mock<UserManager<User>> userManager = UserManagerMock.New();
+            userManager
+                .Setup(u => u.FindByNameAsync(username))
+                .ReturnsAsync(user);
+
+            UsersController usersController = new UsersController(null, userManager.Object, null, null, null);
+
+            //Act
+            var result = await usersController.Orders(username, page);
+
+            //Assert
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Orders");
+            result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("username");
+            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(username);
+        }
+
+        [Fact]
+        public async Task Orders_WithPageBiggerThanOneAndBiggerThanTotalPages_ShouldReturnToOrders()
+        {
+            const int page = 10;
+            const int totalElements = 10;
+
+            //Arrange
+            Mock<UserManager<User>> userManager = UserManagerMock.New();
+            userManager
+                .Setup(u => u.FindByNameAsync(username))
+                .ReturnsAsync(user);
+
+            Mock<IAdminUserService> adminUserService = new Mock<IAdminUserService>();
+            adminUserService
+                .Setup(a => a.GetOrdersByUsernameAsync(username, page))
+                .ReturnsAsync(new AdminUserOrdersServiceModel());
+
+            Mock<IUserService> userService = new Mock<IUserService>();
+            userService
+                .Setup(u => u.TotalOrdersAsync(username))
+                .ReturnsAsync(totalElements);
+
+            UsersController usersController = new UsersController(null, userManager.Object, adminUserService.Object, userService.Object, null);
+
+            //Act
+            var result = await usersController.Orders(username, page);
+
+            //Assert
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Orders");
+            result.As<RedirectToActionResult>().RouteValues.Keys.Should().Contain("username");
+            result.As<RedirectToActionResult>().RouteValues.Values.Should().Contain(username);
+        }
+
+        [Fact]
+        public async Task Orders_WithTotalPagesEqualToOne_ShouldReturnValidPaginationModelAndValidViewModel()
+        {
+            const int page = 1;
+            const int totalElements = OrderPageSize;
+
+            //Arrange
+            Mock<UserManager<User>> userManager = UserManagerMock.New();
+            userManager
+                .Setup(u => u.FindByNameAsync(username))
+                .ReturnsAsync(user);
+
+            Mock<IAdminUserService> adminUserService = new Mock<IAdminUserService>();
+            adminUserService
+                .Setup(a => a.GetOrdersByUsernameAsync(username, page))
+                .ReturnsAsync(new AdminUserOrdersServiceModel());
+
+            Mock<IUserService> userService = new Mock<IUserService>();
+            userService
+                .Setup(u => u.TotalOrdersAsync(username))
+                .ReturnsAsync(totalElements);
+
+            UsersController usersController = new UsersController(null, userManager.Object, adminUserService.Object, userService.Object, null);
+
+            //Assert
+            var result = await usersController.Orders(username, page);
+
+            //Assert
+            result.Should().BeOfType<ViewResult>();
+
+            result.As<ViewResult>().Model.Should().BeOfType<PagingElementViewModel<AdminUserOrdersServiceModel>>();
+
+            PagingElementViewModel<AdminUserOrdersServiceModel> model = result.As<ViewResult>().Model.As<PagingElementViewModel<AdminUserOrdersServiceModel>>();
+
+            model.Pagination.CurrentPage.Should().Be(page);
+            model.Pagination.PreviousPage.Should().Be(page);
+            model.Pagination.NextPage.Should().Be(page);
+            model.Pagination.TotalPages.Should().Be(page);
+            model.Pagination.TotalElements.Should().Be(totalElements);
+            model.Pagination.PageSize.Should().Be(OrderPageSize);
+        }
+
+        [Fact]
+        public async Task Orders_WithCorrectPage_ShouldReturnViewResultWithValidViewModel()
+        {
+            const int page = 3;
+            const int totalElements = 10;
+
+            //Arrange
+            Mock<UserManager<User>> userManager = UserManagerMock.New();
+            userManager
+                .Setup(u => u.FindByNameAsync(username))
+                .ReturnsAsync(user);
+
+            Mock<IAdminUserService> adminUserService = new Mock<IAdminUserService>();
+            adminUserService
+                .Setup(a => a.GetOrdersByUsernameAsync(username, page))
+                .ReturnsAsync(new AdminUserOrdersServiceModel());
+
+            Mock<IUserService> userService = new Mock<IUserService>();
+            userService
+                .Setup(u => u.TotalOrdersAsync(username))
+                .ReturnsAsync(totalElements);
+
+            UsersController usersController = new UsersController(null, userManager.Object, adminUserService.Object, userService.Object, null);
+
+            //Assert
+            var result = await usersController.Orders(username, page);
+
+            //Assert
+            result.Should().BeOfType<ViewResult>();
+
+            result.As<ViewResult>().Model.Should().BeOfType<PagingElementViewModel<AdminUserOrdersServiceModel>>();
+
+            PagingElementViewModel<AdminUserOrdersServiceModel> model = result.As<ViewResult>().Model.As<PagingElementViewModel<AdminUserOrdersServiceModel>>();
+
+            model.Pagination.CurrentPage.Should().Be(page);
+            model.Pagination.PreviousPage.Should().Be(2);
+            model.Pagination.NextPage.Should().Be(4);
+            model.Pagination.TotalPages.Should().Be(4);
+            model.Pagination.TotalElements.Should().Be(totalElements);
+            model.Pagination.PageSize.Should().Be(OrderPageSize);
+        }
+
+        [Fact]
+        public async Task Review_WithIncorrectOrderId_ShouldReturnToIndex()
+        {
+            const int nonExistingOrderId = int.MaxValue;
+
+            //Arrange
+            Mock<IOrderService> orderService = new Mock<IOrderService>();
+            orderService
+                .Setup(o => o.IsOrderExistingById(nonExistingOrderId))
+                .ReturnsAsync(false);
+
+            UsersController usersController = new UsersController(null, null, null, null, orderService.Object);
+
+            //Assert
+            var result = await usersController.Review(nonExistingOrderId);
+
+            //Assert
+            result.Should().BeOfType<RedirectToActionResult>();
+
+            result.As<RedirectToActionResult>().ActionName.Should().Be("Index");
+        }
+
+        [Fact]
+        public async Task Review_WithCorrectOrderId_ShouldReturnValidViewModel()
+        {
+            const int orderId = 1;
+
+            //Arrange
+            Mock<IOrderService> orderService = new Mock<IOrderService>();
+            orderService
+                .Setup(o => o.IsOrderExistingById(orderId))
+                .ReturnsAsync(true);
+            orderService
+                .Setup(o => o.GetDetailsByIdAsync(orderId))
+                .ReturnsAsync(new OrderDetailsServiceModel());
+
+            Mock<IAdminUserService> adminUserService = new Mock<IAdminUserService>();
+            adminUserService
+                .Setup(a => a.GetUsernameByOrderIdAsync(orderId))
+                .ReturnsAsync(username);
+
+            UsersController usersController = new UsersController(null, null, adminUserService.Object, null, orderService.Object);
+
+            //Assert
+            var result = await usersController.Review(orderId);
+
+            //Assert
+            result.Should().BeOfType<ViewResult>();
+            result.As<ViewResult>().ViewData.Keys.Should().Contain("Username");
+            result.As<ViewResult>().ViewData.Values.Should().Contain(username);
+
+            result.As<ViewResult>().Model.Should().BeOfType<OrderDetailsServiceModel>();
         }
 
         [Fact]
@@ -278,7 +509,7 @@
                 .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
                 .Callback((string key, object message) => errorMessage = message as string);
 
-            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null)
+            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null, null, null)
             {
                 TempData = tempData.Object
             };
@@ -319,7 +550,7 @@
                 .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
                 .Callback((string key, object message) => errorMessage = message as string);
 
-            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null)
+            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null, null, null)
             {
                 TempData = tempData.Object
             };
@@ -358,7 +589,7 @@
                 .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
                 .Callback((string key, object message) => errorMessage = message as string);
 
-            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null)
+            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null, null, null)
             {
                 TempData = tempData.Object
             };
@@ -400,7 +631,7 @@
                 .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
                 .Callback((string key, object message) => errorMessage = message as string);
 
-            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null)
+            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null, null, null)
             {
                 TempData = tempData.Object
             };
@@ -442,7 +673,7 @@
                 .SetupSet(t => t[TempDataSuccessMessageKey] = It.IsAny<string>())
                 .Callback((string key, object message) => successMessage = message as string);
 
-            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null)
+            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null, null, null)
             {
                 TempData = tempData.Object
             };
@@ -481,7 +712,7 @@
                 .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
                 .Callback((string key, object message) => errorMessage = message as string);
 
-            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null)
+            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null, null, null)
             {
                 TempData = tempData.Object
             };
@@ -522,7 +753,7 @@
                 .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
                 .Callback((string key, object message) => errorMessage = message as string);
 
-            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null)
+            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null, null, null)
             {
                 TempData = tempData.Object
             };
@@ -561,7 +792,7 @@
                 .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
                 .Callback((string key, object message) => errorMessage = message as string);
 
-            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null)
+            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null, null, null)
             {
                 TempData = tempData.Object
             };
@@ -603,7 +834,7 @@
                 .SetupSet(t => t[TempDataErrorMessageKey] = It.IsAny<string>())
                 .Callback((string key, object message) => errorMessage = message as string);
 
-            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null)
+            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null, null, null)
             {
                 TempData = tempData.Object
             };
@@ -645,7 +876,7 @@
                 .SetupSet(t => t[TempDataSuccessMessageKey] = It.IsAny<string>())
                 .Callback((string key, object message) => successMessage = message as string);
 
-            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null)
+            UsersController usersController = new UsersController(roleManager.Object, userManager.Object, null, null, null)
             {
                 TempData = tempData.Object
             };

@@ -10,6 +10,10 @@
 
         Task<AdminUserDetailsServiceModel> GetDetailsByUsernameAsync(string username);
 
+        Task<AdminUserOrdersServiceModel> GetOrdersByUsernameAsync(string username, int page);
+
+        Task<string> GetUsernameByOrderIdAsync(int orderId);
+
         Task<int> TotalCountAsync(string searchToken);
     }
 }

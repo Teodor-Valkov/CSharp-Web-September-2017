@@ -1,0 +1,94 @@
+﻿@model PagingElementViewModel<AdminUserOrdersServiceModel>
+
+@{
+    ViewData["Title"] = $"Orders";
+}
+
+<div class="row">
+    <div class="col-md-offset-2 col-md-8">
+        <br />
+        <h2 class="text-center">Details</h2>
+
+        <table class="table table-bordered table-responsive">
+            <tr>
+                <th><label asp-for="@Model.Element.Username"></label></th>
+                <td>@Model.Element.Username</td>
+            </tr>
+            <tr>
+                <th><label asp-for="@Model.Element.FullName"></label></th>
+                <td>@Model.Element.FullName</td>
+            </tr>
+            <tr>
+                <th><label asp-for="@Model.Element.Email"></label></th>
+                <td>@Model.Element.Email</td>
+            </tr>
+            <tr>
+                <th><label asp-for="@Model.Element.Address"></label></th>
+                <td>@Model.Element.Address</td>
+            </tr>
+            <tr>
+                <th><label asp-for="@Model.Element.PhoneNumber"></label></th>
+                <td>@Model.Element.PhoneNumber</td>
+            </tr>
+            <tr>
+                <th><label asp-for="@Model.Element.BirthDate"></label></th>
+                <td>@Model.Element.BirthDate.ToShortDateString()</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+@if (Model.Element.Orders.Any())
+{
+
+    <h3 class="text-center">@ViewData["Title"]</h3>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-offset-2 col-md-8">
+            <table class="table table-bordered table-responsive">
+                <thead>
+                    <tr>
+                        <th class="text-center">Order Date</th>
+                        <th class="text-center">Supplements Ordered</th>
+                        <th class="text-center">Total Price</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+
+                @foreach (var order in Model.Element.Orders)
+                {
+                    <tbody>
+                        <tr class="text-center">
+                            <td>@order.PurchaseDate.ToShortDateString()</td>
+                            <td>@order.Supplements</td>
+                            <td>@order.TotalPrice &euro;</td>
+                            <td>
+                                <a asp-action="Review" asp-route-id="@order.Id" asp-route-username="@Model.Element.Username" class="btn btn-primary btn-sm">Details</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                }
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-offset-2 col-md-8">
+            <h3 class="text-center">User has no orders.</h3>
+        </div>
+    </div>
+}
+
+<div class="text-center">
+    @if (Model.Pagination.TotalPages > 1)
+    {
+        string actionLink = $"/admin/users/orders?username={Model.Element.Username}&";
+
+        Model.Pagination.ActionLink = actionLink;
+
+        @Html.Partial("_Pagination", Model.Pagination)
+    }
+</div>

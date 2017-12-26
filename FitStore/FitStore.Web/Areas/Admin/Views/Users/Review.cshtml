@@ -1,0 +1,24 @@
+﻿@model OrderDetailsServiceModel
+
+@{
+    ViewData["Title"] = $"Order Review";
+}
+
+<div class="row">
+    <br />
+
+    <div class="col-12 text-center">
+        <h2>@ViewData["Title"]</h2>
+    </div>
+    <br />
+    <br />
+    
+    @Html.Partial("_Review", Model.Supplements)
+
+
+    <div class="text-center">
+        <h2>Order Date: @Model.PurchaseDate.ToShortDateString()</h2>
+        <h2>Total Price: @Model.TotalPrice &euro;</h2>
+        <a asp-action="Orders" asp-route-username="@ViewData["Username"]" class="btn btn-default">Back</a>
+    </div>
+</div>

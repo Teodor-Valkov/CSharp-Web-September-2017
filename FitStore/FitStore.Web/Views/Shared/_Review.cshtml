@@ -1,0 +1,33 @@
+﻿@model IEnumerable<SupplementInOrderServiceModel>
+
+<table class="table table-bordered table-responsive">
+    <thead>
+        <tr>
+            <th class="text-center">Picture</th>
+            <th class="text-center">Name</th>
+            <th class="text-center">Manufacturer</th>
+            <th class="text-center">Price</th>
+            <th class="text-center">Quantity</th>
+            <th class="text-center">Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var supplement in Model)
+        {
+            <tr class="text-center">
+                <td>
+                    <a asp-area="" asp-controller="Supplements" asp-action="Details" asp-route-id="@supplement.Id" asp-route-name="@supplement.Name" asp-route-returnUrl=@Context.Request.Path>
+                        <img id="supplements-index-image" src="@supplement.Picture" alt="supplement-picture">
+                    </a>
+                </td>
+                <td>@supplement.Name</td>
+                <td>@supplement.ManufacturerName</td>
+                <td>@supplement.Price &euro;</td>
+                <td>@supplement.Quantity</td>
+                <td>@(supplement.Price * supplement.Quantity) &euro;</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<br />

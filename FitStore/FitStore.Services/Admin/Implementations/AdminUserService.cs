@@ -4,7 +4,6 @@
     using Contracts;
     using Data;
     using Data.Models;
-    using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
     using Models.Users;
     using System.Collections.Generic;
@@ -46,6 +45,24 @@
               .Where(u => u.UserName.ToLower() == username.ToLower())
               .ProjectTo<AdminUserDetailsServiceModel>()
               .FirstOrDefaultAsync();
+        }
+
+        public async Task<AdminUserOrdersServiceModel> GetOrdersByUsernameAsync(string username, int page)
+        {
+            return await this.database
+              .Users
+              .Where(u => u.UserName.ToLower() == username.ToLower())
+              .ProjectTo<AdminUserOrdersServiceModel>(new { username, page })
+              .FirstOrDefaultAsync();
+        }
+
+        public async Task<string> GetUsernameByOrderIdAsync(int orderId)
+        {
+            return await this.database
+                .Orders
+                .Where(o => o.Id == orderId)
+                .Select(o => o.User.UserName)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<int> TotalCountAsync(string searchToken)

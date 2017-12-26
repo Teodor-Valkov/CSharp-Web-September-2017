@@ -1,15 +1,16 @@
 ﻿namespace FitStore.Web.Areas.Admin.Controllers
 {
     using Data.Models;
+    using FitStore.Services.Models.Orders;
     using Infrastructure.Extensions;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
-    using Microsoft.EntityFrameworkCore;
     using Models.Users;
     using Services.Admin.Contracts;
     using Services.Admin.Models.Users;
+    using Services.Contracts;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -27,12 +28,16 @@
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly UserManager<User> userManager;
         private readonly IAdminUserService adminUserService;
+        private readonly IUserService userService;
+        private readonly IOrderService orderService;
 
-        public UsersController(RoleManager<IdentityRole> roleManager, UserManager<User> userManager, IAdminUserService adminUserService)
+        public UsersController(RoleManager<IdentityRole> roleManager, UserManager<User> userManager, IAdminUserService adminUserService, IUserService userService, IOrderService orderService)
         {
             this.roleManager = roleManager;
             this.userManager = userManager;
             this.adminUserService = adminUserService;
+            this.userService = userService;
+            this.orderService = orderService;
         }
 
         public async Task<IActionResult> Index(string searchToken, int page = MinPage)
@@ -99,6 +104,59 @@
 
             model.CurrentRoles = currentRoles;
             model.AllRoles = allRoles;
+
+            return View(model);
+        }
+
+        public async Task<IActionResult> Orders(string username, int page = MinPage)
+        {
+            User user = await this.userManager.FindByNameAsync(username);
+
+            if (user == null)
+            {
+                TempData.AddErrorMessage(string.Format(EntityNotFound, UserEntity));
+
+                return this.RedirectToAction(nameof(Index));
+            }
+
+            if (page < MinPage)
+            {
+                return RedirectToAction(nameof(Orders), new { username });
+            }
+
+            PagingElementViewModel<AdminUserOrdersServiceModel> model = new PagingElementViewModel<AdminUserOrdersServiceModel>
+            {
+                Element = await this.adminUserService.GetOrdersByUsernameAsync(username, page),
+                Pagination = new PaginationViewModel
+                {
+                    TotalElements = await this.userService.TotalOrdersAsync(username),
+                    PageSize = OrderPageSize,
+                    CurrentPage = page
+                }
+            };
+
+            if (page > MinPage && page > model.Pagination.TotalPages)
+            {
+                return RedirectToAction(nameof(Orders), new { username });
+            }
+
+            return View(model);
+        }
+
+        public async Task<IActionResult> Review(int id)
+        {
+            bool isOrderExistingById = await this.orderService.IsOrderExistingById(id);
+
+            if (!isOrderExistingById)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            OrderDetailsServiceModel model = await this.orderService.GetDetailsByIdAsync(id);
+
+            string username = await this.adminUserService.GetUsernameByOrderIdAsync(id);
+
+            ViewData["Username"] = username;
 
             return View(model);
         }
