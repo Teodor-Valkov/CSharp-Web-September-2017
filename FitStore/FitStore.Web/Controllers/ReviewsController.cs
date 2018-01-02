@@ -73,7 +73,7 @@
                 return this.RedirectToHomeIndex();
             }
 
-            ReviewDetailsServiceModel model = await this.reviewService.GeDetailsByIdAsync(id);
+            ReviewDetailsServiceModel model = await this.reviewService.GetDetailsByIdAsync(id);
 
             return View(model);
         }

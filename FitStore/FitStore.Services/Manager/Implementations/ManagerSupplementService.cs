@@ -162,14 +162,9 @@
                   .Where(s => s.Id == supplementId)
                   .FirstOrDefaultAsync();
 
-            if (name == supplement.Name && description == supplement.Description && quantity == supplement.Quantity
-                && price == supplement.Price && picture.SequenceEqual(supplement.Picture) && bestBeforeDate == supplement.BestBeforeDate
-                && subcategoryId == supplement.SubcategoryId && manufacturerId == supplement.ManufacturerId)
-            {
-                return false;
-            }
+            bool isSupplementModified = this.CheckIfSupplementIsModified(supplement, name, description, quantity, price, picture, bestBeforeDate, subcategoryId, manufacturerId);
 
-            return true;
+            return isSupplementModified;
         }
 
         public async Task<int> TotalCountAsync(bool isDeleted, string searchToken)
@@ -186,6 +181,18 @@
               .Supplements
               .Where(s => s.IsDeleted == isDeleted && s.Name.ToLower().Contains(searchToken.ToLower()))
               .CountAsync();
+        }
+
+        private bool CheckIfSupplementIsModified(Supplement supplement, string name, string description, int quantity, decimal price, byte[] picture, DateTime bestBeforeDate, int subcategoryId, int manufacturerId)
+        {
+            if (name == supplement.Name && description == supplement.Description && quantity == supplement.Quantity
+                && price == supplement.Price && picture.SequenceEqual(supplement.Picture) && bestBeforeDate.Date == supplement.BestBeforeDate.Date
+                && subcategoryId == supplement.SubcategoryId && manufacturerId == supplement.ManufacturerId)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

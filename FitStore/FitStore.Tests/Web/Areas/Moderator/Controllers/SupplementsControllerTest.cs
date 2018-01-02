@@ -1,5 +1,9 @@
 ﻿namespace FitStore.Tests.Web.Areas.Moderator.Controllers
 {
+    using FitStore.Services.Contracts;
+    using FitStore.Services.Models.Comments;
+    using FitStore.Services.Moderator.Contracts;
+    using FitStore.Services.Moderator.Models.Supplements;
     using FitStore.Web.Areas.Moderator.Controllers;
     using FitStore.Web.Models.Pagination;
     using FluentAssertions;
@@ -7,10 +11,8 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.ViewFeatures;
     using Moq;
-    using Services.Moderator.Contracts;
-    using Services.Moderator.Models.Supplements;
-    using Services.Contracts;
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using Xunit;
@@ -18,8 +20,6 @@
     using static Common.CommonConstants;
     using static Common.CommonMessages;
     using static FitStore.Web.WebConstants;
-    using FitStore.Services.Models.Comments;
-    using System.Collections.Generic;
 
     public class SupplementsControllerTest
     {

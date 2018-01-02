@@ -34,7 +34,7 @@
                .ToListAsync();
         }
 
-        public async Task<ReviewDetailsServiceModel> GeDetailsByIdAsync(int reviewId)
+        public async Task<ReviewDetailsServiceModel> GetDetailsByIdAsync(int reviewId)
         {
             return await this.database
                .Reviews

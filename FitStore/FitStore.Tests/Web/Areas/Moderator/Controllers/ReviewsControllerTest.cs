@@ -1,16 +1,15 @@
 ﻿namespace FitStore.Tests.Web.Areas.Moderator.Controllers
 {
+    using FitStore.Services.Contracts;
+    using FitStore.Services.Models.Reviews;
+    using FitStore.Services.Moderator.Contracts;
     using FitStore.Web.Areas.Moderator.Controllers;
     using FitStore.Web.Models.Pagination;
     using FluentAssertions;
     using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.ViewFeatures;
     using Moq;
-    using Services.Contracts;
-    using Services.Models.Reviews;
-    using Services.Moderator.Contracts;
     using System;
     using System.Collections.Generic;
     using System.Linq;

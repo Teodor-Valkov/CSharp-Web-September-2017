@@ -1,6 +1,8 @@
 ﻿namespace FitStore.Tests.Web.Controllers
 {
     using Data.Models;
+    using FitStore.Services.Contracts;
+    using FitStore.Services.Models.Reviews;
     using FitStore.Web.Controllers;
     using FitStore.Web.Models.Pagination;
     using FitStore.Web.Models.Reviews;
@@ -12,8 +14,6 @@
     using Microsoft.AspNetCore.Mvc.ViewFeatures;
     using Mocks;
     using Moq;
-    using Services.Contracts;
-    using Services.Models.Reviews;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
@@ -221,7 +221,7 @@
                 .Setup(r => r.IsReviewExistingById(reviewId, false))
                 .ReturnsAsync(true);
             reviewService
-                .Setup(r => r.GeDetailsByIdAsync(reviewId))
+                .Setup(r => r.GetDetailsByIdAsync(reviewId))
                 .ReturnsAsync(new ReviewDetailsServiceModel { });
 
             ReviewsController reviewsController = new ReviewsController(null, reviewService.Object, null, null);

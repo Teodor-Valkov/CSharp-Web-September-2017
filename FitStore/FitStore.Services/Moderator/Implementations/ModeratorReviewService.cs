@@ -26,7 +26,7 @@
         {
             return await this.database
                .Reviews
-               .OrderBy(r => r.PublishDate)
+               .OrderByDescending(r => r.PublishDate)
                .Skip((page - 1) * ReviewPageSize)
                .Take(ReviewPageSize)
                .ProjectTo<ReviewAdvancedServiceModel>()

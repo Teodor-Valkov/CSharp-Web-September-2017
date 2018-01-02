@@ -1,6 +1,8 @@
 ﻿namespace FitStore.Tests.Web.Areas.Moderator.Controllers
 {
     using FitStore.Data.Models;
+    using FitStore.Services.Moderator.Contracts;
+    using FitStore.Services.Moderator.Models.Users;
     using FitStore.Tests.Mocks;
     using FitStore.Web.Areas.Moderator.Controllers;
     using FitStore.Web.Models.Pagination;
@@ -10,8 +12,6 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.ViewFeatures;
     using Moq;
-    using Services.Moderator.Contracts;
-    using Services.Moderator.Models.Users;
     using System;
     using System.Collections.Generic;
     using System.Linq;

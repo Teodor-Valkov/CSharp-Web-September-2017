@@ -3,6 +3,7 @@
     using AutoMapper.QueryableExtensions;
     using Contracts;
     using Data;
+    using Data.Models;
     using Models.Supplements;
     using Microsoft.EntityFrameworkCore;
     using System.Linq;
@@ -10,7 +11,6 @@
     using System.Collections.Generic;
 
     using static Common.CommonConstants;
-    using FitStore.Data.Models;
 
     public class SupplementService : ISupplementService
     {

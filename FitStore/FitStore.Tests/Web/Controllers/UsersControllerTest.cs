@@ -1,6 +1,8 @@
 ﻿namespace FitStore.Tests.Web.Controllers
 {
     using Data.Models;
+    using FitStore.Services.Contracts;
+    using FitStore.Services.Models.Users;
     using FitStore.Web.Controllers;
     using FitStore.Web.Models.Pagination;
     using FluentAssertions;
@@ -10,8 +12,6 @@
     using Microsoft.AspNetCore.Mvc.ViewFeatures;
     using Mocks;
     using Moq;
-    using Services.Contracts;
-    using Services.Models.Users;
     using System;
     using System.Linq;
     using System.Threading.Tasks;

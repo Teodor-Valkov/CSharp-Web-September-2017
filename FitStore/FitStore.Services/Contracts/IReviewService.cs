@@ -10,7 +10,7 @@
 
         Task CreateAsync(string content, int rating, string authorId, int supplementId);
 
-        Task<ReviewDetailsServiceModel> GeDetailsByIdAsync(int reviewId);
+        Task<ReviewDetailsServiceModel> GetDetailsByIdAsync(int reviewId);
 
         Task<ReviewBasicServiceModel> GetEditModelAsync(int reviewId);
 

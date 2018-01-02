@@ -62,20 +62,20 @@
                 .AnyAsync(m => m.Id != manufacturerId && m.Name.ToLower() == name.ToLower());
         }
 
-        public async Task<int> TotalCountAsync()
-        {
-            return await this.database
-                .Manufacturers
-                .Where(m => m.IsDeleted == false)
-                .CountAsync();
-        }
-
         public async Task<int> TotalSupplementsCountAsync(int manufacturerId)
         {
             return await this.database
                 .Manufacturers
                 .Where(m => m.Id == manufacturerId)
                 .SumAsync(m => m.Supplements.Count(s => s.IsDeleted == false));
+        }
+
+        public async Task<int> TotalCountAsync()
+        {
+            return await this.database
+                .Manufacturers
+                .Where(m => m.IsDeleted == false)
+                .CountAsync();
         }
     }
 }

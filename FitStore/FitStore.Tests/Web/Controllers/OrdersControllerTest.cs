@@ -1,6 +1,10 @@
 ﻿namespace FitStore.Tests.Web.Controllers
 {
     using Data.Models;
+    using FitStore.Services.Contracts;
+    using FitStore.Services.Models;
+    using FitStore.Services.Models.Orders;
+    using FitStore.Services.Models.Supplements;
     using FitStore.Web.Controllers;
     using FluentAssertions;
     using Microsoft.AspNetCore.Authorization;
@@ -11,10 +15,6 @@
     using Mocks;
     using Moq;
     using Newtonsoft.Json;
-    using Services.Contracts;
-    using Services.Models;
-    using Services.Models.Orders;
-    using Services.Models.Supplements;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;

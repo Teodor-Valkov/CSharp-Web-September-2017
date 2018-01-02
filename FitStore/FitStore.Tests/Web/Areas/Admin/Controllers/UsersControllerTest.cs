@@ -1,6 +1,8 @@
 ﻿namespace FitStore.Tests.Web.Areas.Admin.Controllers
 {
     using Data.Models;
+    using FitStore.Services.Admin.Contracts;
+    using FitStore.Services.Admin.Models.Users;
     using FitStore.Services.Contracts;
     using FitStore.Services.Models.Orders;
     using FitStore.Web.Areas.Admin.Controllers;
@@ -13,8 +15,6 @@
     using Microsoft.AspNetCore.Mvc.ViewFeatures;
     using Mocks;
     using Moq;
-    using Services.Admin.Contracts;
-    using Services.Admin.Models.Users;
     using System;
     using System.Collections.Generic;
     using System.Linq;

@@ -1,5 +1,8 @@
 ﻿namespace FitStore.Tests.Web.Areas.Manager.Controllers
 {
+    using FitStore.Services.Contracts;
+    using FitStore.Services.Manager.Contracts;
+    using FitStore.Services.Models.Manufacturers;
     using FitStore.Web.Areas.Manager.Controllers;
     using FitStore.Web.Areas.Manager.Models.Manufacturers;
     using FitStore.Web.Models.Pagination;
@@ -8,14 +11,10 @@
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.ViewFeatures;
     using Moq;
-    using Services.Contracts;
-    using Services.Manager.Contracts;
-    using Services.Models.Manufacturers;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Web.Controllers;
     using Xunit;
 
     using static Common.CommonConstants;

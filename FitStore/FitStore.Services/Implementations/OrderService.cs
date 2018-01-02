@@ -159,7 +159,8 @@
                 {
                     OrderId = order.Id,
                     SupplementId = supplementInCart.Id,
-                    Quantity = supplementInCart.Quantity
+                    Quantity = supplementInCart.Quantity,
+                    Price = supplementInCart.Price
                 };
 
                 order.Supplements.Add(supplement);

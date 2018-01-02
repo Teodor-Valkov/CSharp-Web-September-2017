@@ -1,14 +1,14 @@
 ﻿namespace FitStore.Tests.Web.Controllers
 {
+    using FitStore.Services.Contracts;
+    using FitStore.Services.Models.Manufacturers;
+    using FitStore.Services.Models.Supplements;
     using FitStore.Web.Controllers;
     using FitStore.Web.Models.Pagination;
     using FluentAssertions;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.ViewFeatures;
     using Moq;
-    using Services.Contracts;
-    using Services.Models.Manufacturers;
-    using Services.Models.Supplements;
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Xunit;
